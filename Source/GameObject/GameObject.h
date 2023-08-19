@@ -37,13 +37,13 @@ public:
 	 * シーンの取得
 	 * @return owner_scene
 	 */
-	class SceneBase* GetOwnerScene() const { return owner_scene; }
+	//class SceneBase* GetOwnerScene() const { return owner_scene; }
 
 	/**
 	 * シーンのセット
 	 * @param	new_owner_scene	セットするPosition
 	 */
-	void SetOwnerScene(class SceneBase* new_owner_scene);
+	//void SetOwnerScene(class SceneBase* new_owner_scene);
 
 	/**
 	 * Positionの取得
@@ -71,7 +71,7 @@ public:
 
 private:
 	// オーナーとなるシーン
-	class SceneBase* owner_scene;
+	//class SceneBase* owner_scene;
 
 	// 位置
 	Vector2D position;
