@@ -10,7 +10,9 @@
 class StageObject : public GameObject {
 
 private:
-	// ˆÊ’u
+	/// <summary>
+	/// ˆÊ’u
+	/// </summary>
 	Vector2D position;
 
 	/// <summary>
@@ -19,8 +21,10 @@ private:
 	BoxCollisionParams body_collision;
 
 public:
-	virtual void Update(float delta_seconds) {}
-	virtual void Draw(const Vector2D& screen_offset) {}
+	/// <inheritdoc/>
+	virtual void Update(float delta_seconds) override {}
+	///  <inheritdoc/>
+	virtual void Draw(const Vector2D& screen_offset) override {}
 
 public:
 	StageObject();
