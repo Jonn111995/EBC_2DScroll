@@ -17,15 +17,16 @@ public:
 	 */
 	virtual void Initialize() {}
 
-	/**
-	 * 更新
-	 * @param	delta_seconds	前フレームとの差分時間(s)
-	 */
+	/// <summary>
+	/// 更新
+	/// </summary>
+	/// <param name="delta_seconds">前フレームとの差分時間(s)</param>
 	virtual void Update(float delta_seconds) {}
 
-	/**
-	 * 描画
-	 */
+	/// <summary>
+	/// 描画
+	/// </summary>
+	/// <param name="screen_offset"></param>
 	virtual void Draw(const Vector2D& screen_offset) {}
 
 	/**
