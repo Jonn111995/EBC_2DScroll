@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Utility/Vector2D.h"
+class Vector2D;
 
 /**
  * ゲーム内に表示されるオブジェクトの基底クラス
@@ -46,18 +46,6 @@ public:
 	//void SetOwnerScene(class SceneBase* new_owner_scene);
 
 	/**
-	 * Positionの取得
-	 * @return	position
-	 */
-	Vector2D GetPosition() const { return position; }
-
-	/**
-	 * Positionのセット
-	 * @param	new_position	セットするPosition
-	 */
-	void SetPosition(const Vector2D& new_position);
-
-	/**
 	 * 描画順の取得
 	 * @return	draw_sort_priority
 	 */
@@ -67,14 +55,11 @@ public:
 	 * 描画順のセット
 	 * @param	new_priority	セットする描画順
 	 */
-	void SetDrawSortPriority(int new_priority);
+	void SetDrawSortPriority(const int new_priority);
 
 private:
 	// オーナーとなるシーン
 	//class SceneBase* owner_scene;
-
-	// 位置
-	Vector2D position;
 
 	// 描画順。数値が小さい順から描画を行う
 	int draw_sort_priority;
