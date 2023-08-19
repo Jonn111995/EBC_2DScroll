@@ -4,6 +4,7 @@
 #include <string>
 #include "../Utility/Vector2D.h"
 #include "../GameObject/GameObject.h"
+#include "../GameObject/StageObject/StageObject.h"
 
 /**
  * シーンタイプ
@@ -62,7 +63,7 @@ public:
 	{
 		// GameObjectの生成
 		T* new_instance = new T();
-		GameObject* new_object = dynamic_cast<GameObject*>(new_instance);
+		StageObject* new_object = dynamic_cast<StageObject*>(new_instance);
 
 		// GameObjectを派生していない場合は、破棄して終了する
 		if (new_object == nullptr)
@@ -73,7 +74,7 @@ public:
 		}
 
 		// GameObjectの初期化
-		new_object->SetOwnerScene(this);
+		//new_object->SetOwnerScene(this);
 		new_object->SetPosition(position);
 		new_object->Initialize();
 		objects.push_back(new_object);

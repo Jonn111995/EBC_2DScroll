@@ -1,6 +1,7 @@
 #include "SampleObject.h"
 
 #include "DxLib.h"
+#include <vector>
 
 SampleObject::SampleObject()
 	: loaded_sprite_handle(0)
@@ -15,15 +16,21 @@ SampleObject::~SampleObject()
 void SampleObject::Initialize()
 {
 	__super::Initialize();
+	count = 0;
 
 	// ‰æ‘œ‚Ì“Ç‚Ýž‚Ý
 	loaded_sprite_handle = LoadGraph(_T("Resources/Images/collon_wait.bmp"));
+	LoadDivGraph(_T("Resources/Images/collon_wait.bmp"),4,4,1,128,128,loaded_sprits);
 }
 
 void SampleObject::Update(float delta_seconds)
 {
 	__super::Update(delta_seconds);
 
+	count += delta_seconds *2.0f;
+	if (count >= 4.0f) {
+		count = 0.0f;
+	}
 	// “®‚©‚·
 	Vector2D input_dir;
 	if (CheckHitKey(KEY_INPUT_A) == 1)
@@ -53,10 +60,12 @@ void SampleObject::Draw(const Vector2D& screen_offset)
 {
 	__super::Draw(screen_offset);
 
+	int num = static_cast<int>(count);
 	// ‰æ‘œ‚Ì•`‰æ
 	int x, y;
 	GetPosition().ToInt(x, y);
-	DrawGraph(x, y, loaded_sprite_handle, true);
+	DrawGraph(x, y, loaded_sprits[0], true);
+
 }
 
 void SampleObject::Finalize()
