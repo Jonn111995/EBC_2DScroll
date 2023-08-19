@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../GameObject.h"
+#include "../StageObject/StageObject.h"
+#include <vector>
 
 class Vector2D;
 
@@ -8,12 +9,12 @@ class Vector2D;
  * サンプルオブジェクト
  * サンプル用に簡易的に実装
  */
-class SampleObject : public GameObject
+class SampleObject : public StageObject
 {
 public:
 	SampleObject();
 	virtual ~SampleObject();
-
+	float count = 0.0f;
 public:
 	//~ Begin GameObject interface
 	virtual void Initialize() override;
@@ -24,4 +25,5 @@ public:
 
 private:
 	int loaded_sprite_handle;
+	int loaded_sprits[4];
 };

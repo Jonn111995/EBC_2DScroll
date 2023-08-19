@@ -12,9 +12,9 @@ public:
 	virtual ~GameObject() {}
 
 public:
-	/**
-	 * ‰Šú‰»
-	 */
+	/// <summary>
+	/// ‰Šú‰»
+	/// </summary>
 	virtual void Initialize() {}
 
 	/// <summary>
@@ -29,9 +29,9 @@ public:
 	/// <param name="screen_offset"></param>
 	virtual void Draw(const Vector2D& screen_offset) {}
 
-	/**
-	 * ‰ğ•ú
-	 */
+	/// <summary>
+	/// ‰ğ•ú
+	/// </summary>
 	virtual void Finalize() {}
 
 	/**

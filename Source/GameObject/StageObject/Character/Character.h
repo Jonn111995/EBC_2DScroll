@@ -1,5 +1,5 @@
 #pragma once
-#include "StageObject.h"
+#include "../Source/GameObject/StageObject/StageObject.h"
 class Character :
     public StageObject
 {
@@ -27,8 +27,12 @@ private:
     bool bIsMove;
 
 public:
+    /// <inheritdoc/>
+    virtual void Initialize() override {}
+    /// <inheritdoc/>
+    virtual void Finalize() override {}
     virtual void Update(float delta_time) override {};
-    virtual void Draw(Vector2D& screen_offset) override {};
+    virtual void Draw(const Vector2D& screen_offset) override {};
     virtual void OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision) override {};
 
 public:
@@ -64,7 +68,7 @@ public:
     /// <summary>
     /// ˆÚ“®‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©‚ğæ“¾
     /// </summary>
-    void GetbIsMove() const { return bIsMove; }
+    bool GetbIsMove() const { return bIsMove; }
 
     /// <summary>
     /// ƒ_ƒ[ƒW‚ğ—^‚¦‚é
