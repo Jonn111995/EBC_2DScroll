@@ -2,6 +2,8 @@
 
 #include "../GameObject.h"
 
+class Vector2D;
+
 /**
  * サンプルオブジェクト
  * サンプル用に簡易的に実装
