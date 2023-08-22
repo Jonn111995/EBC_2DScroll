@@ -23,6 +23,7 @@ public:
 	Vector2D& operator *=(float in_scalar);
 	const Vector2D operator /(float in_scalar) const;
 	Vector2D& operator /=(float in_scalars);
+	bool operator ==(const Vector2D& in_vector) const;
 
 public:
 	static float Dot(const Vector2D& a, const Vector2D& b);

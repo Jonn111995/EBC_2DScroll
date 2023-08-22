@@ -1,8 +1,13 @@
 #pragma once
 #include "../Source/GameObject/StageObject/Character/Character.h"
 #include "EPlayerState.h"
+#include "EPlayerAnimState.h"
+
+
+#include <vector>
 
 class InputHandler;
+class PlayerAnimResourcer;
 
 /// <summary>
 /// プレイヤー
@@ -15,12 +20,60 @@ private:
 	/// 入力チェック機能
 	/// </summary>
 	InputHandler* input_handler;
+
+	/// <summary>
+	/// アニメーションハンドルを管理
+	/// </summary>
+	PlayerAnimResourcer* resourcer;
 	/// <summary>
 	/// プレイヤーの状態
 	/// </summary>
 	EPlayerState player_state;
 
-	int loaded_sprits[4];
+	/// <summary>
+	/// プレイヤーのアニメーションの状態
+	/// </summary>
+	EPlayerAnimState player_anim_state;
+
+	/// <summary>
+	/// 現在のアニメーション
+	/// </summary>
+	std::vector<int> now_animations;
+
+	/// <summary>
+	/// アニメーションを変化させる値
+	/// </summary>
+	float animation_frame;
+
+	/// <summary>
+	/// ジャンプ出来るかどうか
+	/// </summary>
+	bool bIsCanJump = true;
+
+	/// <summary>
+	/// 加速力
+	/// </summary>
+	int velocity = 0;
+	/// <summary>
+	/// 重力加速力
+	/// </summary>
+	int gravity_accelaration = 1;
+	/// <summary>
+	/// ジャンプしたときの地面のy座標
+	/// </summary>
+	int y_ground = 0;
+	/// <summary>
+	/// アニメーションスピード
+	/// </summary>
+	float anim_speed = 0.0f;
+	/// <summary>
+	/// アニメーションフレームの最小値
+	/// </summary>
+	float min_anim_frame;
+	/// <summary>
+	/// アニメーションフレームの最大値
+	/// </summary>
+	float max_anim_frame;
 
 public:
 	Player();
@@ -51,4 +104,9 @@ private:
 	/// 状態が終わるときの終了処理
 	/// </summary>
 	void ExitState();
+
+	/// <summary>
+	/// ジャンプ
+	/// </summary>
+	void Jump();
 };
