@@ -1,10 +1,10 @@
 #pragma once
 #include "../Source/GameObject/StageObject/StageObject.h"
-class Character :
-    public StageObject
-{
-private:
+#include "CharacterDirection.h"
 
+class Character :public StageObject {
+
+private:
     /// <summary>
     /// HP
     /// </summary>
@@ -25,6 +25,8 @@ private:
     /// “®‚¢‚Ä‚¢‚é‚©‚Ç‚¤‚©
     /// </summary>
     bool bIsMove;
+
+    CharacterDirection direction;
 
 public:
     /// <inheritdoc/>
@@ -69,6 +71,9 @@ public:
     /// ˆÚ“®‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©‚ğæ“¾
     /// </summary>
     bool GetbIsMove() const { return bIsMove; }
+
+    void SetDirection(CharacterDirection new_direction) { direction = new_direction; }
+    CharacterDirection GetDirection() { return direction; }
 
     /// <summary>
     /// ƒ_ƒ[ƒW‚ğ—^‚¦‚é
