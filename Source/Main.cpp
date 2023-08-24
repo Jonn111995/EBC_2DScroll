@@ -1,6 +1,6 @@
 #include "DxLib.h"
 
-#include "SystemTypes.h"
+#include "System/SystemTypes.h"
 #include "Scene/SceneManager.h"
 
 // プログラムは WinMain から始まります
@@ -26,7 +26,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// メインループ
 	int prev_frame_time = GetNowCount();
-	while (ProcessMessage() != -1 && CheckHitKey(KEY_INPUT_ESCAPE) != 1)
+ 	while (ProcessMessage() != -1 && CheckHitKey(KEY_INPUT_ESCAPE) != 1)
 	{
 		// DeltaSecondsの計算(秒)
 		int current_frame_time = GetNowCount();
