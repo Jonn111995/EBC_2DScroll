@@ -1,7 +1,8 @@
 #include "SampleScene.h"
-#include "../../SystemTypes.h"
+#include "../Source/System/ScreenInfo.h"
 #include "../../GameObject/SampleObject/SampleObject.h"
 #include "../Source/GameObject/StageObject/Character/Player/Player.h"
+#include "../Source/GameObject/Field/Field.h"
 
 SampleScene::SampleScene()
 {
@@ -12,8 +13,15 @@ void SampleScene::Initialize()
 	// êeÉNÉâÉXÇÃInitialize()
 	__super::Initialize();
 
+	ScreenInfo::CreateInstance();
+	ScreenInfo* screen_info = ScreenInfo::GetInstance();
+	screen_info->Initialize();
+
 	// SampleObjectÇê∂ê¨
-	CreateObject<Player>(Vector2D(SCREEN_RESOLUTION_X / 2.0f, SCREEN_RESOLUTION_Y / 2.0f));
+
+	field = CreateObject<Field>();
+	field->InitializeField("C/Users/n5919/EBC_2DScroll/Source/CSVFile/mapdata.csv");
+	CreateObject<Player>(Vector2D(screen_info->GetCenterX(), screen_info->GetCenterY()));
 }
 
 SceneType SampleScene::Update(float delta_seconds)

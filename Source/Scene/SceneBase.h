@@ -59,11 +59,11 @@ public:
 	 * @return	ê∂ê¨ÇµÇΩGameObject
 	 */
 	template <class T>
-	T* CreateObject(const Vector2D& position)
+	T* CreateObject(const Vector2D& position = Vector2D(0.0f,0.0f))
 	{
 		// GameObjectÇÃê∂ê¨
 		T* new_instance = new T();
-		StageObject* new_object = dynamic_cast<StageObject*>(new_instance);
+		GameObject* new_object = dynamic_cast<GameObject*>(new_instance);
 
 		// GameObjectÇîhê∂ÇµÇƒÇ¢Ç»Ç¢èÍçáÇÕÅAîjä¸ÇµÇƒèIóπÇ∑ÇÈ
 		if (new_object == nullptr)
@@ -74,8 +74,10 @@ public:
 		}
 
 		// GameObjectÇÃèâä˙âª
-		//new_object->SetOwnerScene(this);
-		new_object->SetPosition(position);
+		StageObject* stage_object = nullptr;
+		if (stage_object = dynamic_cast<StageObject*>(new_object)) {
+			stage_object->SetPosition(position);
+	    }
 		new_object->Initialize();
 		objects.push_back(new_object);
 

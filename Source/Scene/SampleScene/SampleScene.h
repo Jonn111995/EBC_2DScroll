@@ -2,6 +2,8 @@
 
 #include "../SceneBase.h"
 
+class Field;
+
 /**
  * サンプルシーン
  * サンプル用に簡易的に実装
@@ -11,6 +13,8 @@ class SampleScene : public SceneBase
 public:
 	SampleScene();
 	virtual ~SampleScene() {}
+
+	Field* field;
 
 public:
 	//~ Begin CSceneBase interface
