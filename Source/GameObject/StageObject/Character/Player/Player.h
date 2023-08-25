@@ -15,7 +15,8 @@ class PlayerAnimResourcer;
 class Player : public Character {
 
 private:
-
+	int xxx;
+	int yyy;
 	/// <summary>
 	/// 入力チェック機能
 	/// </summary>

@@ -8,6 +8,15 @@ SampleScene::SampleScene()
 {
 }
 
+bool SampleScene::CheckCanMove(const Vector2D& move_to_position, const BoxCollisionParams& collision) {
+	return field->CheckMove(move_to_position,collision);
+}
+
+bool SampleScene::CheckCanStand(Vector2D& move_to_position, const BoxCollisionParams& collision) {
+	return field->CheckStande(move_to_position, collision);
+	return false;
+}
+
 void SampleScene::Initialize()
 {
 	// êeÉNÉâÉXÇÃInitialize()
@@ -21,7 +30,8 @@ void SampleScene::Initialize()
 
 	field = CreateObject<Field>();
 	field->InitializeField("C/Users/n5919/EBC_2DScroll/Source/CSVFile/mapdata.csv");
-	CreateObject<Player>(Vector2D(screen_info->GetCenterX(), screen_info->GetCenterY()));
+	Character* chara = CreateObject<Player>(Vector2D(screen_info->GetCenterX(), screen_info->GetCenterY()));
+	chara->SetICharacterEvent(this);
 }
 
 SceneType SampleScene::Update(float delta_seconds)

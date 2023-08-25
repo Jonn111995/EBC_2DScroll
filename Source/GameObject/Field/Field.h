@@ -1,6 +1,8 @@
 #pragma once
 #include "../GameObject.h"
 #include <vector>
+#include "../Source/Utility/Vector2D.h"
+#include "../Source/Utility/BoxCollisionParams.h"
 
 class Character;
 class StageObject;
@@ -21,6 +23,9 @@ public:
 	/// <param name="map_file_name">読み込むマップデータファイル</param>
 	/// <returns>true: 初期化成功 false:　初期化失敗</returns>
 	bool InitializeField(const char* map_file_name);
+
+	bool CheckMove(const Vector2D& move_to_position, const BoxCollisionParams& collision);
+	bool CheckStande(Vector2D& move_to_position, const BoxCollisionParams& collision);
 
 public:
 	
@@ -68,6 +73,9 @@ private:
 	/// マップに配置されているオブジェクト
 	/// </summary>
 	std::vector<StageObject*>  StageObjectList;
+
+	BoxCollisionParams wall_collision;
+	BoxCollisionParams box_collision;
 	
 	/// <summary>
 	/// 地面の描画を行う

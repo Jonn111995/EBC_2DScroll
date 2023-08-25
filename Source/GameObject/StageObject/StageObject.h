@@ -15,6 +15,7 @@ private:
 	/// </summary>
 	Vector2D position;
 
+protected:
 	/// <summary>
 	/// ƒRƒŠƒWƒ‡ƒ“
 	/// </summary>
