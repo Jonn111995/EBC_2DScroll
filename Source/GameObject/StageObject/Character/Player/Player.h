@@ -15,7 +15,6 @@ class PlayerAnimResourcer;
 class Player : public Character {
 
 private:
-
 	/// <summary>
 	/// 入力チェック機能
 	/// </summary>
@@ -53,11 +52,11 @@ private:
 	/// <summary>
 	/// 加速力
 	/// </summary>
-	int velocity = 0;
+	float velocity = 0.0f;
 	/// <summary>
 	/// 重力加速力
 	/// </summary>
-	int gravity_accelaration = 1;
+	float gravity_accelaration = 1.0f;
 	/// <summary>
 	/// ジャンプしたときの地面のy座標
 	/// </summary>

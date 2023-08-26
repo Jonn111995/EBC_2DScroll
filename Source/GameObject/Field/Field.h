@@ -1,13 +1,15 @@
 #pragma once
 #include "../GameObject.h"
 #include <vector>
+#include "../Source/Utility/Vector2D.h"
+#include "../Source/Utility/BoxCollisionParams.h"
 
 class Character;
 class StageObject;
 class CSVFile;
 
 /// <summary>
-/// マップ情報の管理.
+/// マップ情報の管理
 /// </summary>
 class Field : public GameObject {
 
@@ -21,6 +23,9 @@ public:
 	/// <param name="map_file_name">読み込むマップデータファイル</param>
 	/// <returns>true: 初期化成功 false:　初期化失敗</returns>
 	bool InitializeField(const char* map_file_name);
+
+	bool CheckMove(const Vector2D& move_to_position, const BoxCollisionParams& collision);
+	bool CheckStande(Vector2D& move_to_position, const BoxCollisionParams& collision);
 
 public:
 	
@@ -43,7 +48,7 @@ private:
 	int wall_graphic_handle;
 
 	/// <summary>
-	/// ？ボックスのグラフィックハンドル
+	/// ボックスのグラフィックハンドル
 	/// </summary>
 	int box_graphic_handle;
 
@@ -68,11 +73,20 @@ private:
 	/// マップに配置されているオブジェクト
 	/// </summary>
 	std::vector<StageObject*>  StageObjectList;
+
+	/// <summary>
+	/// 地面データを読み込む
+	/// </summary>
+	/// <returns>作成する地面の座標</returns>
+	std::vector<Vector2D> ReadGroundData();
 	
 	/// <summary>
-	/// 地面の描画を行う
+	/// 地面データからオブジェクトを作成する。
 	/// </summary>
-	void DrawGroundSet();
+	/// <param name="left_pos_ground_data">作成する地面オブジェクトの左上座標</param>
+	/// <returns></returns>
+	void CreateGround(std::vector<Vector2D>& left_pos_ground_data);
+	
 	/// <summary>
 	/// ステージに配置されたオブジェクトを追加
 	/// </summary>

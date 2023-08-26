@@ -15,6 +15,7 @@ private:
 	/// </summary>
 	Vector2D position;
 
+protected:
 	/// <summary>
 	/// コリジョン
 	/// </summary>
@@ -50,6 +51,7 @@ public:
 	/// </summary>
 	/// <returns>コリジョン</returns>
 	BoxCollisionParams GetBodyCollision() const { return body_collision; }
+	void SetBodyCollision(const BoxCollisionParams collision) { body_collision = collision; }
 
 	/// <summary>
 	/// 衝突判定が起こった場合の処理

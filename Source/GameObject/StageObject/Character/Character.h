@@ -2,6 +2,8 @@
 #include "../Source/GameObject/StageObject/StageObject.h"
 #include "CharacterDirection.h"
 
+class CharacterEventInterface;
+
 class Character :public StageObject {
 
 private:
@@ -28,6 +30,9 @@ private:
 
     CharacterDirection direction;
 
+protected:
+    CharacterEventInterface* ICharacterEvent;
+
 public:
     /// <inheritdoc/>
     virtual void Initialize() override {}
@@ -36,6 +41,8 @@ public:
     virtual void Update(float delta_time) override {};
     virtual void Draw(const Vector2D& screen_offset) override {};
     virtual void OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision) override {};
+
+    void SetICharacterEvent(CharacterEventInterface* interface) { ICharacterEvent = interface; };
 
 public:
     /// <summary>

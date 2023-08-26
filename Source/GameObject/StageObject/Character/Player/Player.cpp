@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "InputHandler.h"
 #include "../Source/Animation/PlayerAnimResourcer.h"
+#include "../Interface/CharacterEventInterface.h"
 #include "DxLib.h"
 #include <iterator>
 #include <math.h>
@@ -28,6 +29,11 @@ void Player::Initialize() {
     input_handler = new InputHandler();
 	resourcer = new PlayerAnimResourcer();
 	resourcer->Initialize();
+
+	body_collision.center_position = Vector2D(64, 84);
+	body_collision.box_extent = Vector2D(12, 24);
+	/*body_collision.center_position = Vector2D(64, 96);
+	body_collision.box_extent = Vector2D(8, 27);*/
 }
 
 void Player::Finalize(){
@@ -50,12 +56,12 @@ void Player::Update(float delta_time) {
 	player_state = kIDLE;
 
 	if (input_button_status[kLEFT_B]) {
-		input_dir.x = -50;
+		input_dir.x = -50.0f;
 		SetDirection(CharacterDirection::kLEFT);
 	}
 
 	if (input_button_status[kRIGHT_B]) {
-		input_dir.x = 50;
+		input_dir.x = 50.0f;
 		SetDirection(CharacterDirection::kRIGHT);
 	}
 
@@ -65,6 +71,7 @@ void Player::Update(float delta_time) {
 
 	if (input_button_status[kATTACK_B]) {
 		player_state = kATTACK;
+		
 	}
 	
 	const float MOVEMENT_SPEED = 300.0f;
@@ -76,18 +83,51 @@ void Player::Update(float delta_time) {
 		input_dir.y = velocity;
 		delta_position = input_dir.Normalize() * MOVEMENT_SPEED * delta_time;
 
-		if ((GetPosition().y + delta_position.y) > y_ground) {
+		/*if ((GetPosition().y + delta_position.y) > y_ground) {
 			input_dir.y = y_ground;
 			delta_position = input_dir.Normalize() * MOVEMENT_SPEED * delta_time;
 			velocity = 0;
 			bIsCanJump = true;
 			ChangePlayerState(kIDLE);
+		}*/
+		Vector2D new_position = GetPosition() + delta_position;
+		int xxx = new_position.x;
+		int yyy = new_position.y;
+		//Vector2D Check_posi = Vector2D(xxx + (body_collision.center_position.x + -body_collision.box_extent.x), yyy + (body_collision.center_position.y + -body_collision.box_extent.y));
+		if (ICharacterEvent->CheckCanStand(new_position, body_collision)) {
+			velocity = 0;
+			bIsCanJump = true;
+			ChangePlayerState(kIDLE);
+			new_position.y = GetPosition().y;
 		}
-		SetPosition(GetPosition() + delta_position);
+		if (ICharacterEvent->CheckCanMove(new_position, body_collision)) {
+			SetPosition(new_position);
+		}
+		
 	}
 	else {
 		delta_position = input_dir.Normalize() * MOVEMENT_SPEED * delta_time;
-		SetPosition(GetPosition() + delta_position);
+
+		Vector2D new_position = GetPosition() + delta_position;
+		int xxx = new_position.x;
+		int yyy = new_position.y;
+
+		//Vector2D Check_posi = Vector2D(xxx + (body_collision.center_position.x + -body_collision.box_extent.x), yyy + (body_collision.center_position.y + -body_collision.box_extent.y));
+	
+		//printfDx("X=%d, Y=%d ", xxx, yyy);
+		if (!ICharacterEvent->CheckCanStand(new_position, body_collision)) {
+			input_dir.y += 0.7f;
+			input_dir.Normalize();
+			new_position.y += input_dir.y * MOVEMENT_SPEED * delta_time;
+		}
+		if (ICharacterEvent->CheckCanMove(new_position, body_collision)) {
+			
+			/*int xxx = new_position.x;
+			int yyy = new_position.y;
+			printfDx("X=%d, Y=%d ", xxx, yyy);*/
+			SetPosition(new_position);
+		}
+	
 	}
 
 
@@ -184,6 +224,15 @@ void Player::Draw(const Vector2D& screen_offset) {
 		DrawGraph(x, y, now_animations[animation_frame], true);
 		break;
 	}
+
+	unsigned int color = GetColor(255, 0, 0);
+	/*x += body_collision.center_position.x;
+	y += body_collision.center_position.y;*/
+	int x2 = x + body_collision.center_position.x - body_collision.box_extent.x;
+	int y2 = y + body_collision.center_position.y - body_collision.box_extent.y;
+	//DrawPixel(x2, y2, color);
+	DrawBox(x2 ,y2, x2 + body_collision.box_extent.x *2, y2 + body_collision.box_extent.y * 2,color, false);
+	//DrawBox(x+50, y+58, x + 76, y + 110, color, false);
 }
 
 void Player::OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision)
