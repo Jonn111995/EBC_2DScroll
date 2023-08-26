@@ -30,8 +30,8 @@ void Player::Initialize() {
 	resourcer = new PlayerAnimResourcer();
 	resourcer->Initialize();
 
-	body_collision.center_position = Vector2D(64, 96);
-	body_collision.box_extent = Vector2D(12, 16);
+	body_collision.center_position = Vector2D(64, 84);
+	body_collision.box_extent = Vector2D(12, 24);
 	/*body_collision.center_position = Vector2D(64, 96);
 	body_collision.box_extent = Vector2D(8, 27);*/
 }
@@ -56,12 +56,12 @@ void Player::Update(float delta_time) {
 	player_state = kIDLE;
 
 	if (input_button_status[kLEFT_B]) {
-		input_dir.x = -50;
+		input_dir.x = -50.0f;
 		SetDirection(CharacterDirection::kLEFT);
 	}
 
 	if (input_button_status[kRIGHT_B]) {
-		input_dir.x = 50;
+		input_dir.x = 50.0f;
 		SetDirection(CharacterDirection::kRIGHT);
 	}
 
@@ -113,15 +113,15 @@ void Player::Update(float delta_time) {
 		int yyy = new_position.y;
 
 		//Vector2D Check_posi = Vector2D(xxx + (body_collision.center_position.x + -body_collision.box_extent.x), yyy + (body_collision.center_position.y + -body_collision.box_extent.y));
-		
 	
 		//printfDx("X=%d, Y=%d ", xxx, yyy);
+		if (!ICharacterEvent->CheckCanStand(new_position, body_collision)) {
+			input_dir.y += 0.7f;
+			input_dir.Normalize();
+			new_position.y += input_dir.y * MOVEMENT_SPEED * delta_time;
+		}
 		if (ICharacterEvent->CheckCanMove(new_position, body_collision)) {
-			if (!ICharacterEvent->CheckCanStand(new_position, body_collision)) {
-				input_dir.y = 1;
-				input_dir.Normalize();
-				new_position.y  += input_dir.y * MOVEMENT_SPEED * delta_time;
-			}
+			
 			/*int xxx = new_position.x;
 			int yyy = new_position.y;
 			printfDx("X=%d, Y=%d ", xxx, yyy);*/
@@ -225,11 +225,12 @@ void Player::Draw(const Vector2D& screen_offset) {
 		break;
 	}
 
-	unsigned int color = GetColor(255, 255, 255);
+	unsigned int color = GetColor(255, 0, 0);
 	/*x += body_collision.center_position.x;
 	y += body_collision.center_position.y;*/
 	int x2 = x + body_collision.center_position.x - body_collision.box_extent.x;
 	int y2 = y + body_collision.center_position.y - body_collision.box_extent.y;
+	//DrawPixel(x2, y2, color);
 	DrawBox(x2 ,y2, x2 + body_collision.box_extent.x *2, y2 + body_collision.box_extent.y * 2,color, false);
 	//DrawBox(x+50, y+58, x + 76, y + 110, color, false);
 }

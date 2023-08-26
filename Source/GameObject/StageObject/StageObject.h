@@ -51,6 +51,7 @@ public:
 	/// </summary>
 	/// <returns>ƒRƒŠƒWƒ‡ƒ“</returns>
 	BoxCollisionParams GetBodyCollision() const { return body_collision; }
+	void SetBodyCollision(const BoxCollisionParams collision) { body_collision = collision; }
 
 	/// <summary>
 	/// Õ“Ë”»’è‚ª‹N‚±‚Á‚½ê‡‚Ìˆ—

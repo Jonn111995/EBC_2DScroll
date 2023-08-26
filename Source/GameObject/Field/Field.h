@@ -9,7 +9,7 @@ class StageObject;
 class CSVFile;
 
 /// <summary>
-/// マップ情報の管理.
+/// マップ情報の管理
 /// </summary>
 class Field : public GameObject {
 
@@ -48,7 +48,7 @@ private:
 	int wall_graphic_handle;
 
 	/// <summary>
-	/// ？ボックスのグラフィックハンドル
+	/// ボックスのグラフィックハンドル
 	/// </summary>
 	int box_graphic_handle;
 
@@ -74,13 +74,19 @@ private:
 	/// </summary>
 	std::vector<StageObject*>  StageObjectList;
 
-	BoxCollisionParams wall_collision;
-	BoxCollisionParams box_collision;
+	/// <summary>
+	/// 地面データを読み込む
+	/// </summary>
+	/// <returns>作成する地面の座標</returns>
+	std::vector<Vector2D> ReadGroundData();
 	
 	/// <summary>
-	/// 地面の描画を行う
+	/// 地面データからオブジェクトを作成する。
 	/// </summary>
-	void DrawGroundSet();
+	/// <param name="left_pos_ground_data">作成する地面オブジェクトの左上座標</param>
+	/// <returns></returns>
+	void CreateGround(std::vector<Vector2D>& left_pos_ground_data);
+	
 	/// <summary>
 	/// ステージに配置されたオブジェクトを追加
 	/// </summary>
