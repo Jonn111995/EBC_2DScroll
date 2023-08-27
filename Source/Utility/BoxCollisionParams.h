@@ -39,12 +39,16 @@ public:
 	/// </summary>
 	CollisionType collision_type;
 
-public:
 	/// <summary>
 	/// ヒットしたオブジェクトとのコリジョンチェック
 	/// </summary>
 	/// <param name="target">ヒットしたオブジェクトのオブジェクトタイプ</param>
 	/// <returns></returns>
 	bool IsHitCheckTarget(CollisionObjectType target);
+
+	Vector2D GetLeftTopPosition();
+	Vector2D GetRightTopPosition();
+	Vector2D GetLeftDownPosition();
+	Vector2D GetRightDownPosition();
 };
 

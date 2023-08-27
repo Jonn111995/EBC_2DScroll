@@ -3,9 +3,13 @@
 
 class Box : public BaseGround {
 
+/// <summary>
+/// ボックスタイプ
+/// </summary>
 enum EBoxType {
-
+	//通常
 	kNormal,
+	//ギミックあり
 	kGimmick,
 };
 
@@ -15,8 +19,14 @@ private:
 	/// </summary>
 	int box_graphic_handle;
 
+	/// <summary>
+	/// ギミックのあるボックスのグラフィックハンドル
+	/// </summary>
 	int gimmick_box_graphic_handle[7];
 
+	/// <summary>
+	/// ボックスのタイプ
+	/// </summary>
 	EBoxType box_type;
 
 public:

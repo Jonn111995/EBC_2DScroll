@@ -14,7 +14,6 @@ void Wall::Update(float DeltaTime)
 }
 
 void Wall::Initialize() {
-	//wall_graphic_handle = LoadGraph("Resources/Images/mapchip_000.bmp");
 
     char file_name[100];
     for (int i = first_sequence, j = 0; j < ground_mapchip_file_num; i++, j++) {

@@ -10,8 +10,6 @@ private:
 	/// </summary>
 	int wall_graphic_handle[3];
 
-	std::vector<Wall*> broken_wall;
-
 public:
 	/// <inheritdoc />
 	virtual void Update(float DeltaTime) override;

@@ -27,10 +27,15 @@ private:
     /// 動いているかどうか
     /// </summary>
     bool bIsMove;
-
+    /// <summary>
+    /// 移動方向
+    /// </summary>
     CharacterDirection direction;
 
 protected:
+    /// <summary>
+    /// キャラクターイベントインターフェース
+    /// </summary>
     CharacterEventInterface* ICharacterEvent;
 
 public:
@@ -42,6 +47,9 @@ public:
     virtual void Draw(const Vector2D& screen_offset) override {};
     virtual void OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision) override {};
 
+    /// <summary>
+    /// キャラクターイベントインターフェースを設定
+    /// </summary>
     void SetICharacterEvent(CharacterEventInterface* interface) { ICharacterEvent = interface; };
 
 public:
@@ -79,7 +87,15 @@ public:
     /// </summary>
     bool GetbIsMove() const { return bIsMove; }
 
-    void SetDirection(CharacterDirection new_direction) { direction = new_direction; }
+    /// <summary>
+    /// キャラの移動方向を設定
+    /// </summary>
+    /// <param name="new_direction">移動方向</param>
+    void SetDirection(CharacterDirection new_direction) { direction = new_direction;}
+    /// <summary>
+    /// キャラの移動方向を取得
+    /// </summary>
+    /// <returns>移動方向</returns>
     CharacterDirection GetDirection() { return direction; }
 
     /// <summary>

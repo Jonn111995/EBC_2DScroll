@@ -95,10 +95,12 @@ private:
 	/// </summary>
 	/// <param name="new_state">新しい状態</param>
 	void ChangePlayerState(const EPlayerState new_state);
-	/// <summary>
+	
+/// <summary>
 	/// 新しい状態の初期化処理
 	/// </summary>
 	void EnterState();
+
 	/// <summary>
 	/// 状態が終わるときの終了処理
 	/// </summary>
