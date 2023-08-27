@@ -3,6 +3,9 @@
 #include "ColliiosnObjectType.h"
 #include "CollisionType.h"
 
+/// <summary>
+/// コリジョン
+/// </summary>
 struct BoxCollisionParams {
 
 public:
@@ -10,6 +13,11 @@ public:
 	/// コリジョンの中心座標
 	/// </summary>
 	Vector2D center_position;
+
+	/// <summary>
+	/// コリジョンの左上座標
+	/// </summary>
+	Vector2D left_up_position;
 
 	/// <summary>
 	/// オブジェクトタイプ
