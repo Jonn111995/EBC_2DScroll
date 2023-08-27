@@ -83,17 +83,7 @@ void Player::Update(float delta_time) {
 		input_dir.y = velocity;
 		delta_position = input_dir.Normalize() * MOVEMENT_SPEED * delta_time;
 
-		/*if ((GetPosition().y + delta_position.y) > y_ground) {
-			input_dir.y = y_ground;
-			delta_position = input_dir.Normalize() * MOVEMENT_SPEED * delta_time;
-			velocity = 0;
-			bIsCanJump = true;
-			ChangePlayerState(kIDLE);
-		}*/
 		Vector2D new_position = GetPosition() + delta_position;
-		int xxx = new_position.x;
-		int yyy = new_position.y;
-		//Vector2D Check_posi = Vector2D(xxx + (body_collision.center_position.x + -body_collision.box_extent.x), yyy + (body_collision.center_position.y + -body_collision.box_extent.y));
 		if (ICharacterEvent->CheckCanStand(new_position, body_collision)) {
 			velocity = 0;
 			bIsCanJump = true;
@@ -103,7 +93,6 @@ void Player::Update(float delta_time) {
 		if (ICharacterEvent->CheckCanMove(new_position, body_collision)) {
 			SetPosition(new_position);
 		}
-		
 	}
 	else {
 		delta_position = input_dir.Normalize() * MOVEMENT_SPEED * delta_time;
@@ -112,22 +101,14 @@ void Player::Update(float delta_time) {
 		int xxx = new_position.x;
 		int yyy = new_position.y;
 
-		//Vector2D Check_posi = Vector2D(xxx + (body_collision.center_position.x + -body_collision.box_extent.x), yyy + (body_collision.center_position.y + -body_collision.box_extent.y));
-	
-		//printfDx("X=%d, Y=%d ", xxx, yyy);
 		if (!ICharacterEvent->CheckCanStand(new_position, body_collision)) {
-			input_dir.y += 0.7f;
-			input_dir.Normalize();
+			input_dir.y += 1;		
 			new_position.y += input_dir.y * MOVEMENT_SPEED * delta_time;
+		//	new_position.y = GetPosition().y + 0.5;
 		}
 		if (ICharacterEvent->CheckCanMove(new_position, body_collision)) {
-			
-			/*int xxx = new_position.x;
-			int yyy = new_position.y;
-			printfDx("X=%d, Y=%d ", xxx, yyy);*/
 			SetPosition(new_position);
 		}
-	
 	}
 
 

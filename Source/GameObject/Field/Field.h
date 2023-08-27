@@ -13,6 +13,14 @@ class CSVFile;
 /// </summary>
 class Field : public GameObject {
 
+private:
+struct GroundObjectInfo{
+
+	Vector2D left_up_pos;
+	BoxCollisionParams collision;
+
+};
+
 public:
 	Field();
 	virtual ~Field();
@@ -36,21 +44,6 @@ public:
 	/// <inheritdoc />
 	void Draw(const Vector2D& screen_offset) override;
 private:
-
-	/// <summary>
-	/// 地面のグラフィックハンドル
-	/// </summary>
-	int ground_graphic_handle[8];
-
-	/// <summary>
-	/// 壁のグラフィックハンドル
-	/// </summary>
-	int wall_graphic_handle;
-
-	/// <summary>
-	/// ボックスのグラフィックハンドル
-	/// </summary>
-	int box_graphic_handle;
 
 	/// <summary>
 	/// CSVファイル読み込み機能インスタンス
@@ -86,6 +79,20 @@ private:
 	/// <param name="left_pos_ground_data">作成する地面オブジェクトの左上座標</param>
 	/// <returns></returns>
 	void CreateGround(std::vector<Vector2D>& left_pos_ground_data);
+
+	/// <summary>
+	/// 壁データを読み込む
+	/// </summary>
+	/// <returns>作成する地面の座標</returns>
+	std::vector<GroundObjectInfo> ReadWallData();
+
+	/// <summary>
+	/// 壁データからオブジェクトを作成する。
+	/// </summary>
+	/// <param name="left_pos_ground_data">作成する壁オブジェクトの左上座標</param>
+	/// <returns></returns>
+	void CreateWall(std::vector<GroundObjectInfo>& left_pos_wall_data);
+	void CreateBox();
 	
 	/// <summary>
 	/// ステージに配置されたオブジェクトを追加
