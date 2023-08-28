@@ -42,10 +42,6 @@ std::vector<int> PlayerAnimResourcer::GetAnimaitonHandle(EPlayerState now_state)
 	return return_animation;
 }
 
-void PlayerAnimResourcer::DeleteHandleArray(int handle_array[]) {
-
-}
-
 int* PlayerAnimResourcer::GetAnimationHandleHelper(EPlayerState now_state, int& out_array_size)
 {
 	switch (now_state) {

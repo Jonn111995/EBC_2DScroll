@@ -29,11 +29,8 @@ void Player::Initialize() {
     input_handler = new InputHandler();
 	resourcer = new PlayerAnimResourcer();
 	resourcer->Initialize();
-
 	body_collision.center_position = Vector2D(64, 84);
 	body_collision.box_extent = Vector2D(12, 24);
-	/*body_collision.center_position = Vector2D(64, 96);
-	body_collision.box_extent = Vector2D(8, 27);*/
 }
 
 void Player::Finalize(){
@@ -104,7 +101,6 @@ void Player::Update(float delta_time) {
 		if (!ICharacterEvent->CheckCanStand(new_position, body_collision)) {
 			input_dir.y += 1;		
 			new_position.y += input_dir.y * MOVEMENT_SPEED * delta_time;
-		//	new_position.y = GetPosition().y + 0.5;
 		}
 		if (ICharacterEvent->CheckCanMove(new_position, body_collision)) {
 			SetPosition(new_position);
@@ -207,13 +203,11 @@ void Player::Draw(const Vector2D& screen_offset) {
 	}
 
 	unsigned int color = GetColor(255, 0, 0);
-	/*x += body_collision.center_position.x;
-	y += body_collision.center_position.y;*/
 	int x2 = x + body_collision.center_position.x - body_collision.box_extent.x;
 	int y2 = y + body_collision.center_position.y - body_collision.box_extent.y;
-	//DrawPixel(x2, y2, color);
+	
+	//デバック用
 	DrawBox(x2 ,y2, x2 + body_collision.box_extent.x *2, y2 + body_collision.box_extent.y * 2,color, false);
-	//DrawBox(x+50, y+58, x + 76, y + 110, color, false);
 }
 
 void Player::OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision)

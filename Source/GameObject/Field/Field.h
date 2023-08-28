@@ -14,11 +14,11 @@ class CSVFile;
 class Field : public GameObject {
 
 private:
+
 struct GroundObjectInfo{
 
 	Vector2D left_up_pos;
 	BoxCollisionParams collision;
-
 };
 
 public:
@@ -32,7 +32,20 @@ public:
 	/// <returns>true: 初期化成功 false:　初期化失敗</returns>
 	bool InitializeField(const char* map_file_name);
 
+	/// <summary>
+	/// 移動先が移動可能か確認
+	/// </summary>
+	/// <param name="move_to_position">移動先</param>
+	/// <param name="collision">移動するオブジェクトのコリジョン</param>
+	/// <returns>true: 移動可能 false: 移動不可</returns>
 	bool CheckMove(const Vector2D& move_to_position, const BoxCollisionParams& collision);
+
+	/// <summary>
+	/// 移動先が立てるか確認
+	/// </summary>
+	/// <param name="move_to_position">移動先</param>
+	/// <param name="collision">移動するオブジェクトのコリジョン</param>
+	/// <returns>true: 立てる false: 立てない</returns>
 	bool CheckStande(Vector2D& move_to_position, const BoxCollisionParams& collision);
 
 public:
@@ -49,7 +62,6 @@ private:
 	/// CSVファイル読み込み機能インスタンス
 	/// </summary>
 	CSVFile* csv_file_reader;
-
 	/// <summary>
 	/// マップデータ
 	/// </summary>
@@ -87,11 +99,14 @@ private:
 	std::vector<GroundObjectInfo> ReadWallData();
 
 	/// <summary>
-	/// 壁データからオブジェクトを作成する。
+	/// 壁データからオブジェクトを作成する
 	/// </summary>
 	/// <param name="left_pos_ground_data">作成する壁オブジェクトの左上座標</param>
 	/// <returns></returns>
 	void CreateWall(std::vector<GroundObjectInfo>& left_pos_wall_data);
+	/// <summary>
+	/// Boxオブジェクトを作成する
+	/// </summary>
 	void CreateBox();
 	
 	/// <summary>
