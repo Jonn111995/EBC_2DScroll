@@ -9,6 +9,7 @@
 struct BoxCollisionParams {
 
 public:
+	Vector2D move_velocity;
 	/// <summary>
 	/// コリジョンの中心座標
 	/// </summary>

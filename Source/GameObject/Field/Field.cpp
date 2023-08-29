@@ -117,15 +117,22 @@ bool Field::CheckMove(const Vector2D& move_to_position, const BoxCollisionParams
     float opponent_center_x = move_to_position.x + collision.center_position.x;
     float opponent_center_y = move_to_position.y + collision.center_position.y;
 
+    //中心座標 - 横幅の半分、中心座標 + 縦幅の半分
+    Vector2D opponent_y_leftdown = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y + collision.box_extent.y);
+    Vector2D opponent_y_rightdown = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y + collision.box_extent.y);
+
+    int x_position = opponent_y_leftdown.x / map_chip_size;
+    int y_position = opponent_y_leftdown.y / map_chip_size;
+    int object_in_destination = map_data.at(y_position).at(x_position);
+
+
     for(auto obj : StageObjectList) {
    
         BoxCollisionParams ground_collision = obj->GetBodyCollision();
       
         float distance_x = abs(opponent_center_x - ground_collision.center_position.x);
         float distance_y = abs(opponent_center_y - ground_collision.center_position.y);
-        //仮の処理
-        distance_y += 3;
-        //ここまで
+      
         float size_x = collision.box_extent.x + ground_collision.box_extent.x;
         float size_y = collision.box_extent.y + ground_collision.box_extent.y;
 
@@ -142,8 +149,8 @@ bool Field::CheckStande(Vector2D& move_to_position, const BoxCollisionParams& co
     float opponent_center_y = move_to_position.y + collision.center_position.y;
 
     //中心座標 - 横幅の半分、中心座標 + 縦幅の半分
-    Vector2D opponent_y_leftdown = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y + collision.box_extent.y);
-    Vector2D opponent_y_rightdown = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y + collision.box_extent.y);
+    Vector2D opponent_y_leftdown = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y + collision.box_extent.y + collision.move_velocity.y);
+    Vector2D opponent_y_rightdown = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y + collision.box_extent.y + collision.move_velocity.y);
 
     int x_position = opponent_y_leftdown.x / map_chip_size;
     int y_position = opponent_y_leftdown.y / map_chip_size;
