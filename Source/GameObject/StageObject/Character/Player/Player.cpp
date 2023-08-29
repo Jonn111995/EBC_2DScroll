@@ -81,6 +81,7 @@ void Player::Update(float delta_time) {
 		delta_position = input_dir.Normalize() * MOVEMENT_SPEED * delta_time;
 
 		Vector2D new_position = GetPosition() + delta_position;
+		body_collision.move_velocity = Vector2D(input_dir.Normalize());
 		if (ICharacterEvent->CheckCanStand(new_position, body_collision)) {
 			velocity = 0;
 			bIsCanJump = true;
@@ -95,12 +96,12 @@ void Player::Update(float delta_time) {
 		delta_position = input_dir.Normalize() * MOVEMENT_SPEED * delta_time;
 
 		Vector2D new_position = GetPosition() + delta_position;
-		int xxx = new_position.x;
-		int yyy = new_position.y;
-
+		
+		//移動ベクトル。下方向
+		body_collision.move_velocity = Vector2D(0,1);
 		if (!ICharacterEvent->CheckCanStand(new_position, body_collision)) {
-			input_dir.y += 1;		
-			new_position.y += input_dir.y * MOVEMENT_SPEED * delta_time;
+			input_dir.y += 30;		
+			new_position.y += input_dir.Normalize().y * MOVEMENT_SPEED * delta_time;
 		}
 		if (ICharacterEvent->CheckCanMove(new_position, body_collision)) {
 			SetPosition(new_position);

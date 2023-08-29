@@ -14,7 +14,6 @@ bool SampleScene::CheckCanMove(const Vector2D& move_to_position, const BoxCollis
 
 bool SampleScene::CheckCanStand(Vector2D& move_to_position, const BoxCollisionParams& collision) {
 	return field->CheckStande(move_to_position, collision);
-	return false;
 }
 
 void SampleScene::Initialize()
