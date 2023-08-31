@@ -1,8 +1,13 @@
 #pragma once
 #include "../Source/GameObject/StageObject/StageObject.h"
 #include "CharacterDirection.h"
+#include <vector>
 
 class CharacterEventInterface;
+
+namespace {
+    const float MOVEMENT_SPEED = 300.f;
+}
 
 class Character :public StageObject {
 
@@ -32,19 +37,34 @@ private:
     /// </summary>
     CharacterDirection direction;
 
+   
+
 protected:
     /// <summary>
     /// キャラクターイベントインターフェース
     /// </summary>
     CharacterEventInterface* ICharacterEvent;
 
+    Vector2D will_update_position;
+
+    /// <summary>
+    /// 現在のアニメーション
+    /// </summary>
+    std::vector<int> now_animations;
+
+    /// <summary>
+    /// アニメーションを変化させる値
+    /// </summary>
+    float animation_frame;
+protected:
+
 public:
     /// <inheritdoc/>
     virtual void Initialize() override {}
     /// <inheritdoc/>
     virtual void Finalize() override {}
-    virtual void Update(float delta_time) override {};
-    virtual void Draw(const Vector2D& screen_offset) override {};
+    virtual void Update(float delta_time) override;
+    virtual void Draw(const Vector2D& screen_offset) override;
     virtual void OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision) override {};
 
     /// <summary>

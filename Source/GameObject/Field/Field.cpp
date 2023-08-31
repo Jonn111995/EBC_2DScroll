@@ -132,7 +132,7 @@ bool Field::CheckMove(const Vector2D& move_to_position, const BoxCollisionParams
       
         float distance_x = abs(opponent_center_x - ground_collision.center_position.x);
         float distance_y = abs(opponent_center_y - ground_collision.center_position.y);
-      
+        //distance_y += 3;
         float size_x = collision.box_extent.x + ground_collision.box_extent.x;
         float size_y = collision.box_extent.y + ground_collision.box_extent.y;
 

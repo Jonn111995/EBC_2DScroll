@@ -35,6 +35,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		// SceneManager‚ÌXV
 		scene_manager->Update(delta_seconds);
+		Sleep(60 / 1000.f);
 	}
 
 	// SceneManager‚Ì”jŠü
