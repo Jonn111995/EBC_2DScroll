@@ -2,8 +2,8 @@
 
 enum CollisionObjectType {
 
-	kGROUND = 1,
-	kPLAYER = 2,
-	kENEMY = 3,
-	kITEM = 8
+	kGROUND_TYPE = 1,
+	kPLAYER_TYPE = 2,
+	kENEMY_TYPE = 3,
+	kITEM_TYPE = 8
 };

@@ -58,6 +58,32 @@ public:
 	void Draw(const Vector2D& screen_offset) override;
 
 private:
+
+	/// <summary>
+	/// 地面のグラフィックハンドル
+	/// </summary>
+	int ground_graphic_handle[8];
+	int ground_graphic_handle_upper[3];
+	int ground_graphic_handle_middle[3];
+	int ground_graphic_handle_bottom[3];
+
+
+
+	/// <summary>
+	/// 壁のグラフィックハンドル
+	/// </summary>
+	int wall_graphic_handle[3];
+
+	/// <summary>
+	/// ボックスのグラフィックハンドル
+	/// </summary>
+	int box_graphic_handle;
+
+	/// <summary>
+	/// ギミックのあるボックスのグラフィックハンドル
+	/// </summary>
+	int gimmick_box_graphic_handle[7];
+
 	/// <summary>
 	/// CSVファイル読み込み機能インスタンス
 	/// </summary>
@@ -79,6 +105,15 @@ private:
 	/// </summary>
 	std::vector<StageObject*>  StageObjectList;
 private:
+	/// <summary>
+	/// マップを描画する
+	/// </summary>
+	void DrawMap();
+
+	/// <summary>
+	/// 地面のグラフィックを取得。
+	/// </summary>
+	int GetGroundGraphic(const int x, const int y);
 	/// <summary>
 	/// 地面データを読み込む
 	/// </summary>

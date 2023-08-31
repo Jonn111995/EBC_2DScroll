@@ -5,15 +5,14 @@
 /// </summary>
 enum MapChipType {
 
-    kNone = 0,
-    kGround,
-    kWall,
-    kBrokenWall,
-    kBox,
-    kGimmickBox,
-    kDeathPoint,
-    kGoal,
-    kStartPosition,
-    kEnemy,
-    kItem,
+    kNONE = 0,
+    kGROUND,
+    kWALL,
+    kBROKEN_WALL,
+    kBOX,
+    kGIMMICK_BOX,
+    kGOAL,
+    kPLAYER_START,
+    kENEMY,
+    kITEM,
 };
