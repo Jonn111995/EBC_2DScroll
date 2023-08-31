@@ -34,15 +34,8 @@ private:
 	/// </summary>
 	EPlayerAnimState player_anim_state;
 
-	/// <summary>
-	/// 現在のアニメーション
-	/// </summary>
-	std::vector<int> now_animations;
+	
 
-	/// <summary>
-	/// アニメーションを変化させる値
-	/// </summary>
-	float animation_frame;
 
 	/// <summary>
 	/// ジャンプ出来るかどうか
@@ -89,13 +82,11 @@ public:
 	/// <inheritdoc/>
 	virtual void OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision) override;
 
+protected:
+	void ChangeAnimState(const float delta_timeconst, const  Vector2D& delta_position);
+
 private:
-	/// <summary>
-	/// プレイヤーの状態を変更する
-	/// </summary>
-	/// <param name="new_state">新しい状態</param>
-	void ChangePlayerState(const EPlayerState new_state);
-	
+
 /// <summary>
 	/// 新しい状態の初期化処理
 	/// </summary>
@@ -105,6 +96,16 @@ private:
 	/// 状態が終わるときの終了処理
 	/// </summary>
 	void ExitState();
+
+	/// <summary>
+	/// プレイヤーの状態を変更する
+	/// </summary>
+	/// <param name="new_state">新しい状態</param>
+	void ChangePlayerState(const EPlayerState new_state);
+
+	void EnterAnimState();
+
+	void CheckAnimFrame(const float delta_time);
 
 	/// <summary>
 	/// ジャンプ

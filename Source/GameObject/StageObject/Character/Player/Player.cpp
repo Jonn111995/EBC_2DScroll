@@ -12,7 +12,6 @@ Player::Player()
 	,player_state(EPlayerState::kIDLE)
 	,player_anim_state(EPlayerAnimState::kIDLE_ANIM)
 	,anim_speed(0.0f)
-	,animation_frame(0.0f)
 	,min_anim_frame(0.0f)
 	,max_anim_frame(0.0f)
 {
@@ -46,7 +45,7 @@ void Player::Finalize(){
 
 void Player::Update(float delta_time) {
 
-	__super::Update(delta_time);
+	
 
 	std::vector<bool> input_button_status = input_handler->CheckInput(delta_time);
 	Vector2D input_dir;
@@ -68,10 +67,7 @@ void Player::Update(float delta_time) {
 
 	if (input_button_status[kATTACK_B]) {
 		player_state = kATTACK;
-		
 	}
-	
-	const float MOVEMENT_SPEED = 300.0f;
 	Vector2D delta_position;
 
 	if (!bIsCanJump) {
@@ -95,125 +91,35 @@ void Player::Update(float delta_time) {
 	else {
 		delta_position = input_dir.Normalize() * MOVEMENT_SPEED * delta_time;
 
-		Vector2D new_position = GetPosition() + delta_position;
-		
-		//移動ベクトル。下方向
-		body_collision.move_velocity = Vector2D(0,1);
-		if (!ICharacterEvent->CheckCanStand(new_position, body_collision)) {
-			input_dir.y += 30;		
-			new_position.y += input_dir.Normalize().y * MOVEMENT_SPEED * delta_time;
+		will_update_position = GetPosition() + delta_position;
+
+		body_collision.move_velocity = Vector2D(0, 1);
+		if (!ICharacterEvent->CheckCanStand(will_update_position, body_collision)) {
+
+			/*float fall_direction_ammount = 30.f;
+			Vector2D input_dir = Vector2D(0.f, fall_direction_ammount);*/
+			input_dir.y += 30.0f;
+			will_update_position.y += input_dir.Normalize().y * MOVEMENT_SPEED * delta_time;
 		}
-		if (ICharacterEvent->CheckCanMove(new_position, body_collision)) {
-			SetPosition(new_position);
-		}
-	}
+		if (ICharacterEvent->CheckCanMove(will_update_position, body_collision)) {
+			SetPosition(will_update_position);
 
-
-	if (delta_position == Vector2D(0.0f, 0.0f)) {
-
-		if (player_state == kATTACK) {
-			player_anim_state = kATTACK_ANIM;
-		} else {
-			player_anim_state = kIDLE_ANIM;
+			will_update_position = Vector2D(0, 0);
 		}
 	}
 
-	if (delta_position.x != 0.0f && delta_position.y == 0.0f) {
-		player_anim_state = kRUN_ANIM;
-	}
-	
-	if (delta_position.y < 0.0f) {
-		player_anim_state = kJUMP_UP_ANIM;
-	} else if (delta_position.y > 0.0f) {
-
-		if (delta_position.x != 0.0f) {
-			player_anim_state = kJUMP_MOVE_ANIM;
-		} else {
-			player_anim_state = kJUMP_FALL_ANIM;
-		}
-	}
-	
-	switch (player_anim_state) {
-	case kIDLE_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kIDLE);
-		anim_speed = 4.0f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = now_animations.size() - 1.0f;
-		break;
-	case kRUN_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kRUN);
-		anim_speed = 10.0f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = now_animations.size() - 1.0f;
-		break;
-	case kJUMP_UP_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
-		anim_speed = 10.0f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = 1.99f;
-		break;
-	case kJUMP_MOVE_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
-		anim_speed = 5.0f;
-		min_anim_frame = 2.0f;
-		max_anim_frame = 3.99f;
-		break;
-	case kJUMP_FALL_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
-		anim_speed = 20.0f;
-		min_anim_frame = 4.0f;
-		max_anim_frame = 5.99f;
-		break;
-	case kATTACK_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kATTACK);
-		anim_speed = 5.0f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = now_animations.size() - 1;
-		break;
-	}
-
-	if (animation_frame <= min_anim_frame) {
-		animation_frame = min_anim_frame;
-	}
-
-	//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
-	if (animation_frame >= now_animations.size()) {
-		animation_frame = min_anim_frame;
-	}
-
-	animation_frame += delta_time * anim_speed;
-
-	if (animation_frame >= max_anim_frame) {
-		animation_frame = min_anim_frame;
-	}
+	ChangeAnimState(delta_time, delta_position);	
 }
 
 void Player::Draw(const Vector2D& screen_offset) {
-
-	int x, y;
-	GetPosition().ToInt(x, y);
-	switch (GetDirection()) {
-
-	case kLEFT:
-		DrawTurnGraph(x, y, now_animations[animation_frame], true);
-		break;
-
-	case kRIGHT:
-		DrawGraph(x, y, now_animations[animation_frame], true);
-		break;
-	}
-
-	unsigned int color = GetColor(255, 0, 0);
-	int x2 = x + body_collision.center_position.x - body_collision.box_extent.x;
-	int y2 = y + body_collision.center_position.y - body_collision.box_extent.y;
-	
-	//デバック用
-	DrawBox(x2 ,y2, x2 + body_collision.box_extent.x *2, y2 + body_collision.box_extent.y * 2,color, false);
+	__super::Draw(screen_offset);
 }
 
 void Player::OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision)
 {
 }
+
+
 
 void Player::ChangePlayerState(const EPlayerState new_state) {
 
@@ -254,6 +160,100 @@ void Player::ExitState() {
 		break;
 	case kDEAD:
 		break;
+	}
+}
+
+void Player::ChangeAnimState(const float delta_time, const Vector2D& delta_position) {
+
+	if (delta_position == Vector2D(0.0f, 0.0f)) {
+
+		if (player_state == kATTACK) {
+			player_anim_state = kATTACK_ANIM;
+		}
+		else {
+			player_anim_state = kIDLE_ANIM;
+		}
+	}
+
+	if (delta_position.x != 0.0f && delta_position.y == 0.0f) {
+		player_anim_state = kRUN_ANIM;
+	}
+
+	if (delta_position.y < 0.0f) {
+		player_anim_state = kJUMP_UP_ANIM;
+	}
+	else if (delta_position.y > 0.0f) {
+
+		if (delta_position.x != 0.0f) {
+			player_anim_state = kJUMP_MOVE_ANIM;
+		}
+		else {
+			player_anim_state = kJUMP_FALL_ANIM;
+		}
+	}
+
+	EnterAnimState();
+	CheckAnimFrame(delta_time);
+}
+
+void Player::EnterAnimState() {
+
+	switch (player_anim_state) {
+	case kIDLE_ANIM:
+		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kIDLE);
+		anim_speed = 4.0f;
+		min_anim_frame = 0.0f;
+		max_anim_frame = now_animations.size() - 1.0f;
+		break;
+	case kRUN_ANIM:
+		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kRUN);
+		anim_speed = 10.0f;
+		min_anim_frame = 0.0f;
+		max_anim_frame = now_animations.size() - 1.0f;
+		break;
+	case kJUMP_UP_ANIM:
+		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+		anim_speed = 10.0f;
+		min_anim_frame = 0.0f;
+		max_anim_frame = 1.99f;
+		break;
+	case kJUMP_MOVE_ANIM:
+		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+		anim_speed = 5.0f;
+		min_anim_frame = 2.0f;
+		max_anim_frame = 3.99f;
+		break;
+	case kJUMP_FALL_ANIM:
+		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+		anim_speed = 20.0f;
+		min_anim_frame = 4.0f;
+		max_anim_frame = 5.99f;
+		break;
+	case kATTACK_ANIM:
+		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kATTACK);
+		anim_speed = 5.0f;
+		min_anim_frame = 0.0f;
+		max_anim_frame = now_animations.size() - 1;
+		break;
+	}
+}
+
+void Player::CheckAnimFrame(const float delta_time) {
+
+	if (animation_frame <= min_anim_frame) {
+		animation_frame = min_anim_frame;
+	}
+
+	//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
+	if (animation_frame >= now_animations.size()) {
+		animation_frame = min_anim_frame;
+	}
+
+	animation_frame += delta_time * anim_speed;
+
+	//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
+	if (animation_frame >= max_anim_frame) {
+		animation_frame = min_anim_frame;
 	}
 }
 

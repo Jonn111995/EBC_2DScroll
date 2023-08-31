@@ -56,8 +56,8 @@ public:
 	void Initialize() override;
 	/// <inheritdoc />
 	void Draw(const Vector2D& screen_offset) override;
-private:
 
+private:
 	/// <summary>
 	/// CSVファイル読み込み機能インスタンス
 	/// </summary>
@@ -78,7 +78,7 @@ private:
 	/// マップに配置されているオブジェクト
 	/// </summary>
 	std::vector<StageObject*>  StageObjectList;
-
+private:
 	/// <summary>
 	/// 地面データを読み込む
 	/// </summary>
