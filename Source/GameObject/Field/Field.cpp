@@ -113,78 +113,77 @@ bool Field::InitializeField(const char* map_file_name){
 
 bool Field::CheckMove(const Vector2D& move_to_position, const BoxCollisionParams& collision) {
 
-    //float opponent_center_x = move_to_position.x + collision.center_position.x;
-    //float opponent_center_y = move_to_position.y + collision.center_position.y;
-
-    ////中心座標 - 横幅の半分、中心座標 + 縦幅の半分
-    //Vector2D opponent_x_leftup = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y - collision.box_extent.y);
-    //Vector2D opponent_x_rightup = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y - collision.box_extent.y);
-
-    //int x_position = opponent_x_leftup.x / 32;
-    //int y_position = opponent_x_leftup.y / 32;
-    //int object_in_destination = map_data.at(y_position).at(x_position);
-
-    //if (object_in_destination == kGround || object_in_destination == kWall || object_in_destination == kBox) {
-    //    return false;
-    //}
-
-    //x_position = opponent_x_rightup.x / 32;
-    //y_position = opponent_x_rightup.y / 32;
-    //object_in_destination = map_data.at(y_position).at(x_position);
-
-    //if (object_in_destination == kGround || object_in_destination == kWall || object_in_destination == kBox) {
-    //    return false;
-    //}
-
-
-    //////中心座標 - 横幅の半分、中心座標 + 縦幅の半分
-    //Vector2D opponent_y_leftdown = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y + collision.box_extent.y);
-    //Vector2D opponent_y_rightdown = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y + collision.box_extent.y);
-
-    //x_position = opponent_y_leftdown.x / 32-1;
-    //y_position = opponent_y_leftdown.y / 32-1;
-    //object_in_destination = map_data.at(y_position).at(x_position);
-
-    //if (object_in_destination == kGround || object_in_destination == kBox) {
-    //    return false;
-    //}
-
-    //x_position = opponent_y_rightdown.x / 32-1;
-    //y_position = opponent_y_rightdown.y / 32-1;
-    //object_in_destination = map_data.at(y_position).at(x_position);
-
-    //if (object_in_destination == kGround || object_in_destination == kBox) {
-    //    return false;
-    //}
-    //return true;
-
     float opponent_center_x = move_to_position.x + collision.center_position.x;
     float opponent_center_y = move_to_position.y + collision.center_position.y;
 
     //中心座標 - 横幅の半分、中心座標 + 縦幅の半分
+    Vector2D opponent_x_leftup = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y - collision.box_extent.y);
+    Vector2D opponent_x_rightup = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y - collision.box_extent.y);
+
+    int x_position = opponent_x_leftup.x / 32;
+    int y_position = opponent_x_leftup.y / 32;
+    int object_in_destination = map_data.at(y_position).at(x_position);
+
+    if (object_in_destination == kGROUND || object_in_destination == kWALL || object_in_destination == kBOX) {
+        return false;
+    }
+
+    x_position = opponent_x_rightup.x / 32;
+    y_position = opponent_x_rightup.y / 32;
+    object_in_destination = map_data.at(y_position).at(x_position);
+
+    if (object_in_destination == kGROUND || object_in_destination == kWALL || object_in_destination == kBOX) {
+        return false;
+    }
+
+    ////中心座標 - 横幅の半分、中心座標 + 縦幅の半分
     Vector2D opponent_y_leftdown = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y + collision.box_extent.y);
     Vector2D opponent_y_rightdown = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y + collision.box_extent.y);
 
-    int x_position = opponent_y_leftdown.x / map_chip_size;
-    int y_position = opponent_y_leftdown.y / map_chip_size;
-    int object_in_destination = map_data.at(y_position).at(x_position);
+    x_position = opponent_y_leftdown.x / 32;
+    y_position = opponent_y_leftdown.y / 32;
+    object_in_destination = map_data.at(y_position).at(x_position);
 
+    if (object_in_destination == kGROUND || object_in_destination == kWALL || object_in_destination == kBOX) {
+        return false;
+    }
 
-    for(auto obj : StageObjectList) {
-   
-        BoxCollisionParams ground_collision = obj->GetBodyCollision();
-      
-        float distance_x = abs(opponent_center_x - ground_collision.center_position.x);
-        float distance_y = abs(opponent_center_y - ground_collision.center_position.y);
-        //distance_y += 3;
-        float size_x = collision.box_extent.x + ground_collision.box_extent.x;
-        float size_y = collision.box_extent.y + ground_collision.box_extent.y;
+    x_position = opponent_y_rightdown.x / 32;
+    y_position = opponent_y_rightdown.y / 32;
+    object_in_destination = map_data.at(y_position).at(x_position);
 
-        if (distance_x < size_x && distance_y < size_y) {
-           return false;
-        }
+    if (object_in_destination == kGROUND || object_in_destination == kWALL || object_in_destination == kBOX) {
+        return false;
     }
     return true;
+
+    //float opponent_center_x = move_to_position.x + collision.center_position.x;
+    //float opponent_center_y = move_to_position.y + collision.center_position.y;
+
+    ////中心座標 - 横幅の半分、中心座標 + 縦幅の半分
+    //Vector2D opponent_y_leftdown = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y + collision.box_extent.y);
+    //Vector2D opponent_y_rightdown = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y + collision.box_extent.y);
+
+    //int x_position = opponent_y_leftdown.x / map_chip_size;
+    //int y_position = opponent_y_leftdown.y / map_chip_size;
+    //int object_in_destination = map_data.at(y_position).at(x_position);
+
+
+    //for(auto obj : StageObjectList) {
+   
+    //    BoxCollisionParams ground_collision = obj->GetBodyCollision();
+    //  
+    //    float distance_x = abs(opponent_center_x - ground_collision.center_position.x);
+    //    float distance_y = abs(opponent_center_y - ground_collision.center_position.y);
+    //    //distance_y += 3;
+    //    float size_x = collision.box_extent.x + ground_collision.box_extent.x;
+    //    float size_y = collision.box_extent.y + ground_collision.box_extent.y;
+
+    //    if (distance_x < size_x && distance_y < size_y) {
+    //       return false;
+    //    }
+    //}
+    //return true;
 }
 
 bool Field::CheckStande(Vector2D& move_to_position, const BoxCollisionParams& collision){
