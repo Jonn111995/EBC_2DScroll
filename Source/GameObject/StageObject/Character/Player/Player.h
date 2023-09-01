@@ -51,21 +51,6 @@ private:
 	/// </summary>
 	float initial_velocity;
 
-	/// <summary>
-	/// アニメーションスピード
-	/// </summary>
-	float anim_speed;
-
-	/// <summary>
-	/// アニメーションフレームの最小値
-	/// </summary>
-	float min_anim_frame;
-
-	/// <summary>
-	/// アニメーションフレームの最大値
-	/// </summary>
-	float max_anim_frame;
-
 public:
 	Player();
 	virtual ~Player();

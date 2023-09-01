@@ -2,6 +2,29 @@
 #include "DxLib.h"
 #include "Interface/CharacterEventInterface.h"
 
+/// <summary>
+/// キャラクターの基礎クラス
+/// </summary>
+Character::Character()
+	: hp(0)
+	, attack(0)
+	, deffence(0)
+	, speed(MOVEMENT_SPEED)
+	, bIsMove(false)
+	, direction(kRIGHT)
+	, ICharacterEvent(nullptr)
+	, input_direction({0.f,0.f})
+	, now_animations({0})
+	, animation_frame(0.f)
+	, anim_speed(0.f)
+	, min_anim_frame(0.f)
+	, max_anim_frame(0.f)
+{
+}
+
+Character::~Character() {
+}
+
 void Character::Initialize() {
 	__super::Initialize();
 }

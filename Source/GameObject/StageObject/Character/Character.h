@@ -14,6 +14,9 @@ namespace {
 
 class Character :public StageObject {
 
+public:
+    Character();
+    virtual ~Character();
 private:
     /// <summary>
     /// HP
@@ -65,6 +68,21 @@ protected:
     /// アニメーションを変化させる値
     /// </summary>
     float animation_frame;
+
+    /// <summary>
+    /// アニメーションスピード
+    /// </summary>
+    float anim_speed;
+
+    /// <summary>
+    /// アニメーションフレームの最小値
+    /// </summary>
+    float min_anim_frame;
+
+    /// <summary>
+    /// アニメーションフレームの最大値
+    /// </summary>
+    float max_anim_frame;
 protected:
 
 public:
