@@ -3,6 +3,7 @@
 #include "../../GameObject/SampleObject/SampleObject.h"
 #include "../Source/GameObject/StageObject/Character/Player/Player.h"
 #include "../Source/GameObject/Field/Field.h"
+#include "../Source/GameObject/StageObject/Character/Enemy/Enemy.h"
 
 SampleScene::SampleScene()
 {
@@ -33,12 +34,17 @@ void SampleScene::Initialize()
 	ScreenInfo* screen_info = ScreenInfo::GetInstance();
 	screen_info->Initialize();
 
-	// SampleObjectÇê∂ê¨
-
 	field = CreateObject<Field>();
 	field->InitializeField("C/Users/n5919/EBC_2DScroll/Source/CSVFile/mapdata.csv");
-	Character* chara = CreateObject<Player>(Vector2D(screen_info->GetCenterX(), screen_info->GetCenterY()));
-	chara->SetICharacterEvent(this);
+	player = CreateObject<Player>();
+	player->SetICharacterEvent(this);
+	field->AddStageObject(player);
+
+	Enemy* enemy = CreateObject<Enemy>();
+	enemy->SetICharacterEvent(this);
+	field->AddStageObject(enemy);
+
+	field->InitializeStageObjectPosition();
 }
 
 SceneType SampleScene::Update(float delta_seconds)

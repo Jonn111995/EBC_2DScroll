@@ -26,7 +26,6 @@ Player::~Player()
 }
 
 void Player::Initialize() {
-
 	__super::Initialize();
 
     input_handler = new InputHandler();
@@ -34,10 +33,10 @@ void Player::Initialize() {
 	resourcer->Initialize();
 	body_collision.center_position = Vector2D(64, 84);
 	body_collision.box_extent = Vector2D(12, 24);
+	body_collision.object_type = kPLAYER_TYPE;
 }
 
 void Player::Finalize(){
-
 	__super::Finalize();
 
 	delete input_handler;
