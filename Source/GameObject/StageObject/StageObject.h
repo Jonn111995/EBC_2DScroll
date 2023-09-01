@@ -23,27 +23,28 @@ protected:
 
 public:
 	/// <inheritdoc/>
-	virtual void Initialize() override{}
+	virtual void Initialize() override;
 	/// <inheritdoc/>
-	virtual void Finalize() override{}
+	virtual void Finalize() override;
 	/// <inheritdoc/>
-	virtual void Update(float delta_seconds) override {}
+	virtual void Update(float delta_seconds) override;
 	///  <inheritdoc/>
-	virtual void Draw(const Vector2D& screen_offset) override {}
+	virtual void Draw(const Vector2D& screen_offset) override;
 
 public:
 	StageObject();
 	virtual ~StageObject();
-	/**
-	 * Positionの取得
-	 * @return	position
-	 */
+	
+	/// <summary>
+	/// 座標を取得
+	/// </summary>
+	/// <returns>現在の座標</returns>
 	Vector2D GetPosition() const { return position; }
 
-	/**
-	 * Positionのセット
-	 * @param	new_position	セットするPosition
-	 */
+	/// <summary>
+	/// 座標をセット
+	/// </summary>
+	/// <param name="new_position">更新された座標</param>
 	void SetPosition(const Vector2D& new_position);
 
 	/// <summary>
@@ -51,6 +52,11 @@ public:
 	/// </summary>
 	/// <returns>コリジョン</returns>
 	BoxCollisionParams GetBodyCollision() const { return body_collision; }
+	
+	/// <summary>
+	/// コリジョンをセットする
+	/// </summary>
+	/// <param name="collision"></param>
 	void SetBodyCollision(const BoxCollisionParams collision) { body_collision = collision; }
 
 	/// <summary>

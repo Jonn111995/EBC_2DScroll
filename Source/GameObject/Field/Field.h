@@ -13,14 +13,6 @@ class CSVFile;
 /// </summary>
 class Field : public GameObject {
 
-private:
-
-struct GroundObjectInfo{
-
-	Vector2D left_up_pos;
-	BoxCollisionParams collision;
-};
-
 public:
 	Field();
 	virtual ~Field();
@@ -38,7 +30,35 @@ public:
 	/// <param name="move_to_position">移動先</param>
 	/// <param name="collision">移動するオブジェクトのコリジョン</param>
 	/// <returns>true: 移動可能 false: 移動不可</returns>
-	bool CheckMove(const Vector2D& move_to_position, const BoxCollisionParams& collision);
+	bool CheckMove(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision);
+
+	/// <summary>
+	/// X方向へ移動出来るか確認
+	/// </summary>
+	/// <param name="now_position">現在の座標</param>
+	/// <param name="move_amount">移動予定量</param>
+	/// <param name="collision">コリジョン</param>
+	/// <returns>true: 移動可能 false: 移動不可</returns>
+	bool CheckMoveToX(const Vector2D& now_position, const Vector2D& move_amount, const BoxCollisionParams& collision);
+
+	/// <summary>
+	/// Y方向へ移動出来るか確認
+	/// </summary>
+	/// <param name="now_position">現在の座標</param>
+	/// <param name="move_amount">移動予定量</param>
+	/// <param name="collision">コリジョン</param>
+	/// <returns></returns>
+	bool CheckMoveToY(const Vector2D& now_position, const Vector2D& move_amount, const BoxCollisionParams& collision);
+
+	/// <summary>
+	/// 地形マップチップと衝突しているか確認
+	/// </summary>
+	/// <param name="opponent_check_position">衝突相手</param>
+	/// <param name="oppnent_center"></param>
+	/// <param name="collision"></param>
+	/// <returns></returns>
+	bool CheckHitGround(Vector2D& opponent_check_position, const Vector2D& oppnent_center, const BoxCollisionParams& collision);
+
 
 	/// <summary>
 	/// 移動先が立てるか確認
@@ -55,19 +75,24 @@ public:
 	/// <inheritdoc />
 	void Initialize() override;
 	/// <inheritdoc />
+	virtual void Finalize();
+	/// <inheritdoc />
 	void Draw(const Vector2D& screen_offset) override;
 
 private:
 
 	/// <summary>
-	/// 地面のグラフィックハンドル
+	/// 地面の最上層のグラフィックハンドル
 	/// </summary>
-	int ground_graphic_handle[8];
 	int ground_graphic_handle_upper[3];
+	/// <summary>
+	/// 地面の中間層のグラフィックハンドル
+	/// </summary>
 	int ground_graphic_handle_middle[3];
+	/// <summary>
+	/// 地面の最下層のグラフィックハンドル
+	/// </summary>
 	int ground_graphic_handle_bottom[3];
-
-
 
 	/// <summary>
 	/// 壁のグラフィックハンドル
@@ -88,22 +113,27 @@ private:
 	/// CSVファイル読み込み機能インスタンス
 	/// </summary>
 	CSVFile* csv_file_reader;
+
 	/// <summary>
 	/// マップデータ
 	/// </summary>
 	std::vector<std::vector<int>> map_data;
+
 	/// <summary>
 	/// キャラクターの位置関係
 	/// </summary>
 	std::vector<std::vector<Character*>> character_map;
+
 	/// <summary>
 	/// アイテムの位置関係
 	/// </summary>
 	std::vector<std::vector<StageObject*>> item_map;
+
 	/// <summary>
 	/// マップに配置されているオブジェクト
 	/// </summary>
 	std::vector<StageObject*>  StageObjectList;
+
 private:
 	/// <summary>
 	/// マップを描画する
@@ -114,36 +144,7 @@ private:
 	/// 地面のグラフィックを取得。
 	/// </summary>
 	int GetGroundGraphic(const int x, const int y);
-	/// <summary>
-	/// 地面データを読み込む
-	/// </summary>
-	/// <returns>作成する地面の座標</returns>
-	std::vector<Vector2D> ReadGroundData();
-	
-	/// <summary>
-	/// 地面データからオブジェクトを作成する。
-	/// </summary>
-	/// <param name="left_pos_ground_data">作成する地面オブジェクトの左上座標</param>
-	/// <returns></returns>
-	void CreateGround(std::vector<Vector2D>& left_pos_ground_data);
 
-	/// <summary>
-	/// 壁データを読み込む
-	/// </summary>
-	/// <returns>作成する地面の座標</returns>
-	std::vector<GroundObjectInfo> ReadWallData();
-
-	/// <summary>
-	/// 壁データからオブジェクトを作成する
-	/// </summary>
-	/// <param name="left_pos_ground_data">作成する壁オブジェクトの左上座標</param>
-	/// <returns></returns>
-	void CreateWall(std::vector<GroundObjectInfo>& left_pos_wall_data);
-	/// <summary>
-	/// Boxオブジェクトを作成する
-	/// </summary>
-	void CreateBox();
-	
 	/// <summary>
 	/// ステージに配置されたオブジェクトを追加
 	/// </summary>

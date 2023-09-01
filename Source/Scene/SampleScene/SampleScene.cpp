@@ -8,12 +8,20 @@ SampleScene::SampleScene()
 {
 }
 
-bool SampleScene::CheckCanMove(const Vector2D& move_to_position, const BoxCollisionParams& collision) {
-	return field->CheckMove(move_to_position,collision);
+bool SampleScene::CheckCanMove(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) {
+	return field->CheckMove(move_to_position, move_amount, collision);
 }
 
 bool SampleScene::CheckCanStand(Vector2D& move_to_position, const BoxCollisionParams& collision) {
 	return field->CheckStande(move_to_position, collision);
+}
+
+bool SampleScene::CheckCanMoveToX(const Vector2D& now_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) {
+	return field->CheckMoveToX(now_to_position, move_amount, collision);
+}
+
+bool SampleScene::CheckCanMoveToY(const Vector2D& now_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) {
+	return field->CheckMoveToY(now_to_position, move_amount, collision);
 }
 
 void SampleScene::Initialize()
