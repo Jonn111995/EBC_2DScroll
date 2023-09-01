@@ -6,14 +6,21 @@
 #include <iterator>
 #include <math.h>
 
+namespace {
+	const float AIR_RESISTANCE = 0.8f;
+	const float RESET_INITIAL_VELOCITY = 0.0f;
+}
+
 Player::Player()
 	:input_handler(nullptr)
-	,resourcer(nullptr)
-	,player_state(EPlayerState::kIDLE)
-	,player_anim_state(EPlayerAnimState::kIDLE_ANIM)
-	,anim_speed(0.0f)
-	,min_anim_frame(0.0f)
-	,max_anim_frame(0.0f)
+	, resourcer(nullptr)
+	, player_state(EPlayerState::kIDLE)
+	, player_anim_state(EPlayerAnimState::kIDLE_ANIM)
+	, anim_speed(0.f)
+	, min_anim_frame(0.f)
+	, max_anim_frame(0.f)
+	, initial_velocity(0.f)
+	, bIsCanJump(true)
 {
 }
 
@@ -45,81 +52,54 @@ void Player::Finalize(){
 
 void Player::Update(float delta_time) {
 
-	
-
 	std::vector<bool> input_button_status = input_handler->CheckInput(delta_time);
-	Vector2D input_dir;
 	player_state = kIDLE;
 
 	if (input_button_status[kLEFT_B]) {
-		input_dir.x = -50.0f;
+		input_direction.x = -10.0f;
 		SetDirection(CharacterDirection::kLEFT);
 	}
 
 	if (input_button_status[kRIGHT_B]) {
-		input_dir.x = 50.0f;
+		input_direction.x = 10.0f;
 		SetDirection(CharacterDirection::kRIGHT);
 	}
 
 	if (input_button_status[kJUMP_B]) {
-		Jump();
+		StartJump();
 	}
 
 	if (input_button_status[kATTACK_B]) {
 		player_state = kATTACK;
 	}
-	Vector2D delta_position;
 
 	if (!bIsCanJump) {
-		velocity += gravity_accelaration;
-
-		input_dir.y = velocity;
-		delta_position = input_dir.Normalize() * MOVEMENT_SPEED * delta_time;
-
-		Vector2D new_position = GetPosition() + delta_position;
-		body_collision.move_velocity = Vector2D(input_dir.Normalize());
-		if (ICharacterEvent->CheckCanStand(new_position, body_collision)) {
-			velocity = 0;
-			bIsCanJump = true;
-			ChangePlayerState(kIDLE);
-			new_position.y = GetPosition().y;
-		}
-		if (ICharacterEvent->CheckCanMove(new_position, body_collision)) {
-			SetPosition(new_position);
-		}
-	}
-	else {
-		delta_position = input_dir.Normalize() * MOVEMENT_SPEED * delta_time;
-
-		will_update_position = GetPosition() + delta_position;
-
-		body_collision.move_velocity = Vector2D(0, 1);
-		if (!ICharacterEvent->CheckCanStand(will_update_position, body_collision)) {
-
-			/*float fall_direction_ammount = 30.f;
-			Vector2D input_dir = Vector2D(0.f, fall_direction_ammount);*/
-			input_dir.y += 30.0f;
-			will_update_position.y += input_dir.Normalize().y * MOVEMENT_SPEED * delta_time;
-		}
-		if (ICharacterEvent->CheckCanMove(will_update_position, body_collision)) {
-			SetPosition(will_update_position);
-
-			will_update_position = Vector2D(0, 0);
-		}
+		player_state = kJUMP;
 	}
 
-	ChangeAnimState(delta_time, delta_position);	
+	//更新後の座標と比較して、移動量を出すため取得。
+	Vector2D pre_position = GetPosition();
+
+	switch (player_state) {
+		case kJUMP:
+			JumpMove(delta_time);
+			break;
+		default:
+			//移動処理はCharacterに任せる
+			__super::Update(delta_time);
+			break;
+	}
+
+	ChangeAnimState(delta_time, (GetPosition() - pre_position));
 }
 
 void Player::Draw(const Vector2D& screen_offset) {
 	__super::Draw(screen_offset);
 }
 
-void Player::OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision)
-{
+void Player::OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision) {
+
 }
-
-
 
 void Player::ChangePlayerState(const EPlayerState new_state) {
 
@@ -165,6 +145,8 @@ void Player::ExitState() {
 
 void Player::ChangeAnimState(const float delta_time, const Vector2D& delta_position) {
 
+	//delta_positionは、更新前と後の移動量
+
 	if (delta_position == Vector2D(0.0f, 0.0f)) {
 
 		if (player_state == kATTACK) {
@@ -179,6 +161,7 @@ void Player::ChangeAnimState(const float delta_time, const Vector2D& delta_posit
 		player_anim_state = kRUN_ANIM;
 	}
 
+	//ジャンプ中は、ベクトルの値によってアニメーションを変える
 	if (delta_position.y < 0.0f) {
 		player_anim_state = kJUMP_UP_ANIM;
 	}
@@ -257,11 +240,42 @@ void Player::CheckAnimFrame(const float delta_time) {
 	}
 }
 
-void Player::Jump() {
+void Player::StartJump() {
 
 	if (bIsCanJump) {
 		bIsCanJump = false;
-		velocity = -50;
-		y_ground = GetPosition().y;
+		initial_velocity = -25;
 	}
+}
+
+void Player::JumpMove(const float delta_time) {
+
+	Vector2D delta_move_amount;
+	Vector2D new_position = GetPosition();
+	//DXLibでは、Y軸の下方向が+になる。initial_velocityがJump()で、-の値でで初期化されている
+	initial_velocity += GRAVITY_ACCELARATION;
+
+	input_direction.x *= AIR_RESISTANCE;
+	input_direction.y = initial_velocity;
+	delta_move_amount = input_direction.Normalize() * MOVEMENT_SPEED * delta_time;
+
+	//ここから当たり判定
+	bool is_can_move_y = ICharacterEvent->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);
+	if (!is_can_move_y) {
+
+		bIsCanJump = true;
+		initial_velocity = RESET_INITIAL_VELOCITY;
+		ChangePlayerState(kIDLE);
+		new_position.y = GetPosition().y;
+	}
+	else {
+		new_position.y = GetPosition().y + delta_move_amount.y;
+	}
+
+	bool is_can_move_x = ICharacterEvent->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
+	if (is_can_move_x) {
+		new_position.x += delta_move_amount.x;
+	}
+
+	SetPosition(new_position);
 }

@@ -35,6 +35,12 @@ namespace {
 
 Field::Field()
     :csv_file_reader(nullptr)
+    ,ground_graphic_handle_upper()
+    ,ground_graphic_handle_middle()
+    ,ground_graphic_handle_bottom()
+    ,wall_graphic_handle()
+    ,box_graphic_handle()
+    ,gimmick_box_graphic_handle()
 {
 }
 
@@ -42,20 +48,22 @@ Field::~Field()
 {
 }
 
-void Field::Update(float DeltaTime)
-{
+void Field::Update(float delta_time) {
+    __super::Update(delta_time);
 }
 
 void Field::Initialize() {
+    __super::Initialize();
+}
 
+void Field::Finalize() {
+    delete(csv_file_reader);
+    csv_file_reader = nullptr;
 }
 
 void Field::Draw(const Vector2D& screen_offset){
-
+    __super::Draw(screen_offset);
     DrawMap();
-   /* for (auto object : StageObjectList) {
-        object->Draw(screen_offset);
-    }*/
 }
 
 bool Field::InitializeField(const char* map_file_name){
@@ -64,8 +72,7 @@ bool Field::InitializeField(const char* map_file_name){
     char file_name[100];
     for (int i = ground_first_sequence, j = 0; j < ground_mapchip_file_num; i++, j++) {
         snprintf(file_name, sizeof(file_name), "Resources/Images/mapchip_0%d.bmp", i);
-       // ground_graphic_handle[j] = LoadGraph(file_name);
-
+      
         if (j <= 2) {
             ground_graphic_handle_upper[j%3] = LoadGraph(file_name);
         }
@@ -79,8 +86,6 @@ bool Field::InitializeField(const char* map_file_name){
         }
     }
 
-
-    //char file_name2[100];
     for (int i = wall_first_sequence, j = 0; j < ground_mapchip_file_num; i++, j++) {
         snprintf(file_name, sizeof(file_name), "Resources/Images/mapchip_00%d.bmp", i);
         wall_graphic_handle[j] = LoadGraph(file_name);
@@ -100,21 +105,15 @@ bool Field::InitializeField(const char* map_file_name){
     ScreenInfo* screen_info = ScreenInfo::GetInstance();
     screen_info->SetMapSize(map_data.size(), map_data.at(map_data.size() - 1).size());
 
-    //以下でフィールドの地形オブジェクトを作成
-   
-    /*std::vector<Vector2D> load_ground_data = ReadGroundData();
-    CreateGround(load_ground_data);
-
-    std::vector<GroundObjectInfo> load_wall = ReadWallData();
-    CreateWall(load_wall);
-
-    CreateBox();*/
 }
 
-bool Field::CheckMove(const Vector2D& move_to_position, const BoxCollisionParams& collision) {
+bool Field::CheckMove(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) {
 
-    float opponent_center_x = move_to_position.x + collision.center_position.x;
+    float opponent_center_x = move_to_position.x + move_amount.x + collision.center_position.x;
     float opponent_center_y = move_to_position.y + collision.center_position.y;
+   
+   /* float opponent_center_x = move_to_position.x + collision.center_position.x;
+    float opponent_center_y = move_to_position.y + collision.center_position.y;*/
 
     //中心座標 - 横幅の半分、中心座標 + 縦幅の半分
     Vector2D opponent_x_leftup = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y - collision.box_extent.y);
@@ -125,7 +124,21 @@ bool Field::CheckMove(const Vector2D& move_to_position, const BoxCollisionParams
     int object_in_destination = map_data.at(y_position).at(x_position);
 
     if (object_in_destination == kGROUND || object_in_destination == kWALL || object_in_destination == kBOX) {
-        return false;
+
+        ScreenInfo* screen_info = ScreenInfo::GetInstance();
+        float ground_center_pos_x = (screen_info->GetLeftX() + map_chip_size * x_position) + (map_chip_size / 2);
+        float ground_center_pos_y = (screen_info->GetLeftY() + map_chip_size * y_position) + (map_chip_size / 2);
+
+        float distance_x = abs(opponent_center_x - ground_center_pos_x);
+        float distance_y = abs(opponent_center_y - ground_center_pos_y);
+        //distance_y += 3;
+        float size_x = collision.box_extent.x + (map_chip_size / 2);
+        float size_y = collision.box_extent.y + (map_chip_size / 2);
+
+        if (distance_x < size_x && distance_y < size_y) {
+            return false;
+        }
+       // return false;
     }
 
     x_position = opponent_x_rightup.x / 32;
@@ -133,8 +146,25 @@ bool Field::CheckMove(const Vector2D& move_to_position, const BoxCollisionParams
     object_in_destination = map_data.at(y_position).at(x_position);
 
     if (object_in_destination == kGROUND || object_in_destination == kWALL || object_in_destination == kBOX) {
-        return false;
+        ScreenInfo* screen_info = ScreenInfo::GetInstance();
+        float ground_center_pos_x = (screen_info->GetLeftX() + map_chip_size * x_position) + (map_chip_size / 2);
+        float ground_center_pos_y = (screen_info->GetLeftY() + map_chip_size * y_position) + (map_chip_size / 2);
+
+        float distance_x = abs(opponent_center_x - ground_center_pos_x);
+        float distance_y = abs(opponent_center_y - ground_center_pos_y);
+        //distance_y += 3;
+        float size_x = collision.box_extent.x + (map_chip_size / 2);
+        float size_y = collision.box_extent.y + (map_chip_size / 2);
+
+        if (distance_x < size_x && distance_y < size_y) {
+            return false;
+        }
+       // return false;
     }
+
+
+    opponent_center_x = move_to_position.x + collision.center_position.x;
+    opponent_center_y = move_to_position.y + move_amount.y + collision.center_position.y;
 
     ////中心座標 - 横幅の半分、中心座標 + 縦幅の半分
     Vector2D opponent_y_leftdown = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y + collision.box_extent.y);
@@ -145,7 +175,20 @@ bool Field::CheckMove(const Vector2D& move_to_position, const BoxCollisionParams
     object_in_destination = map_data.at(y_position).at(x_position);
 
     if (object_in_destination == kGROUND || object_in_destination == kWALL || object_in_destination == kBOX) {
-        return false;
+        ScreenInfo* screen_info = ScreenInfo::GetInstance();
+        float ground_center_pos_x = (screen_info->GetLeftX() + map_chip_size * x_position) + (map_chip_size / 2);
+        float ground_center_pos_y = (screen_info->GetLeftY() + map_chip_size * y_position) + (map_chip_size / 2);
+
+        float distance_x = abs(opponent_center_x - ground_center_pos_x);
+        float distance_y = abs(opponent_center_y - ground_center_pos_y);
+        //distance_y += 3;
+        float size_x = collision.box_extent.x + (map_chip_size / 2);
+        float size_y = collision.box_extent.y + (map_chip_size / 2);
+
+        if (distance_x < size_x && distance_y < size_y) {
+            return false;
+        }
+        // return false;
     }
 
     x_position = opponent_y_rightdown.x / 32;
@@ -153,7 +196,21 @@ bool Field::CheckMove(const Vector2D& move_to_position, const BoxCollisionParams
     object_in_destination = map_data.at(y_position).at(x_position);
 
     if (object_in_destination == kGROUND || object_in_destination == kWALL || object_in_destination == kBOX) {
-        return false;
+        ScreenInfo* screen_info = ScreenInfo::GetInstance();
+        float ground_center_pos_x = (screen_info->GetLeftX() + map_chip_size * x_position) + (map_chip_size / 2);
+        float ground_center_pos_y = (screen_info->GetLeftY() + map_chip_size * y_position) + (map_chip_size / 2);
+
+        float distance_x = abs(opponent_center_x - ground_center_pos_x);
+        float distance_y = abs(opponent_center_y - ground_center_pos_y);
+        //distance_y += 3;
+        float size_x = collision.box_extent.x + (map_chip_size / 2);
+        float size_y = collision.box_extent.y + (map_chip_size / 2);
+
+        if (distance_x < size_x && distance_y < size_y) {
+
+            return false;
+        }
+        //return false;
     }
     return true;
 
@@ -184,6 +241,94 @@ bool Field::CheckMove(const Vector2D& move_to_position, const BoxCollisionParams
     //    }
     //}
     //return true;
+}
+
+bool Field::CheckMoveToX(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) {
+
+    //X方向にだけ動いた移動先を求める
+    float opponent_center_x = move_to_position.x + move_amount.x + collision.center_position.x;
+    float opponent_center_y = move_to_position.y + collision.center_position.y;
+    Vector2D opponent_center = Vector2D(opponent_center_x, opponent_center_y);
+
+    //中心座標 - 横幅の半分、中心座標 + 縦幅の半分
+    Vector2D opponent_x_leftup = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y - collision.box_extent.y);
+    Vector2D opponent_x_rightup = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y - collision.box_extent.y);
+    Vector2D opponent_x_leftdown = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y + collision.box_extent.y);
+    Vector2D opponent_x_rightdown = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y + collision.box_extent.y);
+    Vector2D opponent_x_leftmiddle = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y);
+    Vector2D opponent_x_rightmiddle = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y);
+   
+    std::vector<Vector2D> check_positions =
+    { opponent_center,opponent_x_leftup,opponent_x_rightup,opponent_x_leftdown,opponent_x_rightdown,opponent_x_leftmiddle,opponent_x_rightmiddle };
+
+    for(auto& check_position : check_positions) {
+        if (!CheckHitGround(check_position, opponent_center, collision)) {
+
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Field::CheckMoveToY(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) {
+
+    float opponent_center_x = move_to_position.x + collision.center_position.x;
+    float opponent_center_y = move_to_position.y + move_amount.y + collision.center_position.y;
+    Vector2D opponent_center = Vector2D(opponent_center_x, opponent_center_y);
+
+    //中心座標 - 横幅の半分、中心座標 + 縦幅の半分
+    Vector2D opponent_y_leftdown = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y + collision.box_extent.y);
+    Vector2D opponent_y_rightdown = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y + collision.box_extent.y);
+    Vector2D opponent_y_left_top = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y - collision.box_extent.y);
+    Vector2D opponent_y_right_top = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y - collision.box_extent.y);
+    Vector2D opponent_y_left_middle = Vector2D(opponent_center_x, opponent_center_y - collision.box_extent.y);
+    Vector2D opponent_y_right_middle = Vector2D(opponent_center_x, opponent_center_y - collision.box_extent.y);
+
+    std::vector<Vector2D> check_positions =
+    { opponent_y_leftdown, opponent_y_rightdown, opponent_y_left_top, opponent_y_right_top, opponent_y_left_middle,opponent_y_right_middle };
+
+
+    for (auto& check_position : check_positions) {
+        if (!CheckHitGround(check_position, opponent_center, collision)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Field::CheckHitGround(Vector2D& opponent_check_position, const Vector2D& oppnent_center, const BoxCollisionParams& collision) {
+
+    float x_position = opponent_check_position.x / map_chip_size;
+    float y_position = opponent_check_position.y / map_chip_size;
+    int object_in_destination = map_data.at(y_position).at(x_position);
+
+    if (object_in_destination == kGROUND || object_in_destination == kWALL || object_in_destination == kBOX) {
+        ScreenInfo* screen_info = ScreenInfo::GetInstance();
+        int x_left = screen_info->GetLeftX() + map_chip_size * int(x_position);
+        int y_down = screen_info->GetLeftY() + map_chip_size * int(y_position);
+        float ground_center_pos_x = (screen_info->GetLeftX() + map_chip_size * x_position) + (map_chip_size / 2);
+        float ground_center_pos_y = (screen_info->GetLeftY() + map_chip_size * y_position) + (map_chip_size / 2);
+
+        float distance_x = abs(oppnent_center.x - ground_center_pos_x);
+        float distance_y = abs(oppnent_center.y - ground_center_pos_y);
+        //distance_y += 3;
+        float size_x = collision.box_extent.x + (map_chip_size / 2);
+        float size_y = collision.box_extent.y + (map_chip_size / 2);
+
+        //差が微小の場合は当たったと見なすための処理
+        if (abs(distance_x - size_x) <= .1f) {
+            distance_x = size_x;
+        }
+        if (abs(distance_y - size_y) <= .1f) {
+            distance_y = size_y;
+        }
+
+
+        if (distance_x <= size_x && distance_y <= size_y) { 
+            return false;
+        }
+    }
+    return true;
 }
 
 bool Field::CheckStande(Vector2D& move_to_position, const BoxCollisionParams& collision){
@@ -284,236 +429,6 @@ int Field::GetGroundGraphic(const int x, const int y) {
     }
    
 }
-
-std::vector<Vector2D> Field::ReadGroundData() {
-    //y軸から見て、最初に見つけた地面チップの場所を記録
-   //そのチップのx軸の地面チップは無視。
-   //違う高さのy軸の地面チップを見つければ、そこの地点を記録。
-    std::vector<Vector2D> left_pos_ground_data;
-    int ignore_y = initialize_ignore_limit;
-    for (unsigned x = 0; x < map_data.at(map_data.size() - 1).size(); x++) {
-        for (unsigned y = 0; y < map_data.size(); y++) {
-
-            if (map_data.at(y).at(x) == MapChipType::kGROUND) {
-                if (ignore_y == y) {
-                    break;
-                }
-                left_pos_ground_data.push_back(Vector2D(x, y));
-                ignore_y = y;
-                break;
-            }
-
-            if (y == map_data.size() - vector_index_adjust) {
-                ignore_y = initialize_ignore_limit;
-            }
-        }
-    }
-    return left_pos_ground_data;
-}
-
-void Field::CreateGround(std::vector<Vector2D>& left_pos_ground_data) {
-   
-    for (auto& left_pos : left_pos_ground_data) {
-
-        int y_leftup_ground_pos = 0;
-        int x_leftup_ground_pos = 0;
-        left_pos.ToInt(x_leftup_ground_pos, y_leftup_ground_pos);
-
-        std::vector<std::vector<int>> ground_data;
-        int limit_x = -1;
-        for (unsigned y = y_leftup_ground_pos; y < map_data.size(); y++) {
-            std::vector<int> one_line_ground;
-
-            for (unsigned x = x_leftup_ground_pos; x < map_data.at(y).size(); x++) {
-              
-                if (map_data.at(y).at(x) == MapChipType::kGROUND) {
-
-                    if (limit_x >= 0) {
-                        if (x >= limit_x) {
-                            break;
-                        }
-                        one_line_ground.push_back(map_data.at(y).at(x));
-                        continue;
-                    }
-
-                    if (y != 0) {
-                        if (map_data.at(y - vector_index_adjust).at(x) == MapChipType::kGROUND) {
-                            limit_x = x;
-                            break;
-                        }
-                    }
-                    one_line_ground.push_back(map_data.at(y).at(x));
-
-                    if (x == map_data.at(y).size() - vector_index_adjust) {
-                        limit_x = x+1;
-                    }
-                }
-                else {
-                    limit_x = x;
-                    break;
-                }
-            }
-            ground_data.push_back(one_line_ground);
-        }
-        Ground* ground = new Ground();
-        ground->Initialize();
-        ground->SetGroundData(ground_data);
-
-        float y_size = static_cast<float>(ground_data.size()) * ground_y_size;
-        float x_size = static_cast<float>(ground_data.at(ground_data.size()-1).size()) * map_chip_size;
-
-        float x_center = (static_cast<float>(x_leftup_ground_pos) * map_chip_size) + (x_size / half);
-        float y_center = (static_cast<float>(y_leftup_ground_pos) * map_chip_size) + (y_size / half);
-
-        BoxCollisionParams collision = ground->GetBodyCollision();
-        collision.center_position = Vector2D(x_center, y_center);
-        collision.box_extent = Vector2D(x_size / half, y_size / half);
-        collision.object_type = CollisionObjectType::kGROUND_TYPE;
-        ground->SetBodyCollision(collision);
-
-        StageObjectList.push_back(ground);
-    }
-}
-
-std::vector<Field::GroundObjectInfo> Field::ReadWallData() {
-
-    //y軸から見て、最初に見つけた地面チップの場所を記録
- //そのチップのx軸の地面チップは無視。
- //違う高さのy軸の地面チップを見つければ、そこの地点を記録。
-    std::vector<GroundObjectInfo> left_pos_ground_data;
-    int ignore_y = initialize_ignore_limit;
-    for (unsigned x = 0; x < map_data.at(map_data.size() - vector_index_adjust).size(); x++) {
-        for (unsigned y = 0; y < map_data.size(); y++) {
-
-            int left_up_pos = map_data.at(y).at(x);
-            if (left_up_pos == MapChipType::kWALL) {
-                if (ignore_y == y) {
-                    break;
-                }
-                GroundObjectInfo info;
-                info.left_up_pos = Vector2D(x, y);
-                info.collision.object_type = CollisionObjectType::kGROUND_TYPE;
-               
-                left_pos_ground_data.push_back(info);
-                ignore_y = y;
-                break;
-            }
-
-            if (y == map_data.size() - vector_index_adjust) {
-                ignore_y = initialize_ignore_limit;
-            }
-        }
-    }
-    return left_pos_ground_data;
-}
-
-
-void Field::CreateWall(std::vector<GroundObjectInfo>& left_pos_wall_data) {
-
-    for (auto& wall_info : left_pos_wall_data) {
-
-        int y_leftup_ground_pos = 0;
-        int x_leftup_ground_pos = 0;
-        wall_info.left_up_pos.ToInt(x_leftup_ground_pos, y_leftup_ground_pos);
-
-        std::vector<std::vector<int>> ground_data;
-        int limit_x = -1;
-        for (unsigned y = y_leftup_ground_pos; y < map_data.size(); y++) {
-            std::vector<int> one_line_ground;
-
-            for (unsigned x = x_leftup_ground_pos; x < map_data.at(y).size(); x++) {
-
-                if (map_data.at(y).at(x) == MapChipType::kWALL || map_data.at(y).at(x) == MapChipType::kBROKEN_WALL) {
-
-                    //リミットが設定されているときはここで格納していく。
-                    if (limit_x >= 0) {
-                        if (x >= limit_x) {
-                            break;
-                        }
-                        one_line_ground.push_back(map_data.at(y).at(x));
-                        continue;
-                    }
-
-                    //リミットが設定されていないときはこのしたで格納。
-                    //yが0の時は上のチップは確認しない
-                    if (y != 0) {
-                        if (map_data.at(y - vector_index_adjust).at(x) == MapChipType::kWALL) {
-                            limit_x = x;
-                            break;
-                        }
-                    }
-                    one_line_ground.push_back(map_data.at(y).at(x));
-
-                    if (x == map_data.at(y).size() - vector_index_adjust) {
-                        limit_x = x + map_chip_size;
-                    }
-                }
-                else {
-                    limit_x = x;
-                    break;
-                }
-            }
-            if(one_line_ground.size() != zero_ground_data){
-                ground_data.push_back(one_line_ground);
-            }
-        }
-        Wall* ground = new Wall();
-        ground->Initialize();
-        ground->SetGroundData(ground_data);
-
-        float y_size = static_cast<float>(ground_data.size()) * wall_y_size;
-        float x_size = static_cast<float>(ground_data.at(ground_data.size() - vector_index_adjust).size()) * map_chip_size;
-
-        float x_center = (static_cast<float>(x_leftup_ground_pos) * map_chip_size) + (x_size / half);
-        float y_center = (static_cast<float>(y_leftup_ground_pos) * map_chip_size) + (y_size / half);
-
-        BoxCollisionParams collision = ground->GetBodyCollision();
-        collision.left_up_position = wall_info.left_up_pos;
-        collision.center_position = Vector2D(x_center, y_center);
-        collision.box_extent = Vector2D(x_size / half, y_size / half);
-        //collision.object_type = kGROUND;
-        ground->SetBodyCollision(collision);
-
-        StageObjectList.push_back(ground);
-    }
-}
-
-void Field::CreateBox() {
-
-    for (unsigned y = 0; y < map_data.size(); y++) {
-        for (unsigned x = 0; x < map_data.at(y).size(); x++) {
-            Box* box = nullptr;
-            float x_center = 0.f;
-            float y_center = 0.f;
-            BoxCollisionParams collision;
-
-            switch (map_data.at(y).at(x)) {
-            case kBOX:
-                box = new Box();
-                box->Initialize();
-
-                x_center = (static_cast<float>(x) * map_chip_size) + (map_chip_size / half);
-                y_center = (static_cast<float>(y) * map_chip_size) + (box_y_size / half);
-
-                collision = box->GetBodyCollision();
-                collision.left_up_position = Vector2D(x, y);
-                collision.center_position = Vector2D(x_center, y_center);
-                collision.box_extent = Vector2D(map_chip_size / half, box_y_size/ half);
-               // collision.object_type = kGROUND;
-                box->SetBodyCollision(collision);
-                StageObjectList.push_back(box);
-                break;
-
-            case kGIMMICK_BOX:
-                //実装予定
-                break;
-
-               
-            }
-        }
-    }
-}
-
 
 void Field::AddStageObject(Character*)
 {

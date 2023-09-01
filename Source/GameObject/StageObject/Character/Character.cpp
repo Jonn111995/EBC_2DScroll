@@ -2,14 +2,49 @@
 #include "DxLib.h"
 #include "Interface/CharacterEventInterface.h"
 
-void Character::Update(float delta_time) {
-	//移動ベクトル。下方向
-	
-
+void Character::Initialize() {
+	__super::Initialize();
 }
 
-void Character::Draw(const Vector2D& screen_offset)
-{
+void Character::Finalize() {
+	__super::Finalize();
+	ICharacterEvent = nullptr;
+}
+
+void Character::Update(float delta_time) {
+	__super::Update(delta_time);
+
+	Vector2D delta_move_amount = { 0.f, 0.f };
+	Vector2D new_position = GetPosition();
+	delta_move_amount = input_direction.Normalize() * MOVEMENT_SPEED * delta_time;
+	bool is_can_move_x = ICharacterEvent->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
+
+	if (is_can_move_x) {
+		new_position.x += delta_move_amount.x;
+	}
+
+	input_direction.y += 50.0f;
+	float move_amount = input_direction.Normalize().y * MOVEMENT_SPEED * delta_time;
+	delta_move_amount.y += move_amount;
+
+	bool is_can_move_y = ICharacterEvent->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);
+	if (is_can_move_y) {
+		new_position.y += delta_move_amount.y;
+	}
+	else {
+		//delta_move_amount.y -= move_amount;
+		new_position.y = GetPosition().y;
+	}
+
+	//リセットしないと前回のフレームの値に次のフレームの値が足されてしまうのでリセット。
+	input_direction = { 0.f, 0.f };
+	SetPosition(new_position);
+}
+
+void Character::Draw(const Vector2D& screen_offset) {
+
+	__super::Draw(screen_offset);
+
 	int x, y;
 	GetPosition().ToInt(x, y);
 	switch (GetDirection()) {

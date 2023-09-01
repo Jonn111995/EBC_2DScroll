@@ -24,6 +24,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SceneManager* scene_manager = new SceneManager();
 	scene_manager->Initialize();
 
+	const float FPS = 60.f;
+	int loop_count = 0;
+	int loop_time = 1000 / 60;
 	// メインループ
 	int prev_frame_time = GetNowCount();
  	while (ProcessMessage() != -1 && CheckHitKey(KEY_INPUT_ESCAPE) != 1)
@@ -32,10 +35,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		int current_frame_time = GetNowCount();
 		float delta_seconds = (float)(current_frame_time - prev_frame_time) / 1000.0f;
 		prev_frame_time = current_frame_time;
+		
 
 		// SceneManagerの更新
 		scene_manager->Update(delta_seconds);
-		Sleep(60 / 1000.f);
+
+		if (GetNowCount() - prev_frame_time < loop_time)
+		{
+			Sleep(loop_time - (GetNowCount() - prev_frame_time));
+		}
+
 	}
 
 	// SceneManagerの破棄

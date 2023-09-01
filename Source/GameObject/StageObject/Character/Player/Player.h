@@ -9,6 +9,13 @@
 class InputHandler;
 class PlayerAnimResourcer;
 
+namespace {
+	/// <summary>
+	/// 重力加速力
+	/// </summary>
+	const float GRAVITY_ACCELARATION = 1.0f;
+}
+
 /// <summary>
 /// プレイヤー
 /// </summary>
@@ -34,34 +41,26 @@ private:
 	/// </summary>
 	EPlayerAnimState player_anim_state;
 
-	
-
-
 	/// <summary>
 	/// ジャンプ出来るかどうか
 	/// </summary>
-	bool bIsCanJump = true;
+	bool bIsCanJump;
 
 	/// <summary>
-	/// 加速力
+	/// 初速度
 	/// </summary>
-	float velocity = 0.0f;
-	/// <summary>
-	/// 重力加速力
-	/// </summary>
-	float gravity_accelaration = 1.0f;
-	/// <summary>
-	/// ジャンプしたときの地面のy座標
-	/// </summary>
-	int y_ground = 0;
+	float initial_velocity;
+
 	/// <summary>
 	/// アニメーションスピード
 	/// </summary>
-	float anim_speed = 0.0f;
+	float anim_speed;
+
 	/// <summary>
 	/// アニメーションフレームの最小値
 	/// </summary>
 	float min_anim_frame;
+
 	/// <summary>
 	/// アニメーションフレームの最大値
 	/// </summary>
@@ -83,11 +82,16 @@ public:
 	virtual void OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision) override;
 
 protected:
-	void ChangeAnimState(const float delta_timeconst, const  Vector2D& delta_position);
+	/// <summary>
+	/// アニメーションを変更する
+	/// </summary>
+	/// <param name="delta_time">毎フレーム時間</param>
+	/// <param name="delta_move_amount">更新前と後の移動量の差</param>
+	void ChangeAnimState(const float delta_time, const Vector2D& delta_move_amount);
 
 private:
 
-/// <summary>
+	///<summary>
 	/// 新しい状態の初期化処理
 	/// </summary>
 	void EnterState();
@@ -103,12 +107,25 @@ private:
 	/// <param name="new_state">新しい状態</param>
 	void ChangePlayerState(const EPlayerState new_state);
 
+	/// <summary>
+	/// アニメーションステートが変更されたときの開始処理
+	/// </summary>
 	void EnterAnimState();
 
+	/// <summary>
+	/// アニメフレームが現在のアニメーションの範囲を超えていないか確認
+	/// </summary>
+	/// <param name="delta_time">毎フレーム時間</param>
 	void CheckAnimFrame(const float delta_time);
 
 	/// <summary>
-	/// ジャンプ
+	/// ジャンプを開始する
 	/// </summary>
-	void Jump();
+	void StartJump();
+
+	/// <summary>
+	/// ジャンプ中の移動処理
+	/// </summary>
+	/// <param name="delta_time">毎フレーム時間</param>
+	void JumpMove(const float delta_time);
 };
