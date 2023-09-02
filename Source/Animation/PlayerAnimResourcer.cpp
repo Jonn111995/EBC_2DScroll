@@ -7,6 +7,7 @@ void PlayerAnimResourcer::Initialize() {
 	LoadDivGraph(_T("Resources/Images/collon_run8.bmp"), 8, 4, 2, 128, 128, loaded_sprite_run);
 	LoadDivGraph(_T("Resources/Images/collon_jump.bmp"), 6, 4, 2, 128, 128, loaded_sprite_jump);
 	LoadDivGraph(_T("Resources/Images/collon_attack.bmp"), 3, 3, 1, 128, 128, loaded_sprite_attack);
+	loaded_sprite_damage = LoadGraph(_T("Resources/Images/collon_damage.bmp"));
 }
 
 void PlayerAnimResourcer::Finalize() {
@@ -29,6 +30,8 @@ void PlayerAnimResourcer::Finalize() {
 		DeleteGraph(handle);
 		handle = 0;
 	}
+
+	DeleteGraph(loaded_sprite_damage);
 }
 
 std::vector<int> PlayerAnimResourcer::GetAnimaitonHandle(EPlayerState now_state) {
@@ -62,6 +65,10 @@ int* PlayerAnimResourcer::GetAnimationHandleHelper(EPlayerState now_state, int& 
 	case kJUMP:
 		out_array_size = sizeof(loaded_sprite_jump);
 		return loaded_sprite_jump;
+		break;
+	case kDAMAGE:
+		out_array_size = sizeof(loaded_sprite_damage);
+		return &loaded_sprite_damage;
 		break;
 	}
 }

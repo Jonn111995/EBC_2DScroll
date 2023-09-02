@@ -165,5 +165,8 @@ public:
     /// <param name="opponent">攻撃してきたキャラ</param>
     /// <param name="damage">ダメージ</param>
     void GetDamage(Character& opponent, const int damage);
+
+    virtual void GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity);
+
 };
 

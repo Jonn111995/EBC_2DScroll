@@ -51,6 +51,13 @@ private:
 	/// </summary>
 	float initial_velocity;
 
+	/// <summary>
+	/// 毎フレーム時間の計測時間
+	/// </summary>
+	float count_time;
+
+	bool bIsNoDamage;
+
 public:
 	Player();
 	virtual ~Player();
@@ -113,4 +120,6 @@ private:
 	/// </summary>
 	/// <param name="delta_time">毎フレーム時間</param>
 	void JumpMove(const float delta_time);
+
+	virtual void GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity) override;
 };

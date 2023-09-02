@@ -58,7 +58,7 @@ SceneType SampleScene::Update(float delta_seconds) {
 		for (auto oppnent_iterator = stage_obj_list.begin(); oppnent_iterator != stage_obj_list.end(); ++oppnent_iterator) {
 
 			if (iterator == oppnent_iterator) {
-				break;
+				continue;
 			}
 		
 			BoxCollisionParams opponent = (*oppnent_iterator)->GetBodyCollision();
