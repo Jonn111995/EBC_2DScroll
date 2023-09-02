@@ -117,10 +117,18 @@ void Player::Update(float delta_time) {
 }
 
 void Player::Draw(const Vector2D& screen_offset) {
-	unsigned int color = GetColor(255, 0, 0);
-	DrawFormatString(0, 0, color, "X=%f, Y=%f:::::", body_collision.center_position2.x, body_collision.center_position2.y);
-
+	
+	if (player_state == kDAMAGE) {
+		if (((int)(count_time * 10) % (int)(0.2f * 10)) == 0.f) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 64);
+		}
+		else {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+		}
+	}
 	__super::Draw(screen_offset);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
 }
 
 void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {

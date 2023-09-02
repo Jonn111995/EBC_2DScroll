@@ -87,7 +87,6 @@ void Character::Draw(const Vector2D& screen_offset) {
 		DrawGraph(x, y, now_animations[animation_frame], true);
 		break;
 	}
-
 	unsigned int color = GetColor(255, 0, 0);
 	int x2 = body_collision.center_position2.x - body_collision.box_extent.x;
 	int y2 = body_collision.center_position2.y - body_collision.box_extent.y;
