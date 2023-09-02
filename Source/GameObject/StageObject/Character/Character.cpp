@@ -13,7 +13,7 @@ Character::Character()
 	: hp(0)
 	, attack(0)
 	, deffence(0)
-	, speed(MOVEMENT_SPEED)
+	, move_speed(MOVEMENT_SPEED)
 	, bIsMove(false)
 	, direction(kRIGHT)
 	, ICharacterEvent(nullptr)
@@ -43,7 +43,7 @@ void Character::Update(float delta_time) {
 
 	Vector2D delta_move_amount = { 0.f, 0.f };
 	Vector2D new_position = GetPosition();
-	delta_move_amount = input_direction.Normalize() * MOVEMENT_SPEED * delta_time;
+	delta_move_amount = input_direction.Normalize() * move_speed * delta_time;
 	bool is_can_move_x = ICharacterEvent->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
 
 	if (is_can_move_x) {
@@ -52,7 +52,7 @@ void Character::Update(float delta_time) {
 
 
 	input_direction.y += 50.0f;
-	float move_amount = input_direction.Normalize().y * MOVEMENT_SPEED * delta_time;
+	float move_amount = input_direction.Normalize().y * move_speed * delta_time;
 	delta_move_amount.y += move_amount;
 
 	bool is_can_move_y = ICharacterEvent->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);

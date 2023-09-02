@@ -10,6 +10,7 @@ enum EPlayerState {
 	kRUN,
 	kJUMP,
 	kATTACK,
+	kINVINCIBLE,
 	kDAMAGE,
 	kDEAD
 };

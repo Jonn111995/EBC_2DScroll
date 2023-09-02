@@ -20,6 +20,7 @@ Player::Player()
 	, initial_velocity(0.f)
 	, bIsCanJump(true)
 	, bIsNoDamage(false)
+	, invincible_time(1.5f)
 {
 }
 
@@ -53,8 +54,8 @@ void Player::Finalize(){
 void Player::Update(float delta_time) {
 
 	std::vector<bool> input_button_status = input_handler->CheckInput(delta_time);
-	//player_state = kIDLE;
-	if (player_state != kDAMAGE) {
+
+	if (!is_reject_input) {
 		if (input_button_status[kLEFT_B]) {
 			input_direction.x = -10.0f;
 			SetDirection(CharacterDirection::kLEFT);
@@ -81,6 +82,16 @@ void Player::Update(float delta_time) {
 	//更新後の座標と比較して、移動量を出すため取得。
 	Vector2D pre_position = GetPosition();
 
+	if (bIsNoDamage) {
+		count_time += delta_time;
+
+		if (count_time > invincible_time) {
+			player_state = kIDLE;
+			bIsNoDamage = false;
+			count_time = 0.f;
+		}
+	}
+
 	switch (player_state) {
 		case kJUMP:
 			JumpMove(delta_time);
@@ -89,7 +100,9 @@ void Player::Update(float delta_time) {
 			count_time += delta_time;
 			if (count_time < 0.1f) {
 
+				is_reject_input = true;
 				Vector2D recoil_dir = { 0.f, 0.f };
+
 				if (GetDirection() == kRIGHT) {
 					recoil_dir = { -1.f, 0.f };
 				}
@@ -98,27 +111,29 @@ void Player::Update(float delta_time) {
 				}
 				GetDamageRecoil(delta_time, recoil_dir);
 			}
-			else if (count_time < 0.3f) {
+			else if (count_time > 0.4f) {
+				is_reject_input = false;
 				bIsNoDamage = true;
-			}
-			else {
-				player_state = kIDLE;
-				bIsNoDamage = false;
-				count_time = 0.f;
+				player_state = kINVINCIBLE;
 			}
 			break;
+		case kINVINCIBLE:
+			
+			//無敵状態の時は移動処理もさせたいので、breakを置かずにフォースルーする。
 		default:
 			//移動処理はCharacterに任せる
 			__super::Update(delta_time);
 			break;
 	}
+
+	
 	
 	ChangeAnimState(delta_time, (GetPosition() - pre_position));
 }
 
 void Player::Draw(const Vector2D& screen_offset) {
 	
-	if (player_state == kDAMAGE) {
+	if (player_state == kDAMAGE || bIsNoDamage) {
 		if (((int)(count_time * 10) % (int)(0.2f * 10)) == 0.f) {
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 64);
 		}

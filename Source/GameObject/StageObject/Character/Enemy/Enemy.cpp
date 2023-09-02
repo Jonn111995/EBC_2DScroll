@@ -19,6 +19,8 @@ void Enemy::Initialize() {
 	min_anim_frame = 0.0f;
 	max_anim_frame = now_animations.size() - 1.0f;
 
+	SetSpeed(50.f);
+
 	body_collision.object_type = kENEMY_TYPE;
 	body_collision.center_position = Vector2D(20, 28);
 	body_collision.box_extent = Vector2D(10.f, 18.f);
@@ -29,6 +31,8 @@ void Enemy::Finalize() {
 }
 
 void Enemy::Update(float delta_time) {
+
+	input_direction.x = -0.1f;
 	__super::Update(delta_time);
 }
 

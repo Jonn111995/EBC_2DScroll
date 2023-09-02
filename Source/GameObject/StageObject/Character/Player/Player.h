@@ -56,7 +56,17 @@ private:
 	/// </summary>
 	float count_time;
 
+	/// <summary>
+	/// ダメージを受けないか？
+	/// </summary>
 	bool bIsNoDamage;
+
+	/// <summary>
+	/// 入力を受け付けるかどうか
+	/// </summary>
+	bool is_reject_input;
+
+	float invincible_time;
 
 public:
 	Player();

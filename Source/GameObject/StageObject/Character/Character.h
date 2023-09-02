@@ -36,7 +36,7 @@ private:
     /// <summary>
     /// 移動スピード
     /// </summary>
-    float speed;
+    float move_speed;
 
     /// <summary>
     /// 動いているかどうか
@@ -125,7 +125,13 @@ public:
     /// 移動スピードを取得
     /// </summary>
     /// <returns>移動スピード</returns>
-    float GetSpeed() const { return speed; }
+    float GetSpeed() const { return move_speed; }
+
+    /// <summary>
+    /// 移動スピードをセット
+    /// </summary>
+    /// <param name="speed">移動スピード</param>
+    void SetSpeed(const float speed) { move_speed = speed; };
 
     /// <summary>
     /// 移動しているかどうかのフラグをセット
