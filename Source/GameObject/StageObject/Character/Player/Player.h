@@ -64,7 +64,7 @@ public:
 	/// <inheritdoc/>
 	virtual void Draw(const Vector2D& screen_offset) override;
 	/// <inheritdoc/>
-	virtual void OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision) override;
+	virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) override;
 
 protected:
 	/// <summary>

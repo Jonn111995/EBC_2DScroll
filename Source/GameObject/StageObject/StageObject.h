@@ -59,11 +59,13 @@ public:
 	/// <param name="collision"></param>
 	void SetBodyCollision(const BoxCollisionParams collision) { body_collision = collision; }
 
+	void SetCenterPosition(const Vector2D& new_position);
+
 	/// <summary>
 	/// 衝突判定が起こった場合の処理
 	/// </summary>
 	/// <param name="hit_object">衝突した相手のオブジェクト</param>
 	/// <param name="hit_collision">衝突した相手のコリジョン</param>
-	virtual void OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision);
+	virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision);
 };
 

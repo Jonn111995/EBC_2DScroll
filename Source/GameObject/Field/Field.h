@@ -25,6 +25,10 @@ public:
 	/// <returns>true: 初期化成功 false:　初期化失敗</returns>
 	bool InitializeField(const char* map_file_name);
 
+	/// <summary>
+	/// キャラクターの初期位置を検索し、セットする
+	/// </summary>
+	/// <returns></returns>
 	bool InitializeStageObjectPosition();
 
 	/// <summary>
@@ -75,7 +79,13 @@ public:
 	/// ステージに配置されたオブジェクトを追加
 	/// </summary>
 	/// <param name=""></param>
-	void AddStageObject(StageObject* stage_object);
+	void AddStageObject(StageObject& stage_object);
+
+	/// <summary>
+	/// ステージに存在するオブジェクトリストを取得
+	/// </summary>
+	/// <returns>ステージオブジェクトリスト</returns>
+	std::vector<StageObject*> GetStageObjectList() { return stage_object_list; }
 
 public:
 	
@@ -156,6 +166,11 @@ private:
 	/// </summary>
 	int GetGroundGraphic(const int x, const int y);
 
+	/// <summary>
+	/// 初期位置をセットする
+	/// </summary>
+	/// <param name="stage_obj"></param>
+	/// <param name="chip_type"></param>
 	void SetInitialPosition(StageObject& stage_obj, const MapChipType chip_type);
 };
 

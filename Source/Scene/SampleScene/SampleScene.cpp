@@ -38,19 +38,36 @@ void SampleScene::Initialize()
 	field->InitializeField("C/Users/n5919/EBC_2DScroll/Source/CSVFile/mapdata.csv");
 	player = CreateObject<Player>();
 	player->SetICharacterEvent(this);
-	field->AddStageObject(player);
+	field->AddStageObject(*player);
 
 	Enemy* enemy = CreateObject<Enemy>();
 	enemy->SetICharacterEvent(this);
-	field->AddStageObject(enemy);
+	field->AddStageObject(*enemy);
 
 	field->InitializeStageObjectPosition();
 }
 
-SceneType SampleScene::Update(float delta_seconds)
-{
+SceneType SampleScene::Update(float delta_seconds) {
+
 	// êeÉNÉâÉXÇÃUpdate()
-	return __super::Update(delta_seconds);
+	SceneType now_scen_type = __super::Update(delta_seconds);
+
+	std::vector<StageObject*> stage_obj_list = field->GetStageObjectList();
+
+	for (auto iterator = stage_obj_list.begin(); iterator != stage_obj_list.end(); ++iterator) {
+		for (auto oppnent_iterator = stage_obj_list.begin(); oppnent_iterator != stage_obj_list.end(); ++oppnent_iterator) {
+
+			if (iterator == oppnent_iterator) {
+				break;
+			}
+		
+			BoxCollisionParams opponent = (*oppnent_iterator)->GetBodyCollision();
+			if (CheckBoxCollision(*iterator, (*iterator)->GetBodyCollision(), opponent)) {
+				(*iterator)->OnHitBoxCollision(*oppnent_iterator, (*oppnent_iterator)->GetBodyCollision());
+			}
+		}
+	}
+	return now_scen_type;
 }
 
 void SampleScene::Draw()

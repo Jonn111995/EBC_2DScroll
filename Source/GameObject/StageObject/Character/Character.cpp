@@ -46,6 +46,7 @@ void Character::Update(float delta_time) {
 		new_position.x += delta_move_amount.x;
 	}
 
+
 	input_direction.y += 50.0f;
 	float move_amount = input_direction.Normalize().y * MOVEMENT_SPEED * delta_time;
 	delta_move_amount.y += move_amount;
@@ -55,10 +56,12 @@ void Character::Update(float delta_time) {
 		new_position.y += delta_move_amount.y;
 	}
 	else {
-		//delta_move_amount.y -= move_amount;
+		delta_move_amount.y -= move_amount;
 		new_position.y = GetPosition().y;
 	}
 
+	Vector2D amount = new_position - GetPosition();
+	body_collision.center_position2 += amount;
 	//リセットしないと前回のフレームの値に次のフレームの値が足されてしまうのでリセット。
 	input_direction = { 0.f, 0.f };
 	SetPosition(new_position);
@@ -82,11 +85,16 @@ void Character::Draw(const Vector2D& screen_offset) {
 	}
 
 	unsigned int color = GetColor(255, 0, 0);
-	int x2 = x + body_collision.center_position.x - body_collision.box_extent.x;
-	int y2 = y + body_collision.center_position.y - body_collision.box_extent.y;
+	int x2 = body_collision.center_position2.x - body_collision.box_extent.x;
+	int y2 = body_collision.center_position2.y - body_collision.box_extent.y;
 
 	//デバック用
 	DrawBox(x2, y2, x2 + body_collision.box_extent.x * 2, y2 + body_collision.box_extent.y * 2, color, false);
+
+}
+
+void Character::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision)
+{
 }
 
 void Character::GiveDamage(Character& target)

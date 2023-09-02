@@ -58,6 +58,7 @@ void Field::Initialize() {
 }
 
 void Field::Finalize() {
+    stage_object_list.clear();
     delete(csv_file_reader);
     csv_file_reader = nullptr;
 }
@@ -121,8 +122,6 @@ bool Field::InitializeStageObjectPosition() {
             SetInitialPosition(*stage_obj, kENEMY);
             break;
         }
-        
-
     }
     return false;
 }
@@ -263,8 +262,8 @@ bool Field::CheckMove(const Vector2D& move_to_position, const Vector2D& move_amo
     //return true;
 }
 
-void Field::AddStageObject(StageObject* stage_object) {
-    stage_object_list.push_back(stage_object);
+void Field::AddStageObject(StageObject& stage_object) {
+    stage_object_list.push_back(&stage_object);
 }
 
 
@@ -362,8 +361,8 @@ bool Field::CheckStande(Vector2D& move_to_position, const BoxCollisionParams& co
     float opponent_center_y = move_to_position.y + collision.center_position.y;
 
     //中心座標 - 横幅の半分、中心座標 + 縦幅の半分
-    Vector2D opponent_y_leftdown = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y + collision.box_extent.y + collision.move_velocity.y);
-    Vector2D opponent_y_rightdown = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y + collision.box_extent.y + collision.move_velocity.y);
+    Vector2D opponent_y_leftdown = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y + collision.box_extent.y);
+    Vector2D opponent_y_rightdown = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y + collision.box_extent.y);
 
     int x_position = opponent_y_leftdown.x / map_chip_size;
     int y_position = opponent_y_leftdown.y / map_chip_size;
@@ -464,14 +463,20 @@ void Field::SetInitialPosition(StageObject& stage_obj, const MapChipType chip_ty
 
             if (map_data.at(y).at(x) == chip_type) {
 
+                const BoxCollisionParams collison = stage_obj.GetBodyCollision();
                 //キャラクターの画像サイズが、キャラが描かれている範囲より大きいので、左上座標をそのままセットすると、
                 //透過されている部分を含めた左上座標の位置に描画される。
                 //それを避けるため、センターポジションまでのオフセット分だけ引いて、キャラが描かれている左上座標を、
                 //指定したマップの座標位置まで持っていく必要がある。
-                int x_left = (screen_info->GetLeftX() + x * 32) - stage_obj.GetBodyCollision().center_position.x;
-                int y_top = (screen_info->GetLeftY() + y * 32) - stage_obj.GetBodyCollision().center_position.y;
+                int x_left = (screen_info->GetLeftX() + x * map_chip_size) - collison.center_position.x;
+                int y_top = (screen_info->GetLeftY() + y * map_chip_size) - collison.center_position.y;
                 stage_obj.SetPosition(Vector2D(x_left, y_top));
 
+                float center_pos_x = stage_obj.GetPosition().x + collison.center_position.x;
+                float center_pos_y = stage_obj.GetPosition().y + collison.center_position.y;
+                stage_obj.SetCenterPosition(Vector2D(center_pos_x, center_pos_y));
+
+                return;
             }
         }
     }

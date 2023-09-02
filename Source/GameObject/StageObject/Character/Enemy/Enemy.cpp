@@ -33,9 +33,12 @@ void Enemy::Update(float delta_time) {
 }
 
 void Enemy::Draw(const Vector2D& screen_offset) {
+	unsigned int color = GetColor(255, 0, 0);
+	DrawFormatString(0, 32, color, "X=%f, Y=%f:::::", body_collision.center_position2.x, body_collision.center_position2.y);
+
 	__super::Draw(screen_offset);
 }
 
-void Enemy::OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision){
+void Enemy::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision){
 	__super::OnHitBoxCollision(hit_object, hit_collision);
 }

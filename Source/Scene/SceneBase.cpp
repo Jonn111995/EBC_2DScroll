@@ -16,8 +16,7 @@ void SceneBase::Initialize()
 
 SceneType SceneBase::Update(float delta_seconds)
 {
-	for (auto iterator = objects.begin(); iterator != objects.end(); ++iterator)
-	{
+	for (auto iterator = objects.begin(); iterator != objects.end(); ++iterator) {
 		(*iterator)->Update(delta_seconds);
 	}
 
@@ -32,14 +31,12 @@ void SceneBase::Draw()
 	}
 }
 
-void SceneBase::Finalize()
-{
+void SceneBase::Finalize() {
 	// 全てのオブジェクトを破棄
 	DestroyAllObjects();
 }
 
-void SceneBase::DestroyObject(GameObject* object)
-{
+void SceneBase::DestroyObject(GameObject* object) {
 	if (object == nullptr)
 	{
 		return;
@@ -67,12 +64,35 @@ void SceneBase::DestroyObject(GameObject* object)
 	delete object;
 }
 
-void SceneBase::DestroyAllObjects()
-{
+void SceneBase::DestroyAllObjects() {
 	for (auto iterator = objects.begin(); iterator != objects.end(); ++iterator)
 	{
 		(*iterator)->Finalize();
 		delete (*iterator);
 	}
 	objects.clear();
+}
+
+bool SceneBase::CheckBoxCollision(StageObject* target, const BoxCollisionParams& collision_params, BoxCollisionParams& hit_collision_params) {
+	
+	if(true/*target->GetBodyCollision().IsHitCheckTarget(hit_collision_params.object_type)*/) {
+	
+		float distance_x = abs(collision_params.center_position2.x - hit_collision_params.center_position2.x);
+		float distance_y = abs(collision_params.center_position2.y - hit_collision_params.center_position2.y);
+		float size_x = collision_params.box_extent.x + hit_collision_params.box_extent.x;
+		float size_y = collision_params.box_extent.y + hit_collision_params.box_extent.y;
+
+		//差が微小の場合は当たったと見なすための処理
+		if (abs(distance_x - size_x) <= .1f) {
+			distance_x = size_x;
+		}
+		if (abs(distance_y - size_y) <= .1f) {
+			distance_y = size_y;
+		}
+
+		if (distance_x <= size_x && distance_y <= size_y) {
+			return true;
+		}
+	}
+	return false;
 }

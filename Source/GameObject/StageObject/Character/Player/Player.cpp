@@ -33,6 +33,8 @@ void Player::Initialize() {
 	resourcer->Initialize();
 	body_collision.center_position = Vector2D(64, 84);
 	body_collision.box_extent = Vector2D(12, 24);
+	//body_collision.box_extent = Vector2D(12, 24);
+
 	body_collision.object_type = kPLAYER_TYPE;
 }
 
@@ -85,16 +87,18 @@ void Player::Update(float delta_time) {
 			__super::Update(delta_time);
 			break;
 	}
-
+	
 	ChangeAnimState(delta_time, (GetPosition() - pre_position));
 }
 
 void Player::Draw(const Vector2D& screen_offset) {
+	unsigned int color = GetColor(255, 0, 0);
+	DrawFormatString(0, 0, color, "X=%f, Y=%f:::::", body_collision.center_position2.x, body_collision.center_position2.y);
+
 	__super::Draw(screen_offset);
 }
 
-void Player::OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision) {
-
+void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
 }
 
 void Player::ChangePlayerState(const EPlayerState new_state) {
@@ -272,6 +276,7 @@ void Player::JumpMove(const float delta_time) {
 	if (is_can_move_x) {
 		new_position.x += delta_move_amount.x;
 	}
-
+	Vector2D amount = new_position - GetPosition();
+	body_collision.center_position2 += amount;
 	SetPosition(new_position);
 }
