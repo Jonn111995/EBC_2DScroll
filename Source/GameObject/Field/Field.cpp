@@ -347,7 +347,6 @@ bool Field::CheckHitGround(Vector2D& opponent_check_position, const Vector2D& op
             distance_y = size_y;
         }
 
-
         if (distance_x <= size_x && distance_y <= size_y) { 
             return false;
         }

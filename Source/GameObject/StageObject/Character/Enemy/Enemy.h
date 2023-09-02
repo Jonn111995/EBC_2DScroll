@@ -22,7 +22,15 @@ public:
 
 private:
     /// <summary>
-    /// 敵のグラフィックハンドル
+    /// 待機アニメーションハンドル
     /// </summary>
     int wait_enemy_graphic_handle;
+
+    /// <summary>
+    /// 移動アニメーションハンドル
+    /// </summary>
+    int walk_enemy_graphic_handle[4];
+
+    float range_move;
+    float move_amount;
 };
