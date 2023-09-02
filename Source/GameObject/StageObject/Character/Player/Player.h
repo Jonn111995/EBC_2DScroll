@@ -52,19 +52,11 @@ private:
 	float initial_velocity;
 
 	/// <summary>
-	/// アニメーションスピード
+	/// 毎フレーム時間の計測時間
 	/// </summary>
-	float anim_speed;
+	float count_time;
 
-	/// <summary>
-	/// アニメーションフレームの最小値
-	/// </summary>
-	float min_anim_frame;
-
-	/// <summary>
-	/// アニメーションフレームの最大値
-	/// </summary>
-	float max_anim_frame;
+	bool bIsNoDamage;
 
 public:
 	Player();
@@ -79,7 +71,7 @@ public:
 	/// <inheritdoc/>
 	virtual void Draw(const Vector2D& screen_offset) override;
 	/// <inheritdoc/>
-	virtual void OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision) override;
+	virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) override;
 
 protected:
 	/// <summary>
@@ -128,4 +120,6 @@ private:
 	/// </summary>
 	/// <param name="delta_time">毎フレーム時間</param>
 	void JumpMove(const float delta_time);
+
+	virtual void GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity) override;
 };

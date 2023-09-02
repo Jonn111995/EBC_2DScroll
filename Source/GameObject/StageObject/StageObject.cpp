@@ -29,6 +29,10 @@ void StageObject::SetPosition(const Vector2D& new_position) {
 	position = new_position;
 }
 
-void StageObject::OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision) {
+void StageObject::SetCenterPosition(const Vector2D& new_position) {
+	body_collision.center_position2 = new_position;
+}
+
+void StageObject::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
 
 }

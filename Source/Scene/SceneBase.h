@@ -17,8 +17,7 @@ enum class SceneType : unsigned short
 /**
  * シーンの基底クラス
  */
-class SceneBase
-{
+class SceneBase {
 public:
 	SceneBase();
 	virtual ~SceneBase();
@@ -97,7 +96,16 @@ public:
 	 */
 	void DestroyAllObjects();
 
-private:
+	/// <summary>
+	/// ステージオブジェクトの衝突判定を行う。
+	/// </summary>
+	/// <param name="target">衝突判定を行うオブジェクト</param>
+	/// <param name="collision_params">衝突判定を行うオブジェクトのコリジョン</param>
+	/// <param name="hit_collision_params">衝突されたオブジェクトのコリジョン</param>
+	/// <returns>true: 衝突した false:衝突してない</returns>
+	bool CheckBoxCollision(StageObject* target, const BoxCollisionParams& collision_params, BoxCollisionParams& hit_collision_params);
+
+protected:
 	// シーンで生成したオブジェクト
 	std::vector<class GameObject*> objects;
 

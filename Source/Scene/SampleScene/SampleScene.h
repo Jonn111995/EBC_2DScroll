@@ -4,6 +4,7 @@
 #include "../Source/Scene/TitleScene/Interface/TitleSceneInterface.h"
 
 class Field;
+class Player;
 
 /**
  * サンプルシーン
@@ -15,7 +16,6 @@ public:
 	SampleScene();
 	virtual ~SampleScene() {}
 
-	Field* field;
 public:
 	//~ Begin CSceneBase interface
 	virtual void Initialize() override;	
@@ -27,6 +27,17 @@ public:
 	bool CheckCanStand(Vector2D& move_to_position, const BoxCollisionParams& collision) override;
 	virtual bool CheckCanMoveToX(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) override;
 	virtual bool CheckCanMoveToY(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) override;
-
 	//~ End SceneBase interface
+
+private:
+	/// <summary>
+	/// マップデータの管理
+	/// </summary>
+	Field* field;
+
+	/// <summary>
+	/// プレイヤー
+	/// </summary>
+	Player* player;
+
 };

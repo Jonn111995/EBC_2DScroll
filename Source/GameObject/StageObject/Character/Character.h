@@ -14,6 +14,9 @@ namespace {
 
 class Character :public StageObject {
 
+public:
+    Character();
+    virtual ~Character();
 private:
     /// <summary>
     /// HP
@@ -65,6 +68,21 @@ protected:
     /// アニメーションを変化させる値
     /// </summary>
     float animation_frame;
+
+    /// <summary>
+    /// アニメーションスピード
+    /// </summary>
+    float anim_speed;
+
+    /// <summary>
+    /// アニメーションフレームの最小値
+    /// </summary>
+    float min_anim_frame;
+
+    /// <summary>
+    /// アニメーションフレームの最大値
+    /// </summary>
+    float max_anim_frame;
 protected:
 
 public:
@@ -77,7 +95,7 @@ public:
     /// <inheritdoc/>
     virtual void Draw(const Vector2D& screen_offset) override;
     /// <inheritdoc/>
-    virtual void OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision) override {};
+    virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) override;
 
     /// <summary>
     /// キャラクターイベントインターフェースを設定
@@ -147,5 +165,8 @@ public:
     /// <param name="opponent">攻撃してきたキャラ</param>
     /// <param name="damage">ダメージ</param>
     void GetDamage(Character& opponent, const int damage);
+
+    virtual void GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity);
+
 };
 

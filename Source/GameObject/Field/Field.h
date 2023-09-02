@@ -3,6 +3,7 @@
 #include <vector>
 #include "../Source/Utility/Vector2D.h"
 #include "../Source/Utility/BoxCollisionParams.h"
+#include "EMapChipType.h"
 
 class Character;
 class StageObject;
@@ -23,6 +24,12 @@ public:
 	/// <param name="map_file_name">読み込むマップデータファイル</param>
 	/// <returns>true: 初期化成功 false:　初期化失敗</returns>
 	bool InitializeField(const char* map_file_name);
+
+	/// <summary>
+	/// キャラクターの初期位置を検索し、セットする
+	/// </summary>
+	/// <returns></returns>
+	bool InitializeStageObjectPosition();
 
 	/// <summary>
 	/// 移動先が移動可能か確認
@@ -67,6 +74,18 @@ public:
 	/// <param name="collision">移動するオブジェクトのコリジョン</param>
 	/// <returns>true: 立てる false: 立てない</returns>
 	bool CheckStande(Vector2D& move_to_position, const BoxCollisionParams& collision);
+
+	/// <summary>
+	/// ステージに配置されたオブジェクトを追加
+	/// </summary>
+	/// <param name=""></param>
+	void AddStageObject(StageObject& stage_object);
+
+	/// <summary>
+	/// ステージに存在するオブジェクトリストを取得
+	/// </summary>
+	/// <returns>ステージオブジェクトリスト</returns>
+	std::vector<StageObject*> GetStageObjectList() { return stage_object_list; }
 
 public:
 	
@@ -120,7 +139,12 @@ private:
 	std::vector<std::vector<int>> map_data;
 
 	/// <summary>
-	/// キャラクターの位置関係
+	/// マップに配置されているオブジェクト
+	/// </summary>
+	std::vector<StageObject*>  stage_object_list;
+
+	/// <summary>
+	/// キャラクターのリスト
 	/// </summary>
 	std::vector<std::vector<Character*>> character_map;
 
@@ -129,10 +153,7 @@ private:
 	/// </summary>
 	std::vector<std::vector<StageObject*>> item_map;
 
-	/// <summary>
-	/// マップに配置されているオブジェクト
-	/// </summary>
-	std::vector<StageObject*>  StageObjectList;
+
 
 private:
 	/// <summary>
@@ -146,9 +167,10 @@ private:
 	int GetGroundGraphic(const int x, const int y);
 
 	/// <summary>
-	/// ステージに配置されたオブジェクトを追加
+	/// 初期位置をセットする
 	/// </summary>
-	/// <param name=""></param>
-	void AddStageObject(Character*);
+	/// <param name="stage_obj"></param>
+	/// <param name="chip_type"></param>
+	void SetInitialPosition(StageObject& stage_obj, const MapChipType chip_type);
 };
 

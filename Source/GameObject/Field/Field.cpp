@@ -2,6 +2,7 @@
 #include "DxLib.h"
 #include "../Source/System/ScreenInfo.h"
 #include <iostream>
+#include <typeinfo>
 #include "../CSVData/CSVFile.h"
 #include "EMapChipType.h"
 #include "../Source/Utility/Vector2D.h"
@@ -57,6 +58,7 @@ void Field::Initialize() {
 }
 
 void Field::Finalize() {
+    stage_object_list.clear();
     delete(csv_file_reader);
     csv_file_reader = nullptr;
 }
@@ -105,6 +107,23 @@ bool Field::InitializeField(const char* map_file_name){
     ScreenInfo* screen_info = ScreenInfo::GetInstance();
     screen_info->SetMapSize(map_data.size(), map_data.at(map_data.size() - 1).size());
 
+}
+
+bool Field::InitializeStageObjectPosition() {
+    
+    for (auto& stage_obj : stage_object_list) {
+
+        switch (stage_obj->GetBodyCollision().object_type) {
+
+        case kPLAYER_TYPE:
+            SetInitialPosition(*stage_obj, kPLAYER_START);
+            break;
+        case kENEMY_TYPE:
+            SetInitialPosition(*stage_obj, kENEMY);
+            break;
+        }
+    }
+    return false;
 }
 
 bool Field::CheckMove(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) {
@@ -243,6 +262,11 @@ bool Field::CheckMove(const Vector2D& move_to_position, const Vector2D& move_amo
     //return true;
 }
 
+void Field::AddStageObject(StageObject& stage_object) {
+    stage_object_list.push_back(&stage_object);
+}
+
+
 bool Field::CheckMoveToX(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) {
 
     //X方向にだけ動いた移動先を求める
@@ -298,8 +322,8 @@ bool Field::CheckMoveToY(const Vector2D& move_to_position, const Vector2D& move_
 
 bool Field::CheckHitGround(Vector2D& opponent_check_position, const Vector2D& oppnent_center, const BoxCollisionParams& collision) {
 
-    float x_position = opponent_check_position.x / map_chip_size;
-    float y_position = opponent_check_position.y / map_chip_size;
+    int x_position = opponent_check_position.x / map_chip_size;
+    int y_position = opponent_check_position.y / map_chip_size;
     int object_in_destination = map_data.at(y_position).at(x_position);
 
     if (object_in_destination == kGROUND || object_in_destination == kWALL || object_in_destination == kBOX) {
@@ -337,8 +361,8 @@ bool Field::CheckStande(Vector2D& move_to_position, const BoxCollisionParams& co
     float opponent_center_y = move_to_position.y + collision.center_position.y;
 
     //中心座標 - 横幅の半分、中心座標 + 縦幅の半分
-    Vector2D opponent_y_leftdown = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y + collision.box_extent.y + collision.move_velocity.y);
-    Vector2D opponent_y_rightdown = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y + collision.box_extent.y + collision.move_velocity.y);
+    Vector2D opponent_y_leftdown = Vector2D(opponent_center_x - collision.box_extent.x, opponent_center_y + collision.box_extent.y);
+    Vector2D opponent_y_rightdown = Vector2D(opponent_center_x + collision.box_extent.x, opponent_center_y + collision.box_extent.y);
 
     int x_position = opponent_y_leftdown.x / map_chip_size;
     int y_position = opponent_y_leftdown.y / map_chip_size;
@@ -430,6 +454,30 @@ int Field::GetGroundGraphic(const int x, const int y) {
    
 }
 
-void Field::AddStageObject(Character*)
-{
+void Field::SetInitialPosition(StageObject& stage_obj, const MapChipType chip_type) {
+   
+    ScreenInfo* screen_info = ScreenInfo::GetInstance();
+   
+    for (unsigned y = 0; y < map_data.size(); y++) {
+        for (unsigned x = 0; x < map_data.at(y).size(); x++) {
+
+            if (map_data.at(y).at(x) == chip_type) {
+
+                const BoxCollisionParams collison = stage_obj.GetBodyCollision();
+                //キャラクターの画像サイズが、キャラが描かれている範囲より大きいので、左上座標をそのままセットすると、
+                //透過されている部分を含めた左上座標の位置に描画される。
+                //それを避けるため、センターポジションまでのオフセット分だけ引いて、キャラが描かれている左上座標を、
+                //指定したマップの座標位置まで持っていく必要がある。
+                int x_left = (screen_info->GetLeftX() + x * map_chip_size) - collison.center_position.x;
+                int y_top = (screen_info->GetLeftY() + y * map_chip_size) - collison.center_position.y;
+                stage_obj.SetPosition(Vector2D(x_left, y_top));
+
+                float center_pos_x = stage_obj.GetPosition().x + collison.center_position.x;
+                float center_pos_y = stage_obj.GetPosition().y + collison.center_position.y;
+                stage_obj.SetCenterPosition(Vector2D(center_pos_x, center_pos_y));
+
+                return;
+            }
+        }
+    }
 }

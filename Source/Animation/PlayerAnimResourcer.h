@@ -25,6 +25,8 @@ private:
 	/// </summary>
 	int loaded_sprite_attack[3];
 
+	int loaded_sprite_damage;
+
 public:
 	/// <summary>
 	/// ‰Šú‰»

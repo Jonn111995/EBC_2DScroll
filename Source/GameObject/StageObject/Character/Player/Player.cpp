@@ -9,6 +9,7 @@
 namespace {
 	const float AIR_RESISTANCE = 0.8f;
 	const float RESET_INITIAL_VELOCITY = 0.0f;
+	Vector2D back_velocity = { -1.f, 0.f };
 }
 
 Player::Player()
@@ -16,11 +17,9 @@ Player::Player()
 	, resourcer(nullptr)
 	, player_state(EPlayerState::kIDLE)
 	, player_anim_state(EPlayerAnimState::kIDLE_ANIM)
-	, anim_speed(0.f)
-	, min_anim_frame(0.f)
-	, max_anim_frame(0.f)
 	, initial_velocity(0.f)
 	, bIsCanJump(true)
+	, bIsNoDamage(false)
 {
 }
 
@@ -29,7 +28,6 @@ Player::~Player()
 }
 
 void Player::Initialize() {
-
 	__super::Initialize();
 
     input_handler = new InputHandler();
@@ -37,10 +35,12 @@ void Player::Initialize() {
 	resourcer->Initialize();
 	body_collision.center_position = Vector2D(64, 84);
 	body_collision.box_extent = Vector2D(12, 24);
+	//body_collision.box_extent = Vector2D(12, 24);
+
+	body_collision.object_type = kPLAYER_TYPE;
 }
 
 void Player::Finalize(){
-
 	__super::Finalize();
 
 	delete input_handler;
@@ -53,28 +53,29 @@ void Player::Finalize(){
 void Player::Update(float delta_time) {
 
 	std::vector<bool> input_button_status = input_handler->CheckInput(delta_time);
-	player_state = kIDLE;
+	//player_state = kIDLE;
+	if (player_state != kDAMAGE) {
+		if (input_button_status[kLEFT_B]) {
+			input_direction.x = -10.0f;
+			SetDirection(CharacterDirection::kLEFT);
+		}
 
-	if (input_button_status[kLEFT_B]) {
-		input_direction.x = -10.0f;
-		SetDirection(CharacterDirection::kLEFT);
-	}
+		if (input_button_status[kRIGHT_B]) {
+			input_direction.x = 10.0f;
+			SetDirection(CharacterDirection::kRIGHT);
+		}
 
-	if (input_button_status[kRIGHT_B]) {
-		input_direction.x = 10.0f;
-		SetDirection(CharacterDirection::kRIGHT);
-	}
+		if (input_button_status[kJUMP_B]) {
+			StartJump();
+		}
 
-	if (input_button_status[kJUMP_B]) {
-		StartJump();
-	}
+		if (input_button_status[kATTACK_B]) {
+			player_state = kATTACK;
+		}
 
-	if (input_button_status[kATTACK_B]) {
-		player_state = kATTACK;
-	}
-
-	if (!bIsCanJump) {
-		player_state = kJUMP;
+		if (!bIsCanJump) {
+			player_state = kJUMP;
+		}
 	}
 
 	//更新後の座標と比較して、移動量を出すため取得。
@@ -84,21 +85,57 @@ void Player::Update(float delta_time) {
 		case kJUMP:
 			JumpMove(delta_time);
 			break;
+		case kDAMAGE:
+			count_time += delta_time;
+			if (count_time < 0.1f) {
+
+				Vector2D recoil_dir = { 0.f, 0.f };
+				if (GetDirection() == kRIGHT) {
+					recoil_dir = { -1.f, 0.f };
+				}
+				else {
+					recoil_dir = { 1.f, 0.f };
+				}
+				GetDamageRecoil(delta_time, recoil_dir);
+			}
+			else if (count_time < 0.3f) {
+				bIsNoDamage = true;
+			}
+			else {
+				player_state = kIDLE;
+				bIsNoDamage = false;
+				count_time = 0.f;
+			}
+			break;
 		default:
 			//移動処理はCharacterに任せる
 			__super::Update(delta_time);
 			break;
 	}
-
+	
 	ChangeAnimState(delta_time, (GetPosition() - pre_position));
 }
 
 void Player::Draw(const Vector2D& screen_offset) {
+	
+	if (player_state == kDAMAGE) {
+		if (((int)(count_time * 10) % (int)(0.2f * 10)) == 0.f) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 64);
+		}
+		else {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+		}
+	}
 	__super::Draw(screen_offset);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
 }
 
-void Player::OnHitBoxCollision(const GameObject& hit_object, const BoxCollisionParams& hit_collision) {
-
+void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
+	if (!bIsNoDamage) {
+		player_state = kDAMAGE;
+		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
+	}
 }
 
 void Player::ChangePlayerState(const EPlayerState new_state) {
@@ -143,7 +180,7 @@ void Player::ExitState() {
 	}
 }
 
-void Player::ChangeAnimState(const float delta_time, const Vector2D& delta_position) {
+void Player::ChangeAnimState(const float delta_time = 0.0f, const Vector2D& delta_position = Vector2D(0.f,0.f)) {
 
 	//delta_positionは、更新前と後の移動量
 
@@ -151,6 +188,9 @@ void Player::ChangeAnimState(const float delta_time, const Vector2D& delta_posit
 
 		if (player_state == kATTACK) {
 			player_anim_state = kATTACK_ANIM;
+		}
+		else if (player_state == kDAMAGE) {
+			player_anim_state = kDAMAGE_ANIM;
 		}
 		else {
 			player_anim_state = kIDLE_ANIM;
@@ -174,6 +214,8 @@ void Player::ChangeAnimState(const float delta_time, const Vector2D& delta_posit
 			player_anim_state = kJUMP_FALL_ANIM;
 		}
 	}
+
+	
 
 	EnterAnimState();
 	CheckAnimFrame(delta_time);
@@ -218,6 +260,12 @@ void Player::EnterAnimState() {
 		min_anim_frame = 0.0f;
 		max_anim_frame = now_animations.size() - 1;
 		break;
+	case kDAMAGE_ANIM:
+		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kDAMAGE);
+		anim_speed = 0.0f;
+		min_anim_frame = 0.0f;
+		max_anim_frame = now_animations.size() - 1;
+		break;
 	}
 }
 
@@ -238,6 +286,10 @@ void Player::CheckAnimFrame(const float delta_time) {
 	if (animation_frame >= max_anim_frame) {
 		animation_frame = min_anim_frame;
 	}
+}
+
+void Player::GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity) {
+	__super::GetDamageRecoil(delta_time, recoil_velocity);
 }
 
 void Player::StartJump() {
@@ -276,6 +328,7 @@ void Player::JumpMove(const float delta_time) {
 	if (is_can_move_x) {
 		new_position.x += delta_move_amount.x;
 	}
-
+	Vector2D amount = new_position - GetPosition();
+	body_collision.center_position2 += amount;
 	SetPosition(new_position);
 }

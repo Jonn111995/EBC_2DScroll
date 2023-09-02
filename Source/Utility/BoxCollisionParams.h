@@ -9,7 +9,10 @@
 struct BoxCollisionParams {
 
 public:
-	Vector2D move_velocity;
+	/// <summary>
+	/// 中心座標までの
+	/// </summary>
+	Vector2D center_position2;
 	/// <summary>
 	/// コリジョンの中心座標
 	/// </summary>
@@ -46,6 +49,8 @@ public:
 	/// <param name="target">ヒットしたオブジェクトのオブジェクトタイプ</param>
 	/// <returns></returns>
 	bool IsHitCheckTarget(CollisionObjectType target);
+
+	void SetCenterPosition(Vector2D position);
 
 	Vector2D GetLeftTopPosition();
 	Vector2D GetRightTopPosition();

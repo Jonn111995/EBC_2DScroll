@@ -3,6 +3,7 @@
 #include "../../GameObject/SampleObject/SampleObject.h"
 #include "../Source/GameObject/StageObject/Character/Player/Player.h"
 #include "../Source/GameObject/Field/Field.h"
+#include "../Source/GameObject/StageObject/Character/Enemy/Enemy.h"
 
 SampleScene::SampleScene()
 {
@@ -33,18 +34,40 @@ void SampleScene::Initialize()
 	ScreenInfo* screen_info = ScreenInfo::GetInstance();
 	screen_info->Initialize();
 
-	// SampleObjectÇê∂ê¨
-
 	field = CreateObject<Field>();
 	field->InitializeField("C/Users/n5919/EBC_2DScroll/Source/CSVFile/mapdata.csv");
-	Character* chara = CreateObject<Player>(Vector2D(screen_info->GetCenterX(), screen_info->GetCenterY()));
-	chara->SetICharacterEvent(this);
+	player = CreateObject<Player>();
+	player->SetICharacterEvent(this);
+	field->AddStageObject(*player);
+
+	Enemy* enemy = CreateObject<Enemy>();
+	enemy->SetICharacterEvent(this);
+	field->AddStageObject(*enemy);
+
+	field->InitializeStageObjectPosition();
 }
 
-SceneType SampleScene::Update(float delta_seconds)
-{
+SceneType SampleScene::Update(float delta_seconds) {
+
 	// êeÉNÉâÉXÇÃUpdate()
-	return __super::Update(delta_seconds);
+	SceneType now_scen_type = __super::Update(delta_seconds);
+
+	std::vector<StageObject*> stage_obj_list = field->GetStageObjectList();
+
+	for (auto iterator = stage_obj_list.begin(); iterator != stage_obj_list.end(); ++iterator) {
+		for (auto oppnent_iterator = stage_obj_list.begin(); oppnent_iterator != stage_obj_list.end(); ++oppnent_iterator) {
+
+			if (iterator == oppnent_iterator) {
+				continue;
+			}
+		
+			BoxCollisionParams opponent = (*oppnent_iterator)->GetBodyCollision();
+			if (CheckBoxCollision(*iterator, (*iterator)->GetBodyCollision(), opponent)) {
+				(*iterator)->OnHitBoxCollision(*oppnent_iterator, (*oppnent_iterator)->GetBodyCollision());
+			}
+		}
+	}
+	return now_scen_type;
 }
 
 void SampleScene::Draw()
