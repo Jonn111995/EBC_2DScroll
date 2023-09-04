@@ -2,12 +2,11 @@
 #include "../Source/GameObject/StageObject/Character/Character.h"
 #include "EPlayerState.h"
 #include "EPlayerAnimState.h"
-
-
 #include <vector>
 
 class InputHandler;
 class PlayerAnimResourcer;
+class BaseWeapon;
 
 namespace {
 	/// <summary>
@@ -31,6 +30,8 @@ private:
 	/// アニメーションハンドルを管理
 	/// </summary>
 	PlayerAnimResourcer* resourcer;
+
+	BaseWeapon* now_weapon;
 	/// <summary>
 	/// プレイヤーの状態
 	/// </summary>
@@ -91,6 +92,10 @@ protected:
 	/// <param name="delta_move_amount">更新前と後の移動量の差</param>
 	void ChangeAnimState(const float delta_time, const Vector2D& delta_move_amount);
 
+	virtual void GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity) override;
+	virtual void Attack();
+	virtual void StopAttack();
+
 private:
 
 	///<summary>
@@ -118,7 +123,7 @@ private:
 	/// アニメフレームが現在のアニメーションの範囲を超えていないか確認
 	/// </summary>
 	/// <param name="delta_time">毎フレーム時間</param>
-	void CheckAnimFrame(const float delta_time);
+	void UpdateAnimFrame(const float delta_time);
 
 	/// <summary>
 	/// ジャンプを開始する
@@ -130,6 +135,4 @@ private:
 	/// </summary>
 	/// <param name="delta_time">毎フレーム時間</param>
 	void JumpMove(const float delta_time);
-
-	virtual void GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity) override;
 };

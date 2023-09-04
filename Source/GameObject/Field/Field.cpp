@@ -2,7 +2,6 @@
 #include "DxLib.h"
 #include "../Source/System/ScreenInfo.h"
 #include <iostream>
-#include <typeinfo>
 #include "../CSVData/CSVFile.h"
 #include "EMapChipType.h"
 #include "../Source/Utility/Vector2D.h"
@@ -10,6 +9,8 @@
 #include "Ground/Ground.h";
 #include "Ground/Wall.h"
 #include "Ground/Box.h"
+#include <vector>
+
 
 namespace {
     const float map_chip_size = 32.f;
@@ -264,6 +265,12 @@ bool Field::CheckMove(const Vector2D& move_to_position, const Vector2D& move_amo
 
 void Field::AddStageObject(StageObject& stage_object) {
     stage_object_list.push_back(&stage_object);
+}
+
+void Field::DeleteStageObject(StageObject* stage_object) {
+   
+    auto remove_start = std::remove(stage_object_list.begin(), stage_object_list.end(), stage_object);
+    stage_object_list.erase(remove_start, stage_object_list.end());
 }
 
 

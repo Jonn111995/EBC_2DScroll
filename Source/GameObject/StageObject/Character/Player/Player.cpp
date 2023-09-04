@@ -2,6 +2,7 @@
 #include "InputHandler.h"
 #include "../Source/Animation/PlayerAnimResourcer.h"
 #include "../Interface/CharacterEventInterface.h"
+#include "../Source/GameObject/StageObject/Weapon/Hand.h"
 #include "DxLib.h"
 #include <iterator>
 #include <math.h>
@@ -33,11 +34,13 @@ void Player::Initialize() {
 
     input_handler = new InputHandler();
 	resourcer = new PlayerAnimResourcer();
+	now_weapon = new Hand();
+	now_weapon->Initialize();
+	now_weapon->SetOwner(this);
 	resourcer->Initialize();
 	body_collision.center_position = Vector2D(64, 84);
 	body_collision.box_extent = Vector2D(12, 24);
-	//body_collision.box_extent = Vector2D(12, 24);
-
+	body_collision.hit_object_types = kENEMY_TYPE;
 	body_collision.object_type = kPLAYER_TYPE;
 }
 
@@ -47,8 +50,12 @@ void Player::Finalize(){
 	delete input_handler;
 	resourcer->Finalize();
 	delete resourcer;
+	
+	now_weapon->Finalize();
+	delete now_weapon;
 	input_handler = nullptr;
 	resourcer = nullptr;
+	now_weapon = nullptr;
 }
 
 void Player::Update(float delta_time) {
@@ -71,11 +78,11 @@ void Player::Update(float delta_time) {
 		}
 
 		if (input_button_status[kATTACK_B]) {
-			player_state = kATTACK;
+			ChangePlayerState(kATTACK);
 		}
-
+		
 		if (!bIsCanJump) {
-			player_state = kJUMP;
+			ChangePlayerState(kJUMP);
 		}
 	}
 
@@ -86,7 +93,7 @@ void Player::Update(float delta_time) {
 		count_time += delta_time;
 
 		if (count_time > invincible_time) {
-			player_state = kIDLE;
+			ChangePlayerState(kIDLE);
 			bIsNoDamage = false;
 			count_time = 0.f;
 		}
@@ -114,9 +121,14 @@ void Player::Update(float delta_time) {
 			else if (count_time > 0.4f) {
 				is_reject_input = false;
 				bIsNoDamage = true;
-				player_state = kINVINCIBLE;
+				ChangePlayerState(kINVINCIBLE);
 			}
 			break;
+		case kATTACK:
+			if (animation_frame >= max_anim_frame - 0.2f) {
+				ChangePlayerState(kIDLE);
+			}
+			
 		case kINVINCIBLE:
 			
 			//無敵状態の時は移動処理もさせたいので、breakを置かずにフォースルーする。
@@ -125,14 +137,15 @@ void Player::Update(float delta_time) {
 			__super::Update(delta_time);
 			break;
 	}
-
-	
 	
 	ChangeAnimState(delta_time, (GetPosition() - pre_position));
 }
 
 void Player::Draw(const Vector2D& screen_offset) {
-	
+
+	unsigned int color = GetColor(255, 0, 0);
+	DrawFormatString(0, 0, color, "X=%f, Y=%f:::::", body_collision.center_position2.x, body_collision.center_position2.y);
+
 	if (player_state == kDAMAGE || bIsNoDamage) {
 		if (((int)(count_time * 10) % (int)(0.2f * 10)) == 0.f) {
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 64);
@@ -144,12 +157,16 @@ void Player::Draw(const Vector2D& screen_offset) {
 	__super::Draw(screen_offset);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
+	now_weapon->Draw(screen_offset);
 }
 
 void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
-	if (!bIsNoDamage) {
-		player_state = kDAMAGE;
-		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
+
+	if (body_collision.hit_object_types & hit_collision.object_type) {
+		if (!bIsNoDamage) {
+			ChangePlayerState(kDAMAGE);
+			ChangeAnimState(0.f, Vector2D(0.f, 0.f));
+		}
 	}
 }
 
@@ -173,6 +190,7 @@ void Player::EnterState() {
 	case kJUMP:
 		break;
 	case kATTACK:
+		Attack();
 		break;
 	case kDEAD:
 		break;
@@ -190,6 +208,9 @@ void Player::ExitState() {
 		break;
 	case kJUMP:
 		break;
+	case kATTACK:
+		ICharacterEvent->RemoveWeapon(now_weapon);
+		break;
 	case kDEAD:
 		break;
 	}
@@ -198,6 +219,9 @@ void Player::ExitState() {
 void Player::ChangeAnimState(const float delta_time = 0.0f, const Vector2D& delta_position = Vector2D(0.f,0.f)) {
 
 	//delta_positionは、更新前と後の移動量
+	if (player_state == kIDLE) {
+		player_anim_state = kIDLE_ANIM;
+	}
 
 	if (delta_position == Vector2D(0.0f, 0.0f)) {
 
@@ -230,10 +254,9 @@ void Player::ChangeAnimState(const float delta_time = 0.0f, const Vector2D& delt
 		}
 	}
 
-	
-
 	EnterAnimState();
-	CheckAnimFrame(delta_time);
+	UpdateAnimFrame(delta_time);
+
 }
 
 void Player::EnterAnimState() {
@@ -284,7 +307,7 @@ void Player::EnterAnimState() {
 	}
 }
 
-void Player::CheckAnimFrame(const float delta_time) {
+void Player::UpdateAnimFrame(const float delta_time) {
 
 	if (animation_frame <= min_anim_frame) {
 		animation_frame = min_anim_frame;
@@ -305,6 +328,15 @@ void Player::CheckAnimFrame(const float delta_time) {
 
 void Player::GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity) {
 	__super::GetDamageRecoil(delta_time, recoil_velocity);
+}
+
+void Player::Attack() {
+	now_weapon->SetAttackRange(body_collision);
+	ICharacterEvent->AddWeapon(*now_weapon);
+}
+
+void Player::StopAttack() {
+	ICharacterEvent->RemoveWeapon(now_weapon);
 }
 
 void Player::StartJump() {

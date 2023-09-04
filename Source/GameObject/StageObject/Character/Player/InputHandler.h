@@ -48,6 +48,8 @@ private:
 	/// <param name="push_time">キーを押している秒数</param>
 	/// <returns>true: 押され続けている　false: 押され続けていない</returns>
 	bool CheckKeyKeepingPush(int key, bool& status, float delta_time, float& push_time);
+	bool CheckMouseKeepingClick(int key, bool& status, float delta_time, float& push_time);
+
 	/// <summary>
 	/// 左移動ボタンのチェック
 	/// </summary>

@@ -1,5 +1,6 @@
 #pragma once
 #include "../Character.h"
+#include "../Enemy/EEnemyState.h"
 
 /// <summary>
 /// 敵
@@ -20,7 +21,14 @@ public:
     /// <inheritdoc/>
     virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) override;
 
-private:
+public:
+    /// <summary>
+    /// ステートをセットする
+    /// </summary>
+    /// <param name="new_state"></param>
+    void SetEnemyState(EEnemyState new_state) { enemy_state = new_state; }
+
+protected:
     /// <summary>
     /// 待機アニメーションハンドル
     /// </summary>
@@ -31,6 +39,24 @@ private:
     /// </summary>
     int walk_enemy_graphic_handle[4];
 
+    /// <summary>
+    /// ダメージアニメーション
+    /// </summary>
+    int damage_enemy_graphic_handle;
+
+    /// <summary>
+    /// 移動範囲
+    /// </summary>
     float range_move;
+
+    /// <summary>
+    /// 移動量
+    /// </summary>
     float move_amount;
+
+    /// <summary>
+    /// 敵のステート
+    /// </summary>
+    EEnemyState enemy_state;
+    float count_time;
 };

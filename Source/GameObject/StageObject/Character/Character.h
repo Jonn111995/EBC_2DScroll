@@ -84,6 +84,8 @@ protected:
     /// </summary>
     float max_anim_frame;
 protected:
+    virtual void GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity);
+
 
 public:
     /// <inheritdoc/>
@@ -172,7 +174,6 @@ public:
     /// <param name="damage">É_ÉÅÅ[ÉW</param>
     void GetDamage(Character& opponent, const int damage);
 
-    virtual void GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity);
 
 };
 
