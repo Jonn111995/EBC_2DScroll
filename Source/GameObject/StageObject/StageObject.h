@@ -9,19 +9,10 @@
 /// </summary>
 class StageObject : public GameObject {
 
-private:
-	/// <summary>
-	/// 位置
-	/// </summary>
-	Vector2D position;
-
-protected:
-	/// <summary>
-	/// コリジョン
-	/// </summary>
-	BoxCollisionParams body_collision;
-
 public:
+	StageObject();
+	virtual ~StageObject();
+
 	/// <inheritdoc/>
 	virtual void Initialize() override;
 	/// <inheritdoc/>
@@ -30,11 +21,14 @@ public:
 	virtual void Update(float delta_seconds) override;
 	///  <inheritdoc/>
 	virtual void Draw(const Vector2D& screen_offset) override;
+	/// <summary>
+	/// 衝突判定が起こった場合の処理
+	/// </summary>
+	/// <param name="hit_object">衝突した相手のオブジェクト</param>
+	/// <param name="hit_collision">衝突した相手のコリジョン</param>
+	virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision);
 
-public:
-	StageObject();
-	virtual ~StageObject();
-	
+public:	
 	/// <summary>
 	/// 座標を取得
 	/// </summary>
@@ -59,13 +53,22 @@ public:
 	/// <param name="collision"></param>
 	void SetBodyCollision(const BoxCollisionParams collision) { body_collision = collision; }
 
+	/// <summary>
+	/// 中心座標をBoxCollisionParamsにセットする
+	/// </summary>
+	/// <param name="new_position"></param>
 	void SetCenterPosition(const Vector2D& new_position);
 
+protected:
 	/// <summary>
-	/// 衝突判定が起こった場合の処理
+	/// コリジョン
 	/// </summary>
-	/// <param name="hit_object">衝突した相手のオブジェクト</param>
-	/// <param name="hit_collision">衝突した相手のコリジョン</param>
-	virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision);
+	BoxCollisionParams body_collision;
+
+private:
+	/// <summary>
+	/// 位置
+	/// </summary>
+	Vector2D position;
 };
 

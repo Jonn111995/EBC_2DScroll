@@ -4,6 +4,8 @@
 #include "../Source/GameObject/StageObject/Character/Player/Player.h"
 #include "../Source/GameObject/Field/Field.h"
 #include "../Source/GameObject/StageObject/Character/Enemy/Enemy.h"
+#include "../Source/GameObject/StageObject/Weapon/BaseWeapon.h"
+#include "../Source/GameObject/StageObject/StageObject.h"
 
 SampleScene::SampleScene()
 {
@@ -23,6 +25,14 @@ bool SampleScene::CheckCanMoveToX(const Vector2D& now_to_position, const Vector2
 
 bool SampleScene::CheckCanMoveToY(const Vector2D& now_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) {
 	return field->CheckMoveToY(now_to_position, move_amount, collision);
+}
+
+void SampleScene::AddWeapon(BaseWeapon& weapon) {
+	field->AddStageObject(weapon);
+}
+
+void SampleScene::RemoveWeapon(BaseWeapon* weapon) {
+	field->DeleteStageObject(weapon);
 }
 
 void SampleScene::Initialize()

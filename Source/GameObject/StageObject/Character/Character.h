@@ -36,7 +36,7 @@ private:
     /// <summary>
     /// 移動スピード
     /// </summary>
-    float speed;
+    float move_speed;
 
     /// <summary>
     /// 動いているかどうか
@@ -84,6 +84,8 @@ protected:
     /// </summary>
     float max_anim_frame;
 protected:
+    virtual void GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity);
+
 
 public:
     /// <inheritdoc/>
@@ -125,7 +127,13 @@ public:
     /// 移動スピードを取得
     /// </summary>
     /// <returns>移動スピード</returns>
-    float GetSpeed() const { return speed; }
+    float GetSpeed() const { return move_speed; }
+
+    /// <summary>
+    /// 移動スピードをセット
+    /// </summary>
+    /// <param name="speed">移動スピード</param>
+    void SetSpeed(const float speed) { move_speed = speed; };
 
     /// <summary>
     /// 移動しているかどうかのフラグをセット
@@ -166,7 +174,6 @@ public:
     /// <param name="damage">ダメージ</param>
     void GetDamage(Character& opponent, const int damage);
 
-    virtual void GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity);
 
 };
 

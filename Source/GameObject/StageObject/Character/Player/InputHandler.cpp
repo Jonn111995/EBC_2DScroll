@@ -47,6 +47,30 @@ bool InputHandler::CheckKeyKeepingPush(int key, bool& key_status, float delta_ti
 	return false;
 }
 
+bool InputHandler::CheckMouseKeepingClick(int key, bool& key_status, float delta_time, float& push_time) {
+	bool is_push = GetMouseInput() == key;
+
+	if (is_push && !key_status) {
+
+		push_time += delta_time;
+		if (push_time < 1.f) {
+			key_status = true;
+			//true‚É‚µ‚Äˆ—‚ðŽÀs
+			return true;
+		}
+	}
+
+	//ƒ{ƒ^ƒ“‚ª—£‚³‚ê‚½‚ç
+	if (!is_push) {
+
+		push_time = 0.0f;
+		key_status = false;
+		return false;
+	}
+
+	return false;
+}
+
 bool InputHandler::CheckLeftButton(float time) {
 	bool check = CheckHitKey(KEY_INPUT_A) == 1;
 
@@ -67,8 +91,10 @@ bool InputHandler::CheckJumpButton(float time) {
 }
 
 bool InputHandler::CheckAttackButton(float time) {
-	if (GetMouseInput() & MOUSE_INPUT_LEFT) {
-		check_key_status[kATTACK_B] = true;
-		return true;
-	}
+	return CheckMouseKeepingClick(MOUSE_INPUT_LEFT, check_key_status[kATTACK_B], time, push_time[kATTACK_B]);//) {
+	//	//check_key_status[kATTACK_B] = true;
+	//	return true;
+	//}
+	//check_key_status[kATTACK_B] = false;
+	//return false;
 }

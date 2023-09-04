@@ -80,6 +80,11 @@ public:
 	/// </summary>
 	/// <param name=""></param>
 	void AddStageObject(StageObject& stage_object);
+	/// <summary>
+	/// ステージに配置されたオブジェクトを削除
+	/// </summary>
+	/// <param name="stage_object"></param>
+	void DeleteStageObject(StageObject* stage_object);
 
 	/// <summary>
 	/// ステージに存在するオブジェクトリストを取得

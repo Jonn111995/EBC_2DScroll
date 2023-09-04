@@ -2,7 +2,6 @@
 #include "DxLib.h"
 #include "../Source/System/ScreenInfo.h"
 #include <iostream>
-#include <typeinfo>
 #include "../CSVData/CSVFile.h"
 #include "EMapChipType.h"
 #include "../Source/Utility/Vector2D.h"
@@ -10,6 +9,8 @@
 #include "Ground/Ground.h";
 #include "Ground/Wall.h"
 #include "Ground/Box.h"
+#include <vector>
+
 
 namespace {
     const float map_chip_size = 32.f;
@@ -266,6 +267,12 @@ void Field::AddStageObject(StageObject& stage_object) {
     stage_object_list.push_back(&stage_object);
 }
 
+void Field::DeleteStageObject(StageObject* stage_object) {
+   
+    auto remove_start = std::remove(stage_object_list.begin(), stage_object_list.end(), stage_object);
+    stage_object_list.erase(remove_start, stage_object_list.end());
+}
+
 
 bool Field::CheckMoveToX(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) {
 
@@ -346,7 +353,6 @@ bool Field::CheckHitGround(Vector2D& opponent_check_position, const Vector2D& op
         if (abs(distance_y - size_y) <= .1f) {
             distance_y = size_y;
         }
-
 
         if (distance_x <= size_x && distance_y <= size_y) { 
             return false;

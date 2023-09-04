@@ -24,7 +24,9 @@ private:
 	/// 攻撃アニメーションハンドル
 	/// </summary>
 	int loaded_sprite_attack[3];
-
+	/// <summary>
+	/// ダメージアニメーションハンドル
+	/// </summary>
 	int loaded_sprite_damage;
 
 public:
