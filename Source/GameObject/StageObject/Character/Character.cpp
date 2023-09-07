@@ -41,6 +41,90 @@ void Character::Finalize() {
 void Character::Update(float delta_time) {
 	__super::Update(delta_time);
 
+	Move(delta_time);
+}
+
+void Character::Draw(const Vector2D& screen_offset) {
+
+	__super::Draw(screen_offset);
+
+	int x, y;
+	GetPosition().ToInt(x, y);
+	switch (body_collision.object_type) {
+
+	case kPLAYER_TYPE:
+		
+		if (GetDirection() == kLEFT) {
+			DrawTurnGraph(x, y, now_animations[animation_frame], true);
+		}
+		else {
+			DrawGraph(x, y, now_animations[animation_frame], true);
+		}
+		break;
+	case kENEMY_TYPE:
+
+		if (GetDirection() == kRIGHT) {
+			DrawGraph(x, y, now_animations[animation_frame], true);
+		}
+		else {
+		    DrawTurnGraph(x, y, now_animations[animation_frame], true);
+		}
+	}
+	unsigned int color = GetColor(255, 0, 0);
+	int x2 = body_collision.center_position2.x - body_collision.box_extent.x;
+	int y2 = body_collision.center_position2.y - body_collision.box_extent.y;
+
+	//デバック用
+	DrawBox(x2, y2, x2 + body_collision.box_extent.x * 2, y2 + body_collision.box_extent.y * 2, color, false);
+
+}
+
+void Character::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision)
+{
+}
+
+void Character::GiveDamage(Character& target)
+{
+}
+
+void Character::GetDamage(Character& opponent, const int damage)
+{
+}
+
+void Character::KnockBack(const float delta_time, const Vector2D& recoil_velocity) {
+
+	Vector2D delta_move_amount;
+	Vector2D new_position = GetPosition();
+	input_direction = recoil_velocity;
+	delta_move_amount = input_direction.Normalize() * MOVEMENT_SPEED * delta_time;
+	bool is_can_move_x = ICharacterEvent->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
+
+	if (is_can_move_x) {
+		new_position.x += delta_move_amount.x;
+	}
+
+	input_direction.y += 50.0f;
+	float move_amount = input_direction.Normalize().y * MOVEMENT_SPEED * delta_time;
+	delta_move_amount.y += move_amount;
+
+	bool is_can_move_y = ICharacterEvent->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);
+	if (is_can_move_y) {
+		new_position.y += delta_move_amount.y;
+	}
+	else {
+		delta_move_amount.y -= move_amount;
+		new_position.y = GetPosition().y;
+	}
+
+	Vector2D amount = new_position - GetPosition();
+	body_collision.center_position2 += amount;
+	//リセットしないと前回のフレームの値に次のフレームの値が足されてしまうのでリセット。
+	input_direction = { 0.f, 0.f };
+	SetPosition(new_position);
+}
+
+void Character::Move(float delta_time) {
+
 	Vector2D delta_move_amount = { 0.f, 0.f };
 	Vector2D new_position = GetPosition();
 	delta_move_amount = input_direction.Normalize() * move_speed * delta_time;
@@ -71,70 +155,12 @@ void Character::Update(float delta_time) {
 	SetPosition(new_position);
 }
 
-void Character::Draw(const Vector2D& screen_offset) {
+void Character::ReverseDirection() {
 
-	__super::Draw(screen_offset);
-
-	int x, y;
-	GetPosition().ToInt(x, y);
-	switch (GetDirection()) {
-
-	case kLEFT:
-		DrawTurnGraph(x, y, now_animations[animation_frame], true);
-		break;
-
-	case kRIGHT:
-		DrawGraph(x, y, now_animations[animation_frame], true);
-		break;
-	}
-	unsigned int color = GetColor(255, 0, 0);
-	int x2 = body_collision.center_position2.x - body_collision.box_extent.x;
-	int y2 = body_collision.center_position2.y - body_collision.box_extent.y;
-
-	//デバック用
-	DrawBox(x2, y2, x2 + body_collision.box_extent.x * 2, y2 + body_collision.box_extent.y * 2, color, false);
-
-}
-
-void Character::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision)
-{
-}
-
-void Character::GiveDamage(Character& target)
-{
-}
-
-void Character::GetDamage(Character& opponent, const int damage)
-{
-}
-
-void Character::GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity) {
-	Vector2D delta_move_amount;
-	Vector2D new_position = GetPosition();
-	input_direction = recoil_velocity;
-	delta_move_amount = input_direction.Normalize() * MOVEMENT_SPEED * delta_time;
-	bool is_can_move_x = ICharacterEvent->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
-
-	if (is_can_move_x) {
-		new_position.x += delta_move_amount.x;
-	}
-
-	input_direction.y += 50.0f;
-	float move_amount = input_direction.Normalize().y * MOVEMENT_SPEED * delta_time;
-	delta_move_amount.y += move_amount;
-
-	bool is_can_move_y = ICharacterEvent->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);
-	if (is_can_move_y) {
-		new_position.y += delta_move_amount.y;
+	if (direction == kRIGHT) {
+		direction = kLEFT;
 	}
 	else {
-		delta_move_amount.y -= move_amount;
-		new_position.y = GetPosition().y;
+		direction = kRIGHT;
 	}
-
-	Vector2D amount = new_position - GetPosition();
-	body_collision.center_position2 += amount;
-	//リセットしないと前回のフレームの値に次のフレームの値が足されてしまうのでリセット。
-	input_direction = { 0.f, 0.f };
-	SetPosition(new_position);
 }

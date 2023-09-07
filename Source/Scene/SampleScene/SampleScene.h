@@ -29,6 +29,8 @@ public:
 	virtual bool CheckCanMoveToY(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) override;
 	virtual void AddWeapon(BaseWeapon& weapon) override;
 	virtual void RemoveWeapon(BaseWeapon* weapon) override;
+	virtual bool SerchPlayer(Enemy* enemy) override;
+
 
 	//~ End SceneBase interface
 

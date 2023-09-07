@@ -4,8 +4,10 @@
 #include "../Source/GameObject/StageObject/Character/Player/Player.h"
 #include "../Source/GameObject/Field/Field.h"
 #include "../Source/GameObject/StageObject/Character/Enemy/Enemy.h"
+#include "../Source/GameObject/StageObject/Character/Enemy/AttackEnemy.h"
 #include "../Source/GameObject/StageObject/Weapon/BaseWeapon.h"
 #include "../Source/GameObject/StageObject/StageObject.h"
+
 
 SampleScene::SampleScene()
 {
@@ -35,6 +37,25 @@ void SampleScene::RemoveWeapon(BaseWeapon* weapon) {
 	field->DeleteStageObject(weapon);
 }
 
+bool SampleScene::SerchPlayer(Enemy* enemy) {
+
+	AttackEnemy* attack_enemy = dynamic_cast<AttackEnemy*>(enemy);
+	if (attack_enemy != nullptr) {
+
+		BoxCollisionParams player_collision = player->GetBodyCollision();
+		BoxCollisionParams enemy_serch_range;
+		enemy_serch_range.center_position2 = enemy->GetSerchRange().serch_range_center;
+		enemy_serch_range.box_extent = enemy->GetSerchRange().serch_range_extent;
+		
+		bool check = CheckBoxCollision(attack_enemy->GetEquipWeapon(), enemy_serch_range, player_collision);
+
+		return check;
+	}
+
+	return false;
+};
+
+
 void SampleScene::Initialize()
 {
 	// eƒNƒ‰ƒX‚ÌInitialize()
@@ -50,8 +71,14 @@ void SampleScene::Initialize()
 	player->SetICharacterEvent(this);
 	field->AddStageObject(*player);
 
-	Enemy* enemy = CreateObject<Enemy>();
+	/*Enemy* enemy = CreateObject<Enemy>();
 	enemy->SetICharacterEvent(this);
+	enemy->SetIEnemyEvent(this);
+	field->AddStageObject(*enemy);*/
+
+	AttackEnemy* enemy = CreateObject<AttackEnemy>();
+	enemy->SetICharacterEvent(this);
+	enemy->SetIEnemyEvent(this);
 	field->AddStageObject(*enemy);
 
 	field->InitializeStageObjectPosition();
@@ -70,10 +97,11 @@ SceneType SampleScene::Update(float delta_seconds) {
 			if (iterator == oppnent_iterator) {
 				continue;
 			}
-		
+
+
 			BoxCollisionParams opponent = (*oppnent_iterator)->GetBodyCollision();
 			if (CheckBoxCollision(*iterator, (*iterator)->GetBodyCollision(), opponent)) {
-				(*iterator)->OnHitBoxCollision(*oppnent_iterator, (*oppnent_iterator)->GetBodyCollision());
+				(*iterator)->OnHitBoxCollision(*oppnent_iterator,opponent);
 			}
 		}
 	}

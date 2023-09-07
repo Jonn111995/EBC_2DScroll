@@ -17,6 +17,8 @@ void Enemy::Initialize() {
 	wait_enemy_graphic_handle = LoadGraph(_T("Resources/Images/murasuke_pp_wait.bmp"));
 	damage_enemy_graphic_handle = LoadGraph(_T("Resources/Images/murasuke_pp_damage.bmp"));
 	LoadDivGraph(_T("Resources/Images/murasuke_pp_walk.bmp"), 4, 4, 1, 40, 48, walk_enemy_graphic_handle);
+
+	SetDirection(kLEFT);
 	int array_size = sizeof(*walk_enemy_graphic_handle);
 	now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
 	//now_animations.push_back(walk_enemy_graphic_handle[0]);
@@ -56,7 +58,7 @@ void Enemy::Update(float delta_time) {
 				else {
 					recoil_dir = { -1.f, 0.f };
 				}
-				GetDamageRecoil(delta_time, recoil_dir);
+				KnockBack(delta_time, recoil_dir);
 			}
 			else if (1.f < count_time) {
 				count_time = 0.f;
@@ -69,28 +71,10 @@ void Enemy::Update(float delta_time) {
 			}
 		}
 		break;
+
 	case EEnemyState::kWALK:
-		if (move_amount <= 0) {
-			move_amount = range_move / 2;
-			SetDirection(kLEFT);
-		}
-		else if (move_amount >= range_move) {
-			move_amount = range_move / 2;
-			SetDirection(kRIGHT);
-		}
-
-		switch (GetDirection()) {
-		case kRIGHT:
-			move_amount--;
-			input_direction.x = -1.f;
-			break;
-		case kLEFT:
-			move_amount++;
-			input_direction.x = 1.f;
-			break;
-		}
-		__super::Update(delta_time);
-
+		
+		Move(delta_time);
 		break;
 	}
 
@@ -120,8 +104,51 @@ void Enemy::Draw(const Vector2D& screen_offset) {
 
 void Enemy::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
 	__super::OnHitBoxCollision(hit_object, hit_collision);
+	ChangeEnemyState(EEnemyState::kDAMAGE);	
+	const bool* is_hitted_surface = hit_collision.is_hit_surfaces;
+	is_hitted_surface++;
+	is_hitted_surface++;
 
-	if (body_collision.hit_object_types & hit_collision.object_type) {
-		enemy_state = EEnemyState::kDAMAGE;
+	if (*is_hitted_surface) {
+
+		knock_back_dir = { 1,0 };
 	}
+	else {
+		knock_back_dir = { -1, 0 };
+	}
+}
+
+void Enemy::Move(float delta_time) {
+	if (move_amount <= 0) {
+		move_amount = range_move / 2;
+		SetDirection(kLEFT);
+	}
+	else if (move_amount >= range_move) {
+		move_amount = range_move / 2;
+		SetDirection(kRIGHT);
+	}
+
+	switch (GetDirection()) {
+	case kRIGHT:
+		move_amount--;
+		input_direction.x = -1.f;
+		break;
+	case kLEFT:
+		move_amount++;
+		input_direction.x = 1.f;
+		break;
+	}
+	__super::Move(delta_time);
+}
+
+void Enemy::EnterState()
+{
+}
+
+void Enemy::ExitState()
+{
+}
+
+void Enemy::ChangeEnemyState(const EEnemyState new_state)
+{
 }

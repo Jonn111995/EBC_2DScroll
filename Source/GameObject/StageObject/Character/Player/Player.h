@@ -92,9 +92,11 @@ protected:
 	/// <param name="delta_move_amount">XV‘O‚ÆŒã‚ÌˆÚ“®—Ê‚Ì·</param>
 	void ChangeAnimState(const float delta_time, const Vector2D& delta_move_amount);
 
-	virtual void GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity) override;
+	virtual void KnockBack(const float delta_time, const Vector2D& recoil_velocity) override;
 	virtual void Attack();
 	virtual void StopAttack();
+
+	
 
 private:
 

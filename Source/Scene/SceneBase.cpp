@@ -75,12 +75,16 @@ void SceneBase::DestroyAllObjects() {
 
 bool SceneBase::CheckBoxCollision(StageObject* target, const BoxCollisionParams& collision_params, BoxCollisionParams& hit_collision_params) {
 	
-	if(true/*target->GetBodyCollision().IsHitCheckTarget(hit_collision_params.object_type)*/) {
+	if(target->GetBodyCollision().IsHitCheckTarget(hit_collision_params.object_type)) {
 	
 		float distance_x = abs(collision_params.center_position2.x - hit_collision_params.center_position2.x);
 		float distance_y = abs(collision_params.center_position2.y - hit_collision_params.center_position2.y);
 		float size_x = collision_params.box_extent.x + hit_collision_params.box_extent.x;
 		float size_y = collision_params.box_extent.y + hit_collision_params.box_extent.y;
+
+		//distance_ｘがマイナスであれば、基準のオブジェクトが他方よりも右にある。
+		//distance_yがマイナスであれば。基準のオブジェクトが他方よりも上にある
+	
 
 		//差が微小の場合は当たったと見なすための処理
 		if (abs(distance_x - size_x) <= .1f) {
@@ -91,6 +95,14 @@ bool SceneBase::CheckBoxCollision(StageObject* target, const BoxCollisionParams&
 		}
 
 		if (distance_x <= size_x && distance_y <= size_y) {
+
+			float check = collision_params.center_position2.x - hit_collision_params.center_position2.x;
+			if (check <= 0) {
+				hit_collision_params.SetHittdSruface(EHitSurface::kLEFT);
+			}
+			else {
+				hit_collision_params.SetHittdSruface(EHitSurface::kRIGHT);
+			}
 			return true;
 		}
 	}

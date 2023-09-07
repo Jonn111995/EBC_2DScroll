@@ -1,6 +1,14 @@
 #include "Hand.h"
 #include "DxLib.h"
 
+Hand::Hand()
+{
+}
+
+Hand::~Hand()
+{
+}
+
 void Hand::Initialize() {
 	__super::Initialize();
 }

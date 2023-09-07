@@ -10,7 +10,6 @@
 namespace {
 	const float AIR_RESISTANCE = 0.8f;
 	const float RESET_INITIAL_VELOCITY = 0.0f;
-	Vector2D back_velocity = { -1.f, 0.f };
 }
 
 Player::Player()
@@ -37,10 +36,11 @@ void Player::Initialize() {
 	now_weapon = new Hand();
 	now_weapon->Initialize();
 	now_weapon->SetOwner(this);
+//	now_weapon->SetWeaponType(EWeaponType::kPLAYER);
 	resourcer->Initialize();
 	body_collision.center_position = Vector2D(64, 84);
 	body_collision.box_extent = Vector2D(12, 24);
-	body_collision.hit_object_types = kENEMY_TYPE;
+	body_collision.hit_object_types = kENEMY_TYPE | kWEAPON_TYPE;
 	body_collision.object_type = kPLAYER_TYPE;
 }
 
@@ -110,13 +110,7 @@ void Player::Update(float delta_time) {
 				is_reject_input = true;
 				Vector2D recoil_dir = { 0.f, 0.f };
 
-				if (GetDirection() == kRIGHT) {
-					recoil_dir = { -1.f, 0.f };
-				}
-				else {
-					recoil_dir = { 1.f, 0.f };
-				}
-				GetDamageRecoil(delta_time, recoil_dir);
+				KnockBack(delta_time, knock_back_dir);
 			}
 			else if (count_time > 0.4f) {
 				is_reject_input = false;
@@ -130,7 +124,6 @@ void Player::Update(float delta_time) {
 			}
 			
 		case kINVINCIBLE:
-			
 			//無敵状態の時は移動処理もさせたいので、breakを置かずにフォースルーする。
 		default:
 			//移動処理はCharacterに任せる
@@ -162,11 +155,21 @@ void Player::Draw(const Vector2D& screen_offset) {
 
 void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
 
-	if (body_collision.hit_object_types & hit_collision.object_type) {
-		if (!bIsNoDamage) {
-			ChangePlayerState(kDAMAGE);
-			ChangeAnimState(0.f, Vector2D(0.f, 0.f));
+	if (!bIsNoDamage) {
+		ChangePlayerState(kDAMAGE);
+
+		const bool* is_hitted_surface = hit_collision.is_hit_surfaces;
+		is_hitted_surface++;
+		is_hitted_surface++;
+
+		if(*is_hitted_surface){
+		
+			knock_back_dir = { 1,0 };
 		}
+		else{
+			knock_back_dir = { -1, 0 };
+		}
+		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
 	}
 }
 
@@ -266,6 +269,7 @@ void Player::EnterAnimState() {
 		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kIDLE);
 		anim_speed = 4.0f;
 		min_anim_frame = 0.0f;
+		animation_frame = min_anim_frame;
 		max_anim_frame = now_animations.size() - 1.0f;
 		break;
 	case kRUN_ANIM:
@@ -294,7 +298,7 @@ void Player::EnterAnimState() {
 		break;
 	case kATTACK_ANIM:
 		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kATTACK);
-		anim_speed = 5.0f;
+		anim_speed = 4.5f;
 		min_anim_frame = 0.0f;
 		max_anim_frame = now_animations.size() - 1;
 		break;
@@ -326,11 +330,12 @@ void Player::UpdateAnimFrame(const float delta_time) {
 	}
 }
 
-void Player::GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity) {
-	__super::GetDamageRecoil(delta_time, recoil_velocity);
+void Player::BackingAway(const float delta_time, const Vector2D& recoil_velocity) {
+	__super::BackingAway(delta_time, recoil_velocity);
 }
 
 void Player::Attack() {
+	now_weapon->SetWeaponDirection();
 	now_weapon->SetAttackRange(body_collision);
 	ICharacterEvent->AddWeapon(*now_weapon);
 }

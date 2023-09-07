@@ -3,8 +3,28 @@
 
 class Character;
 
+namespace {
+
+	enum class EWeaponType {
+		kPLAYER,
+		KENEMY
+	};
+}
+enum class EWeaponDirection {
+	kLEFT,
+	kRIGHT,
+};
+
 class BaseWeapon : public StageObject {
+
 public:
+	
+
+public:
+
+	BaseWeapon();
+	virtual ~BaseWeapon();
+
 	/// <inheritdoc/>
 	virtual void Initialize() override;
 	/// <inheritdoc/>
@@ -19,6 +39,13 @@ public:
 	virtual void SetAttackRange(const BoxCollisionParams& owner_collision);
 
 	void SetOwner(Character* owner) { this->owner = owner; }
+	void SetWeaponDirection();
+	//void SetWeaponType(EWeaponType type);
+
+
 protected:
+
+	EWeaponDirection now_direction;
+	EWeaponType weapon_type;
 	Character* owner;
 };
