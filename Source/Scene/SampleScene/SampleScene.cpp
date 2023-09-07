@@ -7,6 +7,8 @@
 #include "../Source/GameObject/StageObject/Character/Enemy/AttackEnemy.h"
 #include "../Source/GameObject/StageObject/Weapon/BaseWeapon.h"
 #include "../Source/GameObject/StageObject/StageObject.h"
+#include "../Source/GameObject/GameState/GameState.h"
+#include "../Source/GameObject/UI/UIImplement/GameStateUI.h"
 
 
 SampleScene::SampleScene()
@@ -53,8 +55,13 @@ bool SampleScene::SerchPlayer(Enemy* enemy) {
 	}
 
 	return false;
-};
+}
+void SampleScene::UpdateTimeUI(int remain_time) {
+	game_state_ui->SetTime(remain_time);
+}
+void SampleScene::TimeOver() {
 
+}
 
 void SampleScene::Initialize()
 {
@@ -64,6 +71,10 @@ void SampleScene::Initialize()
 	ScreenInfo::CreateInstance();
 	ScreenInfo* screen_info = ScreenInfo::GetInstance();
 	screen_info->Initialize();
+
+	game_state = CreateObject<GameState>();
+	game_state->SetIGameStateEvent(this);
+	game_state_ui = CreateObject<GameStateUI>();
 
 	field = CreateObject<Field>();
 	field->InitializeField("C/Users/n5919/EBC_2DScroll/Source/CSVFile/mapdata.csv");
@@ -84,6 +95,11 @@ void SampleScene::Initialize()
 	field->InitializeStageObjectPosition();
 }
 
+void SampleScene::Finalize() {
+	// 親クラスのFinalize()
+	__super::Finalize();
+}
+
 SceneType SampleScene::Update(float delta_seconds) {
 
 	// 親クラスのUpdate()
@@ -97,7 +113,6 @@ SceneType SampleScene::Update(float delta_seconds) {
 			if (iterator == oppnent_iterator) {
 				continue;
 			}
-
 
 			BoxCollisionParams opponent = (*oppnent_iterator)->GetBodyCollision();
 			if (CheckBoxCollision(*iterator, (*iterator)->GetBodyCollision(), opponent)) {
@@ -114,8 +129,3 @@ void SampleScene::Draw()
 	__super::Draw();
 }
 
-void SampleScene::Finalize()
-{
-	// 親クラスのFinalize()
-	__super::Finalize();
-}

@@ -2,10 +2,18 @@
 #include <string>
 #include "../GameObject.h"
 
+class IGameStateEvent;
+
 /// <summary>
 /// ゲーム全体の状態を管理
 /// </summary>
 class GameState : public GameObject {
+public:
+	enum class EGameState {
+		kPRE_START,
+		KPLAYING,
+		kEND
+	};
 
 public:
 	GameState();
@@ -20,6 +28,9 @@ public:
 	virtual void Update(float delta_seconds) override;
 
 public:
+	void SetGameState(const EGameState new_state) { game_state_state = new_state; }
+	EGameState GetGameStatePhase() const { return game_state_state; }
+	
 	/// <summary>
 	/// スコアをセット
 	/// </summary>
@@ -65,9 +76,20 @@ public:
 	/// </summary>
 	/// <returns>クリアしたかどうか</returns>
 	bool GetbIsClear() const;
+
+	void SetIGameStateEvent(IGameStateEvent* game_state_event_interface) { game_state_event = game_state_event_interface; }
 	//void GetBeforeState(DataSuccessor&);
 
 private:
+	/// <summary>
+	/// ゲームステートの状態
+	/// </summary>
+	EGameState game_state_state;
+
+	/// <summary>
+	/// ゲームステートのイベントインターフェース
+	/// </summary>
+	IGameStateEvent* game_state_event;
 	/// <summary>
 	/// スコア
 	/// </summary>

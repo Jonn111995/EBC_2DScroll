@@ -12,8 +12,8 @@ void GameStateUI::Initialize()
 {
 }
 
-void GameStateUI::Finalize()
-{
+void GameStateUI::Finalize() {
+	game_state_ui_event = nullptr;
 }
 
 void GameStateUI::Update(float delta_seconds)

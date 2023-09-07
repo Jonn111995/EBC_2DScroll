@@ -2,6 +2,8 @@
 #include <string>
 #include "../UIComponent.h"
 
+class IGameStateUI;
+
 class GameStateUI : public UIComponent {
 
 public:
@@ -17,6 +19,7 @@ public:
 	virtual void Update(float delta_seconds) override;
 	///  <inheritdoc/>
 	virtual void Draw(const Vector2D& screen_offset) override;
+
 public:
 	/// <summary>
 	/// UIのスコアを更新

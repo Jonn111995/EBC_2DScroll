@@ -5,6 +5,8 @@
 
 class Field;
 class Player;
+class GameState;
+class GameStateUI;
 
 /**
  * サンプルシーン
@@ -19,9 +21,9 @@ public:
 public:
 	//~ Begin CSceneBase interface
 	virtual void Initialize() override;	
+	virtual void Finalize() override;
 	virtual SceneType Update(float delta_seconds) override;
 	virtual void Draw() override;
-	virtual void Finalize() override;
 	virtual SceneType GetSceneType() const override { return SceneType::SAMPLE_SCENE; }
 	bool CheckCanMove(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) override;
 	bool CheckCanStand(Vector2D& move_to_position, const BoxCollisionParams& collision) override;
@@ -30,8 +32,8 @@ public:
 	virtual void AddWeapon(BaseWeapon& weapon) override;
 	virtual void RemoveWeapon(BaseWeapon* weapon) override;
 	virtual bool SerchPlayer(Enemy* enemy) override;
-
-
+	virtual void UpdateTimeUI(int remain_time) override;
+	virtual void TimeOver() override;
 	//~ End SceneBase interface
 
 private:
@@ -44,5 +46,15 @@ private:
 	/// プレイヤー
 	/// </summary>
 	Player* player;
+
+	/// <summary>
+	/// ゲームの状態を管理
+	/// </summary>
+	GameState* game_state;
+
+	/// <summary>
+	/// ゲーム状態UI
+	/// </summary>
+	GameStateUI* game_state_ui;
 
 };

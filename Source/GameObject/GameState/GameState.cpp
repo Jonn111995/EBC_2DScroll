@@ -1,4 +1,5 @@
 #include "GameState.h"
+#include "Interface/IGameStateEvent.h"
 
 namespace {
 	const float TIME_UP = 0.f;
@@ -12,6 +13,7 @@ GameState::GameState()
 	, remain_time(0)
 	, stage_name("")
 	, is_clear(false)
+	, game_state_event(nullptr)
 {
 }
 
@@ -33,15 +35,27 @@ void GameState::Finalize() {
 void GameState::Update(float delta_seconds) {
 	__super::Update(delta_seconds);
 
-	start_time -= delta_seconds;
+	switch (game_state_state) {
+	case EGameState::kPRE_START:
+		//ゲーム開始前は処理しない
+		break;
+	case EGameState::KPLAYING:
+		start_time -= delta_seconds;
 
-	if (start_time <= TIME_UP) {
+		if (start_time <= TIME_UP) {
 
-		//ゲームオーバー処理を呼ぶ
-	}
-	else {
-		remain_time = static_cast<int>(start_time);
-		//残り時間をUIに渡す
+			//ゲームオーバー処理を呼ぶ
+			game_state_event->TimeOver();
+		}
+		else {
+			remain_time = static_cast<int>(start_time);
+			//残り時間をUIに渡す
+			game_state_event->UpdateTimeUI(remain_time);
+		}
+		break;
+
+	case EGameState::kEND:
+		break;
 	}
 }
 
