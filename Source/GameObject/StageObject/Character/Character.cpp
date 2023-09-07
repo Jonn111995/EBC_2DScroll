@@ -41,34 +41,7 @@ void Character::Finalize() {
 void Character::Update(float delta_time) {
 	__super::Update(delta_time);
 
-	Vector2D delta_move_amount = { 0.f, 0.f };
-	Vector2D new_position = GetPosition();
-	delta_move_amount = input_direction.Normalize() * move_speed * delta_time;
-	bool is_can_move_x = ICharacterEvent->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
-
-	if (is_can_move_x) {
-		new_position.x += delta_move_amount.x;
-	}
-
-
-	input_direction.y += 50.0f;
-	float move_amount = input_direction.Normalize().y * move_speed * delta_time;
-	delta_move_amount.y += move_amount;
-
-	bool is_can_move_y = ICharacterEvent->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);
-	if (is_can_move_y) {
-		new_position.y += delta_move_amount.y;
-	}
-	else {
-		delta_move_amount.y -= move_amount;
-		new_position.y = GetPosition().y;
-	}
-
-	Vector2D amount = new_position - GetPosition();
-	body_collision.center_position2 += amount;
-	//リセットしないと前回のフレームの値に次のフレームの値が足されてしまうのでリセット。
-	input_direction = { 0.f, 0.f };
-	SetPosition(new_position);
+	Move(delta_time);
 }
 
 void Character::Draw(const Vector2D& screen_offset) {
@@ -77,15 +50,25 @@ void Character::Draw(const Vector2D& screen_offset) {
 
 	int x, y;
 	GetPosition().ToInt(x, y);
-	switch (GetDirection()) {
+	switch (body_collision.object_type) {
 
-	case kLEFT:
-		DrawTurnGraph(x, y, now_animations[animation_frame], true);
+	case kPLAYER_TYPE:
+		
+		if (GetDirection() == kLEFT) {
+			DrawTurnGraph(x, y, now_animations[animation_frame], true);
+		}
+		else {
+			DrawGraph(x, y, now_animations[animation_frame], true);
+		}
 		break;
+	case kENEMY_TYPE:
 
-	case kRIGHT:
-		DrawGraph(x, y, now_animations[animation_frame], true);
-		break;
+		if (GetDirection() == kRIGHT) {
+			DrawGraph(x, y, now_animations[animation_frame], true);
+		}
+		else {
+		    DrawTurnGraph(x, y, now_animations[animation_frame], true);
+		}
 	}
 	unsigned int color = GetColor(255, 0, 0);
 	int x2 = body_collision.center_position2.x - body_collision.box_extent.x;
@@ -96,8 +79,20 @@ void Character::Draw(const Vector2D& screen_offset) {
 
 }
 
-void Character::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision)
-{
+void Character::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
+	__super::OnHitBoxCollision(hit_object, hit_collision);
+
+	const bool* is_hitted_surface = hit_collision.is_hit_surfaces;
+	is_hitted_surface++;
+	is_hitted_surface++;
+
+	if (*is_hitted_surface) {
+
+		knock_back_dir = { 1,0 };
+	}
+	else {
+		knock_back_dir = { -1, 0 };
+	}
 }
 
 void Character::GiveDamage(Character& target)
@@ -108,7 +103,8 @@ void Character::GetDamage(Character& opponent, const int damage)
 {
 }
 
-void Character::GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity) {
+void Character::KnockBack(const float delta_time, const Vector2D& recoil_velocity) {
+
 	Vector2D delta_move_amount;
 	Vector2D new_position = GetPosition();
 	input_direction = recoil_velocity;
@@ -137,4 +133,45 @@ void Character::GetDamageRecoil(const float delta_time, const Vector2D& recoil_v
 	//リセットしないと前回のフレームの値に次のフレームの値が足されてしまうのでリセット。
 	input_direction = { 0.f, 0.f };
 	SetPosition(new_position);
+}
+
+void Character::Move(float delta_time) {
+
+	Vector2D delta_move_amount = { 0.f, 0.f };
+	Vector2D new_position = GetPosition();
+	delta_move_amount = input_direction.Normalize() * move_speed * delta_time;
+
+	bool is_can_move_x = ICharacterEvent->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
+	if (is_can_move_x) {
+		new_position.x += delta_move_amount.x;
+	}
+
+	input_direction.y += 50.0f;
+	float move_amount = input_direction.Normalize().y * move_speed * delta_time;
+	delta_move_amount.y += move_amount;
+
+	bool is_can_move_y = ICharacterEvent->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);
+	if (is_can_move_y) {
+		new_position.y += delta_move_amount.y;
+	}
+	else {
+		delta_move_amount.y -= move_amount;
+		new_position.y = GetPosition().y;
+	}
+
+	Vector2D amount = new_position - GetPosition();
+	body_collision.center_position2 += amount;
+	//リセットしないと前回のフレームの値に次のフレームの値が足されてしまうのでリセット。
+	input_direction = { 0.f, 0.f };
+	SetPosition(new_position);
+}
+
+void Character::ReverseDirection() {
+
+	if (direction == kRIGHT) {
+		direction = kLEFT;
+	}
+	else {
+		direction = kRIGHT;
+	}
 }

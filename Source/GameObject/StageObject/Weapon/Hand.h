@@ -4,6 +4,8 @@
 class Hand : public BaseWeapon {
 
 public:
+	Hand();
+	virtual ~Hand();
 	/// <inheritdoc/>
 	virtual void Initialize() override;
 	/// <inheritdoc/>

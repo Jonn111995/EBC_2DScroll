@@ -3,6 +3,17 @@
 #include "ColliiosnObjectType.h"
 #include "CollisionType.h"
 
+enum class EHitSurface {
+	kTOP = 0,
+	kBOTTOM,
+	kRIGHT,
+	kLEFT
+};
+
+namespace {
+	EHitSurface surface_type[4] = { EHitSurface::kTOP, EHitSurface::kBOTTOM, EHitSurface::kRIGHT, EHitSurface::kLEFT };
+}
+
 /// <summary>
 /// コリジョン
 /// </summary>
@@ -43,12 +54,18 @@ public:
 	/// </summary>
 	CollisionType collision_type;
 
+	bool is_hit_surfaces[4] = { false };
+
 	/// <summary>
 	/// ヒットしたオブジェクトとのコリジョンチェック
 	/// </summary>
 	/// <param name="target">ヒットしたオブジェクトのオブジェクトタイプ</param>
 	/// <returns></returns>
 	bool IsHitCheckTarget(CollisionObjectType target);
+
+	void SetHittdSruface(EHitSurface hitted_surface);
+	
+	bool* GetHittedSurface() { return is_hit_surfaces; }
 
 	void SetCenterPosition(Vector2D position);
 

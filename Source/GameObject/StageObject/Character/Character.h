@@ -84,8 +84,29 @@ protected:
     /// </summary>
     float max_anim_frame;
 protected:
-    virtual void GetDamageRecoil(const float delta_time, const Vector2D& recoil_velocity);
+    /// <summary>
+    /// 移動処理
+    /// </summary>
+    /// <param name="delta_time">毎フレーム時間</param>
+    virtual void Move(float delta_time);
 
+    /// <summary>
+    /// ノックバックする
+    /// </summary>
+    /// <param name="delta_time">毎フレーム時間</param>
+    /// <param name="knock_back_dir">ノックバックする方向</param>
+    virtual void KnockBack(const float delta_time, const Vector2D& knock_back_dir);
+
+    /// <summary>
+    /// キャラの向きを反対に変更。
+    /// </summary>
+    void ReverseDirection();
+
+protected:
+    /// <summary>
+    /// ノックバックのベクトル
+    /// </summary>
+    Vector2D knock_back_dir;
 
 public:
     /// <inheritdoc/>
@@ -173,7 +194,5 @@ public:
     /// <param name="opponent">攻撃してきたキャラ</param>
     /// <param name="damage">ダメージ</param>
     void GetDamage(Character& opponent, const int damage);
-
-
 };
 

@@ -4,5 +4,7 @@ enum class EEnemyState {
 
 	kWALK,
 	kATTACK,
+	kSERCH,
+	kCHASE,
 	kDAMAGE,
 };
