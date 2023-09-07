@@ -79,6 +79,16 @@ private:
 	int respawn_remain;
 
 	/// <summary>
+	/// 開始時間
+	/// </summary>
+	float start_time;
+
+	/// <summary>
+	/// 毎フレーム合計時間
+	/// </summary>
+	float count_time;
+
+	/// <summary>
 	/// 残り時間
 	/// </summary>
 	int remain_time;
