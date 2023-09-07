@@ -33,6 +33,10 @@ void AttackEnemy::Initialize() {
 }
 
 void AttackEnemy::Finalize() {
+
+	delete equip_weapon;
+	equip_weapon = nullptr;
+
 	__super::Finalize();
 }
 
@@ -84,36 +88,35 @@ void AttackEnemy::Move(float delta_time) {
 }
 
 void AttackEnemy::EnterState() {
-	__super::EnterState();
 
 	switch (enemy_state) {
-	case EEnemyState::kSERCH: {
-		int array_size = sizeof(*walk_enemy_graphic_handle);
-		SetSpeed(GetSpeed() / 10.f);
-		now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
-		anim_speed = 5.0f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = now_animations.size() - 1.0f;
-		break;
+		case EEnemyState::kSERCH: {
+			int array_size = sizeof(*walk_enemy_graphic_handle);
+			SetSpeed(GetSpeed() / 10.f);
+			now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
+			anim_speed = 5.0f;
+			min_anim_frame = 0.0f;
+			max_anim_frame = now_animations.size() - 1.0f;
+			break;
+		}
+		case EEnemyState::kATTACK:{
+			//SetSpeed(MOVEMENT_SPEED * 1.2);
+			int array_size = sizeof(*attack_enemy_graphic_handle);
+			SetSpeed(GetSpeed() * 10.f);
+			now_animations.assign(attack_enemy_graphic_handle, attack_enemy_graphic_handle + array_size);
+			anim_speed = 5.0f;
+			min_anim_frame = 0.0f;
+			max_anim_frame = now_animations.size() - 1.0f;
+			equip_weapon->SetWeaponDirection();
+			equip_weapon->SetAttackRange(body_collision);
+			ICharacterEvent->AddWeapon(*equip_weapon);
+			break;
+		}
 	}
-	case EEnemyState::kATTACK:{
-		//SetSpeed(MOVEMENT_SPEED * 1.2);
-		int array_size = sizeof(*attack_enemy_graphic_handle);
-		SetSpeed(GetSpeed() * 10.f);
-		now_animations.assign(attack_enemy_graphic_handle, attack_enemy_graphic_handle + array_size);
-		anim_speed = 5.0f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = now_animations.size() - 1.0f;
-		equip_weapon->SetWeaponDirection();
-		equip_weapon->SetAttackRange(body_collision);
-		ICharacterEvent->AddWeapon(*equip_weapon);
-		break;
-	}
-	}
+	__super::EnterState();
 }
 
 void AttackEnemy::ExitState() {
-	__super::ExitState();
 	switch (enemy_state) {
 	case EEnemyState::kSERCH:
 		break;
@@ -122,6 +125,7 @@ void AttackEnemy::ExitState() {
 		ICharacterEvent->RemoveWeapon(equip_weapon);
 		break;
 	}
+	__super::ExitState();
 }
 
 void AttackEnemy::ChangeEnemyState(const EEnemyState new_state) {
@@ -129,19 +133,4 @@ void AttackEnemy::ChangeEnemyState(const EEnemyState new_state) {
 	ExitState();
 	enemy_state = new_state;
 	EnterState();
-	
-}
-
-void AttackEnemy::SetSerchRange() {
-	int direct_ajust = 0;
-	if (GetDirection() == kRIGHT) {
-		direct_ajust = -1;
-	}
-	else {
-		direct_ajust = 1;
-	}
-
-	float center_x = body_collision.center_position2.x + (body_collision.box_extent.x * 4) * direct_ajust;
-	serch_range.serch_range_center = Vector2D(center_x, body_collision.center_position2.y );
-	serch_range.serch_range_extent = { (body_collision.box_extent.x *3), body_collision.box_extent.y };
 }

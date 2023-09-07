@@ -2,6 +2,9 @@
 
 class BaseWeapon;
 
+/// <summary>
+/// キャラクター共通イベント
+/// </summary>
 class CharacterEventInterface {
 
 public:

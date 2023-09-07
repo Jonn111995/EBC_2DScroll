@@ -5,11 +5,20 @@
 class IEnemyEvent;
 
 namespace {
+    /// <summary>
+    /// 索敵範囲構造体
+    /// </summary>
     struct SerchRange {
 
     public:
+        /// <summary>
+        /// 索敵範囲の中心座標
+        /// </summary>
         Vector2D serch_range_center;
 
+        /// <summary>
+        /// 中心座標からの索敵範囲
+        /// </summary>
         Vector2D serch_range_extent;
     };
 }
@@ -37,16 +46,28 @@ public:
     /// <summary>
     /// ステートをセットする
     /// </summary>
-    /// <param name="new_state"></param>
+    /// <param name="new_state">新しいステート</param>
     void SetEnemyState(EEnemyState new_state) { enemy_state = new_state; }
 
+    /// <summary>
+    /// 索敵範囲を取得
+    /// </summary>
+    /// <returns>索敵範囲構造体</returns>
     SerchRange GetSerchRange() { return serch_range; }
 
-
+    /// <summary>
+    /// 敵キャライベントインターフェースをセット
+    /// </summary>
+    /// <param name="new_interface">インターフェース</param>
     void SetIEnemyEvent(IEnemyEvent* new_interface) { enemy_event = new_interface; }
 
-
 protected:
+
+    /// <summary>
+    /// 敵キャライベント
+    /// </summary>
+    IEnemyEvent* enemy_event;
+
     /// <summary>
     /// 待機アニメーションハンドル
     /// </summary>
@@ -77,13 +98,32 @@ protected:
     /// </summary>
     EEnemyState enemy_state;
 
+    /// <summary>
+    /// 毎フレーム時間の合計時間
+    /// </summary>
     float count_time;
 
+    /// <summary>
+    /// 索敵範囲
+    /// </summary>
     SerchRange serch_range;
-    IEnemyEvent* enemy_event;
 
 protected:
+    /// <inheritdoc />
     virtual void Move(float delta_time) override;
+
+protected:
+    /// <summary>
+    /// 索敵範囲をセット
+    /// </summary>
+    virtual void SetSerchRange();
+
+    /// <summary>
+    /// プレイヤーの状態を変更する
+    /// </summary>
+    /// <param name="new_state">新しい状態</param>
+    virtual void ChangeEnemyState(const EEnemyState new_state);
+
     ///<summary>
     /// 新しい状態の初期化処理
     /// </summary>
@@ -93,10 +133,4 @@ protected:
     /// 状態が終わるときの終了処理
     /// </summary>
     virtual void ExitState();
-
-    /// <summary>
-    /// プレイヤーの状態を変更する
-    /// </summary>
-    /// <param name="new_state">新しい状態</param>
-    virtual void ChangeEnemyState(const EEnemyState new_state);
 };

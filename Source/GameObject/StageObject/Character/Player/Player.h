@@ -31,7 +31,11 @@ private:
 	/// </summary>
 	PlayerAnimResourcer* resourcer;
 
-	BaseWeapon* now_weapon;
+	/// <summary>
+	/// 装備中の武器
+	/// </summary>
+	BaseWeapon* equip_weapon;
+
 	/// <summary>
 	/// プレイヤーの状態
 	/// </summary>
@@ -73,6 +77,7 @@ public:
 	Player();
 	virtual ~Player();
 
+public:
 	/// <inheritdoc/>
 	virtual void Initialize() override;
 	/// <inheritdoc/>
@@ -92,11 +97,18 @@ protected:
 	/// <param name="delta_move_amount">更新前と後の移動量の差</param>
 	void ChangeAnimState(const float delta_time, const Vector2D& delta_move_amount);
 
+	//削除するかも
 	virtual void KnockBack(const float delta_time, const Vector2D& recoil_velocity) override;
-	virtual void Attack();
-	virtual void StopAttack();
 
-	
+	/// <summary>
+	/// 攻撃を開始
+	/// </summary>
+	virtual void Attack();
+
+	/// <summary>
+	/// 攻撃を止める
+	/// </summary>
+	virtual void StopAttack();
 
 private:
 

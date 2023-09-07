@@ -33,10 +33,9 @@ void Player::Initialize() {
 
     input_handler = new InputHandler();
 	resourcer = new PlayerAnimResourcer();
-	now_weapon = new Hand();
-	now_weapon->Initialize();
-	now_weapon->SetOwner(this);
-//	now_weapon->SetWeaponType(EWeaponType::kPLAYER);
+	equip_weapon = new Hand();
+	equip_weapon->Initialize();
+	equip_weapon->SetOwner(this);
 	resourcer->Initialize();
 	body_collision.center_position = Vector2D(64, 84);
 	body_collision.box_extent = Vector2D(12, 24);
@@ -48,14 +47,16 @@ void Player::Finalize(){
 	__super::Finalize();
 
 	delete input_handler;
+
 	resourcer->Finalize();
 	delete resourcer;
 	
-	now_weapon->Finalize();
-	delete now_weapon;
+	equip_weapon->Finalize();
+	delete equip_weapon;
+
 	input_handler = nullptr;
 	resourcer = nullptr;
-	now_weapon = nullptr;
+	equip_weapon = nullptr;
 }
 
 void Player::Update(float delta_time) {
@@ -109,8 +110,10 @@ void Player::Update(float delta_time) {
 
 				is_reject_input = true;
 				Vector2D recoil_dir = { 0.f, 0.f };
-
-				KnockBack(delta_time, knock_back_dir);
+				input_direction = knock_back_dir;
+				//今のところMoveで代用可能
+				Move(delta_time);
+				//KnockBack(delta_time, knock_back_dir);
 			}
 			else if (count_time > 0.4f) {
 				is_reject_input = false;
@@ -135,7 +138,7 @@ void Player::Update(float delta_time) {
 }
 
 void Player::Draw(const Vector2D& screen_offset) {
-
+	//デバック用
 	unsigned int color = GetColor(255, 0, 0);
 	DrawFormatString(0, 0, color, "X=%f, Y=%f:::::", body_collision.center_position2.x, body_collision.center_position2.y);
 
@@ -150,7 +153,7 @@ void Player::Draw(const Vector2D& screen_offset) {
 	__super::Draw(screen_offset);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-	now_weapon->Draw(screen_offset);
+	equip_weapon->Draw(screen_offset);
 }
 
 void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
@@ -158,18 +161,9 @@ void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollision
 	if (!bIsNoDamage) {
 		ChangePlayerState(kDAMAGE);
 
-		const bool* is_hitted_surface = hit_collision.is_hit_surfaces;
-		is_hitted_surface++;
-		is_hitted_surface++;
-
-		if(*is_hitted_surface){
-		
-			knock_back_dir = { 1,0 };
-		}
-		else{
-			knock_back_dir = { -1, 0 };
-		}
 		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
+
+		__super::OnHitBoxCollision(hit_object, hit_collision);
 	}
 }
 
@@ -212,7 +206,7 @@ void Player::ExitState() {
 	case kJUMP:
 		break;
 	case kATTACK:
-		ICharacterEvent->RemoveWeapon(now_weapon);
+		ICharacterEvent->RemoveWeapon(equip_weapon);
 		break;
 	case kDEAD:
 		break;
@@ -259,7 +253,6 @@ void Player::ChangeAnimState(const float delta_time = 0.0f, const Vector2D& delt
 
 	EnterAnimState();
 	UpdateAnimFrame(delta_time);
-
 }
 
 void Player::EnterAnimState() {
@@ -330,18 +323,18 @@ void Player::UpdateAnimFrame(const float delta_time) {
 	}
 }
 
-void Player::BackingAway(const float delta_time, const Vector2D& recoil_velocity) {
-	__super::BackingAway(delta_time, recoil_velocity);
+void Player::KnockBack(const float delta_time, const Vector2D& recoil_velocity) {
+	__super::KnockBack(delta_time, recoil_velocity);
 }
 
 void Player::Attack() {
-	now_weapon->SetWeaponDirection();
-	now_weapon->SetAttackRange(body_collision);
-	ICharacterEvent->AddWeapon(*now_weapon);
+	equip_weapon->SetWeaponDirection();
+	equip_weapon->SetAttackRange(body_collision);
+	ICharacterEvent->AddWeapon(*equip_weapon);
 }
 
 void Player::StopAttack() {
-	ICharacterEvent->RemoveWeapon(now_weapon);
+	ICharacterEvent->RemoveWeapon(equip_weapon);
 }
 
 void Player::StartJump() {

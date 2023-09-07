@@ -79,8 +79,20 @@ void Character::Draw(const Vector2D& screen_offset) {
 
 }
 
-void Character::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision)
-{
+void Character::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
+	__super::OnHitBoxCollision(hit_object, hit_collision);
+
+	const bool* is_hitted_surface = hit_collision.is_hit_surfaces;
+	is_hitted_surface++;
+	is_hitted_surface++;
+
+	if (*is_hitted_surface) {
+
+		knock_back_dir = { 1,0 };
+	}
+	else {
+		knock_back_dir = { -1, 0 };
+	}
 }
 
 void Character::GiveDamage(Character& target)
@@ -128,12 +140,11 @@ void Character::Move(float delta_time) {
 	Vector2D delta_move_amount = { 0.f, 0.f };
 	Vector2D new_position = GetPosition();
 	delta_move_amount = input_direction.Normalize() * move_speed * delta_time;
-	bool is_can_move_x = ICharacterEvent->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
 
+	bool is_can_move_x = ICharacterEvent->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
 	if (is_can_move_x) {
 		new_position.x += delta_move_amount.x;
 	}
-
 
 	input_direction.y += 50.0f;
 	float move_amount = input_direction.Normalize().y * move_speed * delta_time;
