@@ -11,6 +11,7 @@ Hand::~Hand()
 
 void Hand::Initialize() {
 	__super::Initialize();
+	attack = 10;
 }
 
 void Hand::Finalize()
@@ -31,7 +32,7 @@ void Hand::Draw(const Vector2D& screen_offset)
 }
 
 void Hand::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
-
+	__super::OnHitBoxCollision(hit_object, hit_collision);
 }
 
 void Hand::SetAttackRange(const BoxCollisionParams& owner_collision) {

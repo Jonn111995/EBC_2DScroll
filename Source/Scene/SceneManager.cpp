@@ -86,7 +86,9 @@ SceneBase* SceneManager::CreateScene(SceneType new_scene_type)
 {
 	switch (new_scene_type)
 	{
-	case SceneType::SAMPLE_SCENE:	return new SampleScene();
-	default:					return nullptr;
+	case SceneType::SAMPLE_SCENE:	
+		return new SampleScene();
+	default:					
+		return nullptr;
 	}
 }

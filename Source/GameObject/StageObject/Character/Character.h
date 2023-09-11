@@ -4,6 +4,7 @@
 #include <vector>
 
 class CharacterEventInterface;
+class HpUI;
 
 namespace {
     /// <summary>
@@ -52,7 +53,7 @@ protected:
     /// <summary>
     /// キャラクターイベントインターフェース
     /// </summary>
-    CharacterEventInterface* ICharacterEvent;
+    CharacterEventInterface* character_event;
 
     /// <summary>
     /// 移動ベクトル
@@ -83,6 +84,9 @@ protected:
     /// アニメーションフレームの最大値
     /// </summary>
     float max_anim_frame;
+
+    bool is_get_damaged;
+    HpUI* hp_ui;
 protected:
     /// <summary>
     /// 移動処理
@@ -123,15 +127,18 @@ public:
     /// <summary>
     /// キャラクターイベントインターフェースを設定
     /// </summary>
-    void SetICharacterEvent(CharacterEventInterface* interface) { ICharacterEvent = interface; };
+    void SetICharacterEvent(CharacterEventInterface* interface) { character_event = interface; };
+    void SetHpUi(HpUI& hp_ui);
 
 public:
+    void SetHp(const int new_hp) { hp = new_hp; }
     /// <summary>
     /// HPを取得
     /// </summary>
     /// <returns>HP</returns>
     int GetHp() const { return hp; }
 
+    void SetAttack(const int attack) { this->attack = attack; }
     /// <summary>
     /// 攻撃力を取得
     /// </summary>
@@ -186,7 +193,7 @@ public:
     /// ダメージを与える
     /// </summary>
     /// <param name="target">ダメージを与えるキャラ</param>
-    void GiveDamage(Character& target);
+    void GiveDamage(Character& target, int damage);
 
     /// <summary>
     /// ダメージを受ける
@@ -194,5 +201,11 @@ public:
     /// <param name="opponent">攻撃してきたキャラ</param>
     /// <param name="damage">ダメージ</param>
     void GetDamage(Character& opponent, const int damage);
+
+    void CallGiveDamageEvent(StageObject& give_gamage_chara, const StageObject& opponent_chara, const int damage);
+
+    bool GetIsGetDmaged() { return is_get_damaged; }
+
+    void UpdateHpUI(const int new_hp);
 };
 

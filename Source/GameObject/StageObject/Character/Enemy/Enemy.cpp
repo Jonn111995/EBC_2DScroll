@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include "DxLib.h"
+#include "../Source/GameObject/StageObject/Character/Interface/CharacterEventInterface.h"
 
 Enemy::Enemy()
 	: wait_enemy_graphic_handle()
@@ -12,6 +13,7 @@ Enemy::Enemy()
 	, count_time(0.f)
 	
 {
+	SetAttack(10);
 }
 
 Enemy::~Enemy() {
@@ -38,12 +40,12 @@ void Enemy::Initialize() {
 	body_collision.object_type = kENEMY_TYPE;
 	body_collision.center_position = Vector2D(20, 28);
 	body_collision.box_extent = Vector2D(10.f, 18.f);
-	body_collision.hit_object_types =  kWEAPON_TYPE;
+	body_collision.hit_object_types =  kPLAYER_TYPE | kWEAPON_TYPE;
 	enemy_state = EEnemyState::kWALK;
+	game_object_state = EGameObjectState::kPLAYING;
 }
 
 void Enemy::Finalize() {
-	delete enemy_event;
 	enemy_event = nullptr;
 
 	__super::Finalize();
@@ -51,43 +53,50 @@ void Enemy::Finalize() {
 
 void Enemy::Update(float delta_time) {
 
-	switch (enemy_state) {
-	case EEnemyState::kDAMAGE:
-		if (enemy_state == EEnemyState::kDAMAGE) {
-			count_time += delta_time;
+	switch (game_object_state) {
+	case EGameObjectState::kPLAYING:
 
-			if (count_time < 0.1f) {
+		switch (enemy_state) {
+		case EEnemyState::kDAMAGE:
+			if (enemy_state == EEnemyState::kDAMAGE) {
+				count_time += delta_time;
 
-				input_direction = knock_back_dir;
-				Move(delta_time);
+				if (count_time < 0.1f) {
+					input_direction = knock_back_dir;
+					Move(delta_time);
+				}
+				else if (1.f < count_time) {
+					is_get_damaged = false;
+					count_time = 0.f;
+					ChangeEnemyState(EEnemyState::kWALK);
+				}
 			}
-			else if (1.f < count_time) {
+			break;
 
-				count_time = 0.f;
-				ChangeEnemyState(EEnemyState::kWALK);
-			}
+		case EEnemyState::kWALK:
+			Move(delta_time);
+			break;
+		}
+
+		if (animation_frame <= min_anim_frame) {
+			animation_frame = min_anim_frame;
+		}
+
+		//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
+		if (animation_frame >= now_animations.size()) {
+			animation_frame = min_anim_frame;
+		}
+
+		animation_frame += delta_time * anim_speed;
+
+		//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
+		if (animation_frame >= max_anim_frame) {
+			animation_frame = min_anim_frame;
 		}
 		break;
 
-	case EEnemyState::kWALK:
-		Move(delta_time);
+	case EGameObjectState::kPAUSE:
 		break;
-	}
-
-	if (animation_frame <= min_anim_frame) {
-		animation_frame = min_anim_frame;
-	}
-
-	//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
-	if (animation_frame >= now_animations.size()) {
-		animation_frame = min_anim_frame;
-	}
-
-	animation_frame += delta_time * anim_speed;
-
-	//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
-	if (animation_frame >= max_anim_frame) {
-		animation_frame = min_anim_frame;
 	}
 }
 
@@ -99,7 +108,13 @@ void Enemy::Draw(const Vector2D& screen_offset) {
 }
 
 void Enemy::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
-	ChangeEnemyState(EEnemyState::kDAMAGE);	
+
+	if (hit_collision.object_type & kPLAYER_TYPE) {
+		character_event->GiveDamageEvent(*this, *hit_object, GetAttack());
+	}
+	else if (hit_collision.object_type & kWEAPON_TYPE) {
+		ChangeEnemyState(EEnemyState::kDAMAGE);
+	}
 	__super::OnHitBoxCollision(hit_object, hit_collision);
 }
 

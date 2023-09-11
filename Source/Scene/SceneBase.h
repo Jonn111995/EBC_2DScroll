@@ -14,6 +14,12 @@ enum class SceneType : unsigned short
 	SAMPLE_SCENE,
 };
 
+enum class SceneState : unsigned short {
+	kPRESTART,
+	kPLAYING,
+	kEND
+};
+
 /**
  * シーンの基底クラス
  */

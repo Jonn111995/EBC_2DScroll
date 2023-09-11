@@ -2,7 +2,6 @@
 #include "../Scene/SceneBase.h"
 
 GameObject::GameObject()
-	//: owner_scene(nullptr)
 	: draw_sort_priority(0)
 {
 }
@@ -12,7 +11,6 @@ GameObject::GameObject()
 //	owner_scene = new_owner_scene;
 //}
 
-void GameObject::SetDrawSortPriority(int new_priority)
-{
+void GameObject::SetDrawSortPriority(int new_priority) {
 	draw_sort_priority = new_priority;
 }

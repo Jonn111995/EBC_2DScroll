@@ -1,6 +1,7 @@
 #include "Character.h"
 #include "DxLib.h"
 #include "Interface/CharacterEventInterface.h"
+#include "../Source/GameObject/UI/UIImplement/HpUI.h"
 
 namespace {
 	Vector2D back_velocity = { -1.f, 0.f };
@@ -10,13 +11,13 @@ namespace {
 /// キャラクターの基礎クラス
 /// </summary>
 Character::Character()
-	: hp(0)
+	: hp(100)
 	, attack(0)
 	, deffence(0)
 	, move_speed(MOVEMENT_SPEED)
 	, bIsMove(false)
 	, direction(kRIGHT)
-	, ICharacterEvent(nullptr)
+	, character_event(nullptr)
 	, input_direction({0.f,0.f})
 	, now_animations()
 	, animation_frame(0.f)
@@ -35,7 +36,7 @@ void Character::Initialize() {
 
 void Character::Finalize() {
 	__super::Finalize();
-	ICharacterEvent = nullptr;
+	character_event = nullptr;
 }
 
 void Character::Update(float delta_time) {
@@ -95,12 +96,46 @@ void Character::OnHitBoxCollision(const StageObject* hit_object, const BoxCollis
 	}
 }
 
-void Character::GiveDamage(Character& target)
-{
+void Character::SetHpUi(HpUI& hp_ui) {
+	this->hp_ui = &hp_ui;
+	this->hp_ui->InitializeHP(hp);
 }
 
-void Character::GetDamage(Character& opponent, const int damage)
-{
+void Character::GiveDamage(Character& receive_damage_chara, int damage) {
+
+	
+	int true_damage = damage - receive_damage_chara.GetDeffence();
+
+	if (true_damage <= 0) {
+		true_damage = 0;
+	}
+
+	receive_damage_chara.GetDamage(*this, true_damage);
+}
+
+void Character::GetDamage(Character& give_damage_chara, const int damage) {
+
+	is_get_damaged = true;
+	this->hp -= damage;
+
+	if (hp <= 0) {
+		hp = 0;
+		//死亡状態にする
+		//さらにキャラの死亡イベントを呼ぶ。
+	}
+	if (hp_ui != nullptr) {
+		this->character_event->UpdateHpUI(this->hp);
+	}
+
+}
+
+void Character::CallGiveDamageEvent(StageObject& give_gamage_chara, const StageObject& opponent_chara, const int damage) {
+
+	character_event->GiveDamageEvent(give_gamage_chara, opponent_chara, damage);
+}
+
+void Character::UpdateHpUI(const int new_hp) {
+	hp_ui->SetHP(new_hp);
 }
 
 void Character::KnockBack(const float delta_time, const Vector2D& recoil_velocity) {
@@ -109,7 +144,7 @@ void Character::KnockBack(const float delta_time, const Vector2D& recoil_velocit
 	Vector2D new_position = GetPosition();
 	input_direction = recoil_velocity;
 	delta_move_amount = input_direction.Normalize() * MOVEMENT_SPEED * delta_time;
-	bool is_can_move_x = ICharacterEvent->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
+	bool is_can_move_x = character_event->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
 
 	if (is_can_move_x) {
 		new_position.x += delta_move_amount.x;
@@ -119,7 +154,7 @@ void Character::KnockBack(const float delta_time, const Vector2D& recoil_velocit
 	float move_amount = input_direction.Normalize().y * MOVEMENT_SPEED * delta_time;
 	delta_move_amount.y += move_amount;
 
-	bool is_can_move_y = ICharacterEvent->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);
+	bool is_can_move_y = character_event->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);
 	if (is_can_move_y) {
 		new_position.y += delta_move_amount.y;
 	}
@@ -141,7 +176,7 @@ void Character::Move(float delta_time) {
 	Vector2D new_position = GetPosition();
 	delta_move_amount = input_direction.Normalize() * move_speed * delta_time;
 
-	bool is_can_move_x = ICharacterEvent->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
+	bool is_can_move_x = character_event->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
 	if (is_can_move_x) {
 		new_position.x += delta_move_amount.x;
 	}
@@ -150,7 +185,7 @@ void Character::Move(float delta_time) {
 	float move_amount = input_direction.Normalize().y * move_speed * delta_time;
 	delta_move_amount.y += move_amount;
 
-	bool is_can_move_y = ICharacterEvent->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);
+	bool is_can_move_y = character_event->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);
 	if (is_can_move_y) {
 		new_position.y += delta_move_amount.y;
 	}

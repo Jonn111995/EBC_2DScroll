@@ -41,6 +41,8 @@ void Player::Initialize() {
 	body_collision.box_extent = Vector2D(12, 24);
 	body_collision.hit_object_types = kENEMY_TYPE | kWEAPON_TYPE;
 	body_collision.object_type = kPLAYER_TYPE;
+	game_object_state = EGameObjectState::kPLAYING;
+	SetHp(100);
 }
 
 void Player::Finalize(){
@@ -54,6 +56,7 @@ void Player::Finalize(){
 	equip_weapon->Finalize();
 	delete equip_weapon;
 
+	player_event = nullptr;
 	input_handler = nullptr;
 	resourcer = nullptr;
 	equip_weapon = nullptr;
@@ -61,46 +64,49 @@ void Player::Finalize(){
 
 void Player::Update(float delta_time) {
 
-	std::vector<bool> input_button_status = input_handler->CheckInput(delta_time);
+	switch (game_object_state) {
+	case EGameObjectState::kPLAYING:
+	{
+		std::vector<bool> input_button_status = input_handler->CheckInput(delta_time);
+		if (!is_reject_input) {
+			if (input_button_status[kLEFT_B]) {
+				input_direction.x = -10.0f;
+				SetDirection(CharacterDirection::kLEFT);
+			}
 
-	if (!is_reject_input) {
-		if (input_button_status[kLEFT_B]) {
-			input_direction.x = -10.0f;
-			SetDirection(CharacterDirection::kLEFT);
+			if (input_button_status[kRIGHT_B]) {
+				input_direction.x = 10.0f;
+				SetDirection(CharacterDirection::kRIGHT);
+			}
+
+			if (input_button_status[kJUMP_B]) {
+				StartJump();
+			}
+
+			if (input_button_status[kATTACK_B]) {
+				ChangePlayerState(kATTACK);
+			}
+
+			if (!bIsCanJump) {
+				ChangePlayerState(kJUMP);
+			}
 		}
 
-		if (input_button_status[kRIGHT_B]) {
-			input_direction.x = 10.0f;
-			SetDirection(CharacterDirection::kRIGHT);
+		//更新後の座標と比較して、移動量を出すため取得。
+		Vector2D pre_position = GetPosition();
+
+		if (bIsNoDamage) {
+			count_time += delta_time;
+
+			if (count_time > invincible_time) {
+				ChangePlayerState(kIDLE);
+				bIsNoDamage = false;
+				is_get_damaged = false;
+				count_time = 0.f;
+			}
 		}
 
-		if (input_button_status[kJUMP_B]) {
-			StartJump();
-		}
-
-		if (input_button_status[kATTACK_B]) {
-			ChangePlayerState(kATTACK);
-		}
-		
-		if (!bIsCanJump) {
-			ChangePlayerState(kJUMP);
-		}
-	}
-
-	//更新後の座標と比較して、移動量を出すため取得。
-	Vector2D pre_position = GetPosition();
-
-	if (bIsNoDamage) {
-		count_time += delta_time;
-
-		if (count_time > invincible_time) {
-			ChangePlayerState(kIDLE);
-			bIsNoDamage = false;
-			count_time = 0.f;
-		}
-	}
-
-	switch (player_state) {
+		switch (player_state) {
 		case kJUMP:
 			JumpMove(delta_time);
 			break;
@@ -125,16 +131,21 @@ void Player::Update(float delta_time) {
 			if (animation_frame >= max_anim_frame - 0.2f) {
 				ChangePlayerState(kIDLE);
 			}
-			
+
 		case kINVINCIBLE:
 			//無敵状態の時は移動処理もさせたいので、breakを置かずにフォースルーする。
 		default:
 			//移動処理はCharacterに任せる
 			__super::Update(delta_time);
 			break;
+		}
+
+		ChangeAnimState(delta_time, (GetPosition() - pre_position));
+		break;
 	}
-	
-	ChangeAnimState(delta_time, (GetPosition() - pre_position));
+	case EGameObjectState::kPAUSE:
+		break;
+	}
 }
 
 void Player::Draw(const Vector2D& screen_offset) {
@@ -160,9 +171,7 @@ void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollision
 
 	if (!bIsNoDamage) {
 		ChangePlayerState(kDAMAGE);
-
 		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
-
 		__super::OnHitBoxCollision(hit_object, hit_collision);
 	}
 }
@@ -206,7 +215,7 @@ void Player::ExitState() {
 	case kJUMP:
 		break;
 	case kATTACK:
-		ICharacterEvent->RemoveWeapon(equip_weapon);
+		character_event->RemoveWeapon(equip_weapon);
 		break;
 	case kDEAD:
 		break;
@@ -330,11 +339,11 @@ void Player::KnockBack(const float delta_time, const Vector2D& recoil_velocity) 
 void Player::Attack() {
 	equip_weapon->SetWeaponDirection();
 	equip_weapon->SetAttackRange(body_collision);
-	ICharacterEvent->AddWeapon(*equip_weapon);
+	character_event->AddWeapon(*equip_weapon);
 }
 
 void Player::StopAttack() {
-	ICharacterEvent->RemoveWeapon(equip_weapon);
+	character_event->RemoveWeapon(equip_weapon);
 }
 
 void Player::StartJump() {
@@ -357,7 +366,7 @@ void Player::JumpMove(const float delta_time) {
 	delta_move_amount = input_direction.Normalize() * MOVEMENT_SPEED * delta_time;
 
 	//ここから当たり判定
-	bool is_can_move_y = ICharacterEvent->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);
+	bool is_can_move_y = character_event->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);
 	if (!is_can_move_y) {
 
 		bIsCanJump = true;
@@ -369,7 +378,7 @@ void Player::JumpMove(const float delta_time) {
 		new_position.y = GetPosition().y + delta_move_amount.y;
 	}
 
-	bool is_can_move_x = ICharacterEvent->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
+	bool is_can_move_x = character_event->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
 	if (is_can_move_x) {
 		new_position.x += delta_move_amount.x;
 	}

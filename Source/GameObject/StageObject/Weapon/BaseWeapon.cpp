@@ -14,6 +14,15 @@ void BaseWeapon::Initialize() {
 	body_collision.object_type = kWEAPON_TYPE;
 }
 
+void BaseWeapon::Finalize() {
+	owner = nullptr;
+}
+
+void BaseWeapon::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
+	//‚±‚±‚ÅƒLƒƒƒ‰‚ÌUŒ‚ˆ—‚ðŒÄ‚Ô
+	owner->CallGiveDamageEvent(*owner, *hit_object, attack);
+}
+
 void BaseWeapon::SetAttackRange(const BoxCollisionParams& owner_collision) {
 	int direct_ajust = 1;
 	switch (owner->GetBodyCollision().object_type) {
