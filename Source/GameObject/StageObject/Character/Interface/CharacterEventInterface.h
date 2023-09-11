@@ -14,7 +14,7 @@ public:
 	virtual void AddWeapon(BaseWeapon& weapon) = 0;
 	virtual void RemoveWeapon(BaseWeapon* weapon) = 0;
 	virtual void GiveDamageEvent(StageObject& give_gamage_chara, const StageObject& opponent_chara, const int damage) = 0;
-
+	virtual void UpdateHpUI(const int now_hp) = 0;
 
 	virtual bool CheckCanStand(Vector2D& move_to_position, const BoxCollisionParams& collision) = 0;
 };

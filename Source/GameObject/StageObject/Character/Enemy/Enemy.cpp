@@ -13,6 +13,7 @@ Enemy::Enemy()
 	, count_time(0.f)
 	
 {
+	SetAttack(10);
 }
 
 Enemy::~Enemy() {
@@ -39,7 +40,7 @@ void Enemy::Initialize() {
 	body_collision.object_type = kENEMY_TYPE;
 	body_collision.center_position = Vector2D(20, 28);
 	body_collision.box_extent = Vector2D(10.f, 18.f);
-	body_collision.hit_object_types =  kWEAPON_TYPE;
+	body_collision.hit_object_types =  kPLAYER_TYPE | kWEAPON_TYPE;
 	enemy_state = EEnemyState::kWALK;
 	game_object_state = EGameObjectState::kPLAYING;
 }
@@ -61,12 +62,11 @@ void Enemy::Update(float delta_time) {
 				count_time += delta_time;
 
 				if (count_time < 0.1f) {
-
 					input_direction = knock_back_dir;
 					Move(delta_time);
 				}
 				else if (1.f < count_time) {
-
+					is_get_damaged = false;
 					count_time = 0.f;
 					ChangeEnemyState(EEnemyState::kWALK);
 				}

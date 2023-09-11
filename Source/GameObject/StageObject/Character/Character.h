@@ -4,6 +4,7 @@
 #include <vector>
 
 class CharacterEventInterface;
+class HpUI;
 
 namespace {
     /// <summary>
@@ -83,6 +84,9 @@ protected:
     /// アニメーションフレームの最大値
     /// </summary>
     float max_anim_frame;
+
+    bool is_get_damaged;
+    HpUI* hp_ui;
 protected:
     /// <summary>
     /// 移動処理
@@ -124,6 +128,7 @@ public:
     /// キャラクターイベントインターフェースを設定
     /// </summary>
     void SetICharacterEvent(CharacterEventInterface* interface) { character_event = interface; };
+    void SetHpUi(HpUI& hp_ui);
 
 public:
     void SetHp(const int new_hp) { hp = new_hp; }
@@ -133,6 +138,7 @@ public:
     /// <returns>HP</returns>
     int GetHp() const { return hp; }
 
+    void SetAttack(const int attack) { this->attack = attack; }
     /// <summary>
     /// 攻撃力を取得
     /// </summary>
@@ -195,5 +201,11 @@ public:
     /// <param name="opponent">攻撃してきたキャラ</param>
     /// <param name="damage">ダメージ</param>
     void GetDamage(Character& opponent, const int damage);
+
+    void CallGiveDamageEvent(StageObject& give_gamage_chara, const StageObject& opponent_chara, const int damage);
+
+    bool GetIsGetDmaged() { return is_get_damaged; }
+
+    void UpdateHpUI(const int new_hp);
 };
 

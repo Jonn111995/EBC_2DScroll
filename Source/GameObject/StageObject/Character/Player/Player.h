@@ -9,6 +9,7 @@ class PlayerAnimResourcer;
 class BaseWeapon;
 class IPlayerEvent;
 
+
 namespace {
 	/// <summary>
 	/// d—Í‰Á‘¬—Í

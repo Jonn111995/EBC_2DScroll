@@ -7,6 +7,7 @@ class Field;
 class Player;
 class GameState;
 class GameStateUI;
+class HpUI;
 
 enum class EPlaySceneState : unsigned short{
 
@@ -78,4 +79,8 @@ private:
 	/// </summary>
 	GameStateUI* game_state_ui;
 
+	/// <summary>
+	/// キャラクターのHpUI
+	/// </summary>
+	HpUI* hp_ui;
 };

@@ -9,6 +9,7 @@
 #include "../Source/GameObject/StageObject/StageObject.h"
 #include "../Source/GameObject/GameState/GameState.h"
 #include "../Source/GameObject/UI/UIImplement/GameStateUI.h"
+#include "../Source/GameObject/UI/UIImplement/HpUI.h"
 
 
 SampleScene::SampleScene()
@@ -52,13 +53,16 @@ void SampleScene::GiveDamageEvent(StageObject& give_gamage_chara, const StageObj
 		}
 
 		if(receive_damage_chara != nullptr ) {
-			chara->GiveDamage(*receive_damage_chara, damage);
+			if (!receive_damage_chara->GetIsGetDmaged()) {
+				chara->GiveDamage(*receive_damage_chara, damage);
+			}
 		}
 	}
 }
 
-void SampleScene::UpdateHpUI(const int now_hp)
-{
+void SampleScene::UpdateHpUI(const int now_hp) {
+
+	player->UpdateHpUI(now_hp);
 }
 
 
@@ -98,12 +102,14 @@ void SampleScene::Initialize()
 	game_state = CreateObject<GameState>();
 	game_state->SetIGameStateEvent(this);
 	game_state_ui = CreateObject<GameStateUI>();
-
+	hp_ui = CreateObject<HpUI>();
+	
 	field = CreateObject<Field>();
 	field->InitializeField("C/Users/n5919/EBC_2DScroll/Source/CSVFile/mapdata.csv");
 	player = CreateObject<Player>();
 	player->SetICharacterEvent(this);
 	player->SetIPlayerEvent(this);
+	player->SetHpUi(*hp_ui);
 	field->AddStageObject(*player);
 
 	/*Enemy* enemy = CreateObject<Enemy>();
@@ -140,6 +146,7 @@ SceneType SampleScene::Update(float delta_seconds) {
 		if (game_state != nullptr && game_state->GetGameObjectState() == EGameObjectState::kPRE_START) {
 			game_state->SetPlaying();
 			game_state_ui->OnActive();
+			hp_ui->OnActive();
 		}
 
 		SceneType now_scen_type = __super::Update(delta_seconds);
@@ -157,6 +164,11 @@ SceneType SampleScene::Update(float delta_seconds) {
 				if (CheckBoxCollision(*iterator, (*iterator)->GetBodyCollision(), opponent)) {
 					(*iterator)->OnHitBoxCollision(*oppnent_iterator, opponent);
 				}
+
+				/*opponent = (*iterator)->GetBodyCollision();
+				if (CheckBoxCollision(*oppnent_iterator, (*oppnent_iterator)->GetBodyCollision(), opponent)) {
+					(*oppnent_iterator)->OnHitBoxCollision(*iterator, opponent);
+				}*/
 			}
 		}
 		return now_scen_type;

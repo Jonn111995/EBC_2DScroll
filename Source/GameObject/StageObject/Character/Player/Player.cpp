@@ -101,6 +101,7 @@ void Player::Update(float delta_time) {
 			if (count_time > invincible_time) {
 				ChangePlayerState(kIDLE);
 				bIsNoDamage = false;
+				is_get_damaged = false;
 				count_time = 0.f;
 			}
 		}
@@ -171,7 +172,6 @@ void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollision
 	if (!bIsNoDamage) {
 		ChangePlayerState(kDAMAGE);
 		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
-		
 		__super::OnHitBoxCollision(hit_object, hit_collision);
 	}
 }
