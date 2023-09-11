@@ -2,6 +2,18 @@
 
 class Vector2D;
 
+enum class EGameObjectState : unsigned short {
+	kPRE_START,	//初期フェーズ
+	kPLAYING,	//処理フェーズ
+	kPAUSE,		//ポーズフェーズ
+	kEND,		//終了フェーズ
+};
+
+enum class EActivation : unsigned short {
+	kACTIVE,
+	kNONE_ACTIVE
+};
+
 /**
  * ゲーム内に表示されるオブジェクトの基底クラス
  */
@@ -58,10 +70,23 @@ public:
 	 */
 	void SetDrawSortPriority(const int new_priority);
 
-private:
+	void SetPlaying() { game_object_state = EGameObjectState::kPLAYING; }
+	void SetPause() { game_object_state = EGameObjectState::kPAUSE; }
+	EGameObjectState GetGameObjectState() { return game_object_state; }
+
+	void OnActive() { active_state = EActivation::kACTIVE; }
+	void OffActive() { active_state = EActivation::kNONE_ACTIVE; }
+
+protected:
 	// オーナーとなるシーン
 	//class SceneBase* owner_scene;
 
 	// 描画順。数値が小さい順から描画を行う
 	int draw_sort_priority;
+	/// <summary>
+	/// ステージオブジェクトの処理ステート
+	/// </summary>
+	EGameObjectState game_object_state;
+
+	EActivation active_state;
 };

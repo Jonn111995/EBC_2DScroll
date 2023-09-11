@@ -52,7 +52,7 @@ protected:
     /// <summary>
     /// キャラクターイベントインターフェース
     /// </summary>
-    CharacterEventInterface* ICharacterEvent;
+    CharacterEventInterface* character_event;
 
     /// <summary>
     /// 移動ベクトル
@@ -123,9 +123,10 @@ public:
     /// <summary>
     /// キャラクターイベントインターフェースを設定
     /// </summary>
-    void SetICharacterEvent(CharacterEventInterface* interface) { ICharacterEvent = interface; };
+    void SetICharacterEvent(CharacterEventInterface* interface) { character_event = interface; };
 
 public:
+    void SetHp(const int new_hp) { hp = new_hp; }
     /// <summary>
     /// HPを取得
     /// </summary>
@@ -186,7 +187,7 @@ public:
     /// ダメージを与える
     /// </summary>
     /// <param name="target">ダメージを与えるキャラ</param>
-    void GiveDamage(Character& target);
+    void GiveDamage(Character& target, int damage);
 
     /// <summary>
     /// ダメージを受ける

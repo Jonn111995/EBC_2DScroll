@@ -39,6 +39,29 @@ void SampleScene::RemoveWeapon(BaseWeapon* weapon) {
 	field->DeleteStageObject(weapon);
 }
 
+void SampleScene::GiveDamageEvent(StageObject& give_gamage_chara, const StageObject& opponent_chara, const int damage) {
+
+	Character* receive_damage_chara = nullptr;
+	Character* chara = dynamic_cast<Character*>(&give_gamage_chara);
+	
+	if (chara != nullptr) {
+		for (auto& obj : field->GetStageObjectList()) {
+			if (obj == &opponent_chara) {
+				receive_damage_chara = dynamic_cast<Character*>(obj);
+			}
+		}
+
+		if(receive_damage_chara != nullptr ) {
+			chara->GiveDamage(*receive_damage_chara, damage);
+		}
+	}
+}
+
+void SampleScene::UpdateHpUI(const int now_hp)
+{
+}
+
+
 bool SampleScene::SerchPlayer(Enemy* enemy) {
 
 	AttackEnemy* attack_enemy = dynamic_cast<AttackEnemy*>(enemy);
@@ -80,6 +103,7 @@ void SampleScene::Initialize()
 	field->InitializeField("C/Users/n5919/EBC_2DScroll/Source/CSVFile/mapdata.csv");
 	player = CreateObject<Player>();
 	player->SetICharacterEvent(this);
+	player->SetIPlayerEvent(this);
 	field->AddStageObject(*player);
 
 	/*Enemy* enemy = CreateObject<Enemy>();
@@ -91,8 +115,10 @@ void SampleScene::Initialize()
 	enemy->SetICharacterEvent(this);
 	enemy->SetIEnemyEvent(this);
 	field->AddStageObject(*enemy);
-
+	
 	field->InitializeStageObjectPosition();
+
+	play_scene_state = EPlaySceneState::kPLAYING;
 }
 
 void SampleScene::Finalize() {
@@ -101,26 +127,52 @@ void SampleScene::Finalize() {
 }
 
 SceneType SampleScene::Update(float delta_seconds) {
+	switch (play_scene_state) {
+	case EPlaySceneState::kPRE_START:
+		//ここでキャラを動かないようにする
+		break;
+	case EPlaySceneState::kSTART_UI:
+		break;
+	case EPlaySceneState::kWAIT_END_START_UI:
+		break;
+	case EPlaySceneState::kPLAYING:
+	{
+		if (game_state != nullptr && game_state->GetGameObjectState() == EGameObjectState::kPRE_START) {
+			game_state->SetPlaying();
+			game_state_ui->OnActive();
+		}
 
-	// 親クラスのUpdate()
-	SceneType now_scen_type = __super::Update(delta_seconds);
+		SceneType now_scen_type = __super::Update(delta_seconds);
 
-	std::vector<StageObject*> stage_obj_list = field->GetStageObjectList();
+		std::vector<StageObject*> stage_obj_list = field->GetStageObjectList();
 
-	for (auto iterator = stage_obj_list.begin(); iterator != stage_obj_list.end(); ++iterator) {
-		for (auto oppnent_iterator = stage_obj_list.begin(); oppnent_iterator != stage_obj_list.end(); ++oppnent_iterator) {
+		for (auto iterator = stage_obj_list.begin(); iterator != stage_obj_list.end(); ++iterator) {
+			for (auto oppnent_iterator = stage_obj_list.begin(); oppnent_iterator != stage_obj_list.end(); ++oppnent_iterator) {
 
-			if (iterator == oppnent_iterator) {
-				continue;
-			}
+				if (iterator == oppnent_iterator) {
+					continue;
+				}
 
-			BoxCollisionParams opponent = (*oppnent_iterator)->GetBodyCollision();
-			if (CheckBoxCollision(*iterator, (*iterator)->GetBodyCollision(), opponent)) {
-				(*iterator)->OnHitBoxCollision(*oppnent_iterator,opponent);
+				BoxCollisionParams opponent = (*oppnent_iterator)->GetBodyCollision();
+				if (CheckBoxCollision(*iterator, (*iterator)->GetBodyCollision(), opponent)) {
+					(*iterator)->OnHitBoxCollision(*oppnent_iterator, opponent);
+				}
 			}
 		}
+		return now_scen_type;
+		break;
 	}
-	return now_scen_type;
+	case EPlaySceneState::kFINISH_UI:
+		break;
+	case EPlaySceneState::kWAIT_END_FINISH_UI:
+		break;
+	case EPlaySceneState::kPAUSE:
+		break;
+	case EPlaySceneState::kFINISH:
+		break;
+	case EPlaySceneState::kFinished:
+		break;
+	}
 }
 
 void SampleScene::Draw()

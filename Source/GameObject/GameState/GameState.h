@@ -3,18 +3,15 @@
 #include "../GameObject.h"
 
 class IGameStateEvent;
-
+//enum class EGameStatePhase {
+//	kPRE_START,
+//	KPLAYING,
+//	kEND
+//};
 /// <summary>
 /// ゲーム全体の状態を管理
 /// </summary>
 class GameState : public GameObject {
-public:
-	enum class EGameState {
-		kPRE_START,
-		KPLAYING,
-		kEND
-	};
-
 public:
 	GameState();
 	virtual ~GameState();
@@ -28,9 +25,9 @@ public:
 	virtual void Update(float delta_seconds) override;
 
 public:
-	void SetGameState(const EGameState new_state) { game_state_state = new_state; }
-	EGameState GetGameStatePhase() const { return game_state_state; }
-	
+	/*void SetGameState(const EGameStatePhase new_state) { game_state_state = new_state; }
+	EGameStatePhase GetGameStatePhase() const { return game_state_state; }
+	*/
 	/// <summary>
 	/// スコアをセット
 	/// </summary>
@@ -84,7 +81,7 @@ private:
 	/// <summary>
 	/// ゲームステートの状態
 	/// </summary>
-	EGameState game_state_state;
+	//EGameStatePhase game_state_state;
 
 	/// <summary>
 	/// ゲームステートのイベントインターフェース

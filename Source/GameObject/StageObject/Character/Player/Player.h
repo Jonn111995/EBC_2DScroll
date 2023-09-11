@@ -7,6 +7,7 @@
 class InputHandler;
 class PlayerAnimResourcer;
 class BaseWeapon;
+class IPlayerEvent;
 
 namespace {
 	/// <summary>
@@ -19,6 +20,9 @@ namespace {
 /// ÉvÉåÉCÉÑÅ[
 /// </summary>
 class Player : public Character {
+
+protected:
+	IPlayerEvent* player_event;
 
 private:
 	/// <summary>
@@ -88,6 +92,9 @@ public:
 	virtual void Draw(const Vector2D& screen_offset) override;
 	/// <inheritdoc/>
 	virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) override;
+
+public:
+	void SetIPlayerEvent(IPlayerEvent* interface) { player_event = interface; }
 
 protected:
 	/// <summary>

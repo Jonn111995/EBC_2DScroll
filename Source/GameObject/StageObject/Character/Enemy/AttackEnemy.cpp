@@ -30,6 +30,7 @@ void AttackEnemy::Initialize() {
 	equip_weapon->Initialize();
 	equip_weapon->SetOwner(this);
 	//equip_weapon->SetWeaponType(EWeaponType::KENEMY);
+	game_object_state = EGameObjectState::kPLAYING;
 }
 
 void AttackEnemy::Finalize() {
@@ -42,21 +43,28 @@ void AttackEnemy::Finalize() {
 
 void AttackEnemy::Update(float delta_time) {
 
-	switch (enemy_state) {
-	case EEnemyState::kSERCH:
-		Move(delta_time);
-		break;
-	case EEnemyState::kCHASE:
-		break;
-	case EEnemyState::kATTACK:
-		if (animation_frame >= max_anim_frame - 0.2f) {
-			ChangeEnemyState(EEnemyState::kSERCH);
+	switch (game_object_state) {
+	case EGameObjectState::kPLAYING:
+		switch (enemy_state) {
+		case EEnemyState::kSERCH:
+			Move(delta_time);
+			break;
+		case EEnemyState::kCHASE:
+			break;
+		case EEnemyState::kATTACK:
+			if (animation_frame >= max_anim_frame - 0.2f) {
+				ChangeEnemyState(EEnemyState::kSERCH);
+			}
+			break;
+		default:
+			break;
 		}
+		__super::Update(delta_time);
+
 		break;
-	default:
+	case EGameObjectState::kPAUSE:
 		break;
 	}
-	__super::Update(delta_time);
 }
 
 void AttackEnemy::Draw(const Vector2D& screen_offset) {
@@ -109,7 +117,7 @@ void AttackEnemy::EnterState() {
 			max_anim_frame = now_animations.size() - 1.0f;
 			equip_weapon->SetWeaponDirection();
 			equip_weapon->SetAttackRange(body_collision);
-			ICharacterEvent->AddWeapon(*equip_weapon);
+			character_event->AddWeapon(*equip_weapon);
 			break;
 		}
 	}
@@ -122,7 +130,7 @@ void AttackEnemy::ExitState() {
 		break;
 	case EEnemyState::kATTACK:
 		//SetSpeed(MOVEMENT_SPEED);
-		ICharacterEvent->RemoveWeapon(equip_weapon);
+		character_event->RemoveWeapon(equip_weapon);
 		break;
 	}
 	__super::ExitState();

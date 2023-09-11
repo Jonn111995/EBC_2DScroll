@@ -11,6 +11,7 @@ Hand::~Hand()
 
 void Hand::Initialize() {
 	__super::Initialize();
+	attack = 10;
 }
 
 void Hand::Finalize()

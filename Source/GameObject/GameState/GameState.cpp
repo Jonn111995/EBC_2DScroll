@@ -35,15 +35,14 @@ void GameState::Finalize() {
 void GameState::Update(float delta_seconds) {
 	__super::Update(delta_seconds);
 
-	switch (game_state_state) {
-	case EGameState::kPRE_START:
+	switch (game_object_state) {
+	case EGameObjectState::kPRE_START:
 		//ゲーム開始前は処理しない
 		break;
-	case EGameState::KPLAYING:
+	case EGameObjectState::kPLAYING:
 		start_time -= delta_seconds;
 
 		if (start_time <= TIME_UP) {
-
 			//ゲームオーバー処理を呼ぶ
 			game_state_event->TimeOver();
 		}
@@ -53,8 +52,9 @@ void GameState::Update(float delta_seconds) {
 			game_state_event->UpdateTimeUI(remain_time);
 		}
 		break;
-
-	case EGameState::kEND:
+	case EGameObjectState::kPAUSE:
+		break;
+	case EGameObjectState::kEND:
 		break;
 	}
 }
