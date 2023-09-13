@@ -25,9 +25,6 @@ public:
 	virtual void Update(float delta_seconds) override;
 
 public:
-	/*void SetGameState(const EGameStatePhase new_state) { game_state_state = new_state; }
-	EGameStatePhase GetGameStatePhase() const { return game_state_state; }
-	*/
 	/// <summary>
 	/// スコアをセット
 	/// </summary>

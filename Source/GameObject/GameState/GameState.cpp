@@ -3,7 +3,7 @@
 
 namespace {
 	const float TIME_UP = 0.f;
-	const int RESPAWN_REMAIN_APP = 10;
+	const int RESPAWN_REMAIN_APP = 1;
 }
 
 GameState::GameState()

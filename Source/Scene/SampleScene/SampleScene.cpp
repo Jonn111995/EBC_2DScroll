@@ -151,6 +151,7 @@ void SampleScene::Initialize()
 	player->SetHpUi(*hp_ui);
 	field->AddStageObject(*player);
 
+	game_state_ui->SetScore(game_state->GetScore());
 	game_state_ui->SetRespawn(game_state->GetRespawnRemain());
 
 	/*Enemy* enemy = CreateObject<Enemy>();
