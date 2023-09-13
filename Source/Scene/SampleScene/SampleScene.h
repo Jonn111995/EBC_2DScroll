@@ -49,11 +49,16 @@ public:
 	virtual void RemoveWeapon(BaseWeapon* weapon) override;
 	virtual void GiveDamageEvent(StageObject& give_gamage_chara, const StageObject& opponent_chara, const int damage) override;
 	virtual void UpdateHpUI(const int now_hp) override;
-	virtual void UpdateRespawnRemain(const int respawn_remain) override;
+	virtual void UpdateRespawnRemainUI(const int respawn_remain) override;
+	virtual void UpdateScoreUI(const int new_score) override;
+
 
 	virtual void DeadEvent(Character* dead_object) override;
 	virtual bool ExecuteRespawn() override;
 
+	virtual void ScoreUp() override;
+	virtual void ChangeInvincible() override;
+	virtual void DestroyItem(StageObject& delete_object) override;
 
 
 

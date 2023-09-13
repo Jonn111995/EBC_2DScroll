@@ -38,6 +38,7 @@ public:
 	/// </summary>
 	/// <returns>現在スコア</returns>
 	int GetScore() const;
+	void IncreaseScore();
 	/// <summary>
 	/// リスポーン残り回数をセット
 	/// </summary>

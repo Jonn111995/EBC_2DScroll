@@ -3,6 +3,7 @@
 
 namespace {
 	const float TIME_UP = 0.f;
+	const int RESPAWN_REMAIN_APP = 10;
 }
 
 GameState::GameState()
@@ -67,6 +68,16 @@ int GameState::GetScore() const {
 	return score;
 }
 
+void GameState::IncreaseScore() {
+	score++;
+	game_state_event->UpdateScoreUI(score);
+
+	//ˆê’è’PˆÊ–ˆ‚ÉŽc‹@‚ð‘‚â‚·
+	if (score % RESPAWN_REMAIN_APP == 0) {
+		IncreseRespawnRemain();
+	}
+}
+
 void GameState::SetRespawnRemain(const int respawn_remain) {
 	this->respawn_remain = respawn_remain;
 }
@@ -77,7 +88,7 @@ int GameState::GetRespawnRemain() {
 
 void GameState::IncreseRespawnRemain() {
 	respawn_remain++;
-	game_state_event->UpdateRespawnRemain(respawn_remain);
+	game_state_event->UpdateRespawnRemainUI(respawn_remain);
 }
 
 void GameState::ReduceRespawnRemain() {
@@ -85,7 +96,7 @@ void GameState::ReduceRespawnRemain() {
 	if (respawn_remain <= 0) {
 		respawn_remain = 0;
 	}
-	game_state_event->UpdateRespawnRemain(respawn_remain);
+	game_state_event->UpdateRespawnRemainUI(respawn_remain);
 }
 
 int GameState::GetRemainTime() const {

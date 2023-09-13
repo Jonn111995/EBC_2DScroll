@@ -11,6 +11,7 @@
 #include "../Source/GameObject/UI/UIImplement/GameStateUI.h"
 #include "../Source/GameObject/UI/UIImplement/HpUI.h"
 #include "../Source/GameObject/RespawnManager/RespawnManager.h"
+#include "../Source/GameObject/StageObject/Item/Coin.h"
 
 
 SampleScene::SampleScene()
@@ -65,7 +66,11 @@ void SampleScene::UpdateHpUI(const int now_hp) {
 	player->UpdateHpUI(now_hp);
 }
 
-void SampleScene::UpdateRespawnRemain(const int respawn_remain) {
+void SampleScene::UpdateScoreUI(const int new_score) {
+	game_state_ui->SetScore(new_score);
+}
+
+void SampleScene::UpdateRespawnRemainUI(const int respawn_remain) {
 	game_state_ui->SetRespawn(respawn_remain);
 }
 
@@ -83,6 +88,18 @@ bool SampleScene::ExecuteRespawn() {
 	respawn_manager->RespawnObject();
 	hp_ui->InitializeHP(player->GetHp());
 	return true;
+}
+
+void SampleScene::ScoreUp() {
+	game_state->IncreaseScore();
+}
+
+void SampleScene::ChangeInvincible()
+{
+}
+
+void SampleScene::DestroyItem(StageObject& delete_object) {
+	BookDeleteObject(&delete_object);
 }
 
 
@@ -103,9 +120,11 @@ bool SampleScene::SerchPlayer(Enemy* enemy) {
 
 	return false;
 }
+
 void SampleScene::UpdateTimeUI(int remain_time) {
 	game_state_ui->SetTime(remain_time);
 }
+
 void SampleScene::TimeOver() {
 
 }
@@ -143,12 +162,17 @@ void SampleScene::Initialize()
 	enemy->SetICharacterEvent(this);
 	enemy->SetIEnemyEvent(this);
 	field->AddStageObject(*enemy);
-	
+	Coin* coin = CreateObject<Coin>();
+	coin->SetIItemEvent(this);
+	field->AddStageObject(*coin);
+
 	field->InitializeStageObjectPosition();
 
 	respawn_manager = CreateObject<RespawnManager>();
 	respawn_manager->SetCheckPointList(field->GetCheckPointList());
 	respawn_manager->SetObserveObject(*player);
+
+	
 
 	play_scene_state = EPlaySceneState::kPLAYING;
 }
