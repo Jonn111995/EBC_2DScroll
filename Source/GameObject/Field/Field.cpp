@@ -113,14 +113,17 @@ bool Field::InitializeField(const char* map_file_name){
 bool Field::InitializeStageObjectPosition() {
     
     for (auto& stage_obj : stage_object_list) {
-
-        switch (stage_obj->GetBodyCollision().object_type) {
+        BoxCollisionParams stage_object_collision = stage_obj->GetBodyCollision();
+        switch (stage_object_collision.object_type) {
 
         case kPLAYER_TYPE:
             SetInitialPosition(*stage_obj, kPLAYER_START);
             break;
         case kENEMY_TYPE:
             SetInitialPosition(*stage_obj, kENEMY);
+            break;
+        case kITEM_TYPE:
+            SetInitialPosition(*stage_obj, kITEM);
             break;
         }
     }
@@ -498,10 +501,6 @@ std::vector<Vector2D> Field::GetCheckPointList() {
 
             if (map_data.at(y).at(x) == kPLAYER_START) {
 
-                //キャラクターの画像サイズが、キャラが描かれている範囲より大きいので、左上座標をそのままセットすると、
-                //透過されている部分を含めた左上座標の位置に描画される。
-                //それを避けるため、センターポジションまでのオフセット分だけ引いて、キャラが描かれている左上座標を、
-                //指定したマップの座標位置まで持っていく必要がある。
                 int x_left = (screen_info->GetLeftX() + x * map_chip_size);
                 int y_top = (screen_info->GetLeftY() + y * map_chip_size);
                 check_point_list.push_back(Vector2D(x_left, y_top));
