@@ -8,6 +8,7 @@ class Player;
 class GameState;
 class GameStateUI;
 class HpUI;
+class RespawnManager;
 
 enum class EPlaySceneState : unsigned short{
 
@@ -48,6 +49,11 @@ public:
 	virtual void RemoveWeapon(BaseWeapon* weapon) override;
 	virtual void GiveDamageEvent(StageObject& give_gamage_chara, const StageObject& opponent_chara, const int damage) override;
 	virtual void UpdateHpUI(const int now_hp) override;
+	virtual void UpdateRespawnRemain(const int respawn_remain) override;
+
+	virtual void DeadEvent(Character* dead_object) override;
+	virtual bool ExecuteRespawn() override;
+
 
 
 
@@ -68,6 +74,11 @@ private:
 	/// プレイヤー
 	/// </summary>
 	Player* player;
+
+	/// <summary>
+	/// リスポーン関連の管理オブジェクト
+	/// </summary>
+	RespawnManager* respawn_manager;
 
 	/// <summary>
 	/// ゲームの状態を管理

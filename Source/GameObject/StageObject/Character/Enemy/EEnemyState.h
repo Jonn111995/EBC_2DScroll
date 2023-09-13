@@ -7,4 +7,5 @@ enum class EEnemyState {
 	kSERCH,
 	kCHASE,
 	kDAMAGE,
+	kDEAD
 };

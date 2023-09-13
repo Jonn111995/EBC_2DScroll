@@ -14,9 +14,9 @@ enum class EActivation : unsigned short {
 	kNONE_ACTIVE
 };
 
-/**
- * ゲーム内に表示されるオブジェクトの基底クラス
- */
+/// <summary>
+/// ゲーム内に表示されるオブジェクトの基底クラス
+/// </summary>
 class GameObject
 {
 public:
@@ -46,47 +46,59 @@ public:
 	/// </summary>
 	virtual void Finalize() {}
 
-	/**
-	 * シーンの取得
-	 * @return owner_scene
-	 */
-	//class SceneBase* GetOwnerScene() const { return owner_scene; }
-
-	/**
-	 * シーンのセット
-	 * @param	new_owner_scene	セットするPosition
-	 */
-	//void SetOwnerScene(class SceneBase* new_owner_scene);
-
-	/**
-	 * 描画順の取得
-	 * @return	draw_sort_priority
-	 */
+	/// <summary>
+	/// 描画順の取得
+	/// </summary>
+	/// <returns>描画順</returns>
 	int GetDrawSortPriority() const { return draw_sort_priority; }
 
-	/**
-	 * 描画順のセット
-	 * @param	new_priority	セットする描画順
-	 */
+	/// <summary>
+	/// 描画順のセット
+	/// </summary>
+	/// <param name="new_priority">セットする描画順</param>
 	void SetDrawSortPriority(const int new_priority);
 
+	/// <summary>
+	/// 処理状態をPlayに変更
+	/// </summary>
 	void SetPlaying() { game_object_state = EGameObjectState::kPLAYING; }
+	/// <summary>
+	/// 処理状態をポーズに変更
+	/// </summary>
 	void SetPause() { game_object_state = EGameObjectState::kPAUSE; }
+	/// <summary>
+	/// 処理状態を終了状態に変更
+	/// </summary>
+	void SetEnd() { game_object_state = EGameObjectState::kEND; }
+
+	/// <summary>
+	/// オブジェクト
+	/// </summary>
+	/// <returns></returns>
 	EGameObjectState GetGameObjectState() { return game_object_state; }
 
+	/// <summary>
+	/// 活動状態に変更
+	/// </summary>
 	void OnActive() { active_state = EActivation::kACTIVE; }
+	/// <summary>
+	/// 休止状態に変更
+	/// </summary>
 	void OffActive() { active_state = EActivation::kNONE_ACTIVE; }
 
 protected:
-	// オーナーとなるシーン
-	//class SceneBase* owner_scene;
-
-	// 描画順。数値が小さい順から描画を行う
+	/// <summary>
+	/// 描画順。数値が小さい順から描画を行う
+	/// </summary>
 	int draw_sort_priority;
+
 	/// <summary>
 	/// ステージオブジェクトの処理ステート
 	/// </summary>
 	EGameObjectState game_object_state;
 
+	/// <summary>
+	/// このオブジェクトが活動中かどうかを表すステート
+	/// </summary>
 	EActivation active_state;
 };

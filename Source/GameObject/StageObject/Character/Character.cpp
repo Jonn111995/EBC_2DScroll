@@ -3,15 +3,12 @@
 #include "Interface/CharacterEventInterface.h"
 #include "../Source/GameObject/UI/UIImplement/HpUI.h"
 
-namespace {
-	Vector2D back_velocity = { -1.f, 0.f };
-}
-
 /// <summary>
 /// キャラクターの基礎クラス
 /// </summary>
 Character::Character()
 	: hp(100)
+	, MAX_HP(hp)
 	, attack(0)
 	, deffence(0)
 	, move_speed(MOVEMENT_SPEED)
@@ -37,6 +34,7 @@ void Character::Initialize() {
 void Character::Finalize() {
 	__super::Finalize();
 	character_event = nullptr;
+	hp_ui = nullptr;
 }
 
 void Character::Update(float delta_time) {
@@ -96,6 +94,7 @@ void Character::OnHitBoxCollision(const StageObject* hit_object, const BoxCollis
 	}
 }
 
+
 void Character::SetHpUi(HpUI& hp_ui) {
 	this->hp_ui = &hp_ui;
 	this->hp_ui->InitializeHP(hp);
@@ -117,15 +116,17 @@ void Character::GetDamage(Character& give_damage_chara, const int damage) {
 
 	is_get_damaged = true;
 	this->hp -= damage;
-
-	if (hp <= 0) {
-		hp = 0;
-		//死亡状態にする
-		//さらにキャラの死亡イベントを呼ぶ。
-	}
 	if (hp_ui != nullptr) {
 		this->character_event->UpdateHpUI(this->hp);
 	}
+	if (hp <= 0) {
+		hp = 0;
+		//死亡状態にする
+		this->SetEnd();
+		//さらにキャラの死亡イベントを呼ぶ。
+		//character_event->DeadEvent(this);
+	}
+	
 
 }
 
@@ -209,4 +210,8 @@ void Character::ReverseDirection() {
 	else {
 		direction = kRIGHT;
 	}
+}
+
+void Character::CallDeadEvent() {
+	character_event->DeadEvent(this);
 }

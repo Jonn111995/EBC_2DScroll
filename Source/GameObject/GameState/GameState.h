@@ -48,6 +48,8 @@ public:
 	/// </summary>
 	/// <returns>残りリスポーン回数</returns>
 	int GetRespawnRemain();
+	void IncreseRespawnRemain();
+	void ReduceRespawnRemain();
 	/// <summary>
 	/// 残り時間を取得
 	/// </summary>

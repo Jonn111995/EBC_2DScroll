@@ -2,8 +2,9 @@
 #include <string>
 #include "../UIComponent.h"
 
-class IGameStateUI;
-
+/// <summary>
+/// ゲーム状態をUIとして表示する
+/// </summary>
 class GameStateUI : public UIComponent {
 
 public:
@@ -31,6 +32,7 @@ public:
 	/// </summary>
 	/// <param name="new_respawn_remain">残りの残機数</param>
 	void SetRespawn(const int new_respawn_remain) { display_respawn_remain = new_respawn_remain; };
+
 	/// <summary>
 	/// UIの残り時間を更新
 	/// </summary>
@@ -41,7 +43,15 @@ public:
 	/// </summary>
 	/// <param name="new_stage_name">現在のステージ名</param>
 	void SetStageName(const std::string new_stage_name) { stage_name = new_stage_name; }
-		
+private:
+	/// <summary>
+	/// 制限時間を描写
+	/// </summary>
+	void DrawTime();
+	/// <summary>
+	/// 残り残機回数を表示
+	/// </summary>
+	void DrawRespawnRemain();
 private:
 	/// <summary>
 	/// UIに表示する現在スコア

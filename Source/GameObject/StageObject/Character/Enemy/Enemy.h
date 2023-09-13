@@ -108,6 +108,11 @@ protected:
     /// </summary>
     SerchRange serch_range;
 
+    /// <summary>
+    /// ‰‘¬“x
+    /// </summary>
+    float initial_velocity = -25;
+
 protected:
     /// <inheritdoc />
     virtual void Move(float delta_time) override;

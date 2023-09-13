@@ -106,6 +106,8 @@ protected:
     /// </summary>
     void ReverseDirection();
 
+    virtual void CallDeadEvent();
+
 protected:
     /// <summary>
     /// ノックバックのベクトル
@@ -127,10 +129,11 @@ public:
     /// <summary>
     /// キャラクターイベントインターフェースを設定
     /// </summary>
-    void SetICharacterEvent(CharacterEventInterface* interface) { character_event = interface; };
+    void SetICharacterEvent(CharacterEventInterface* character_interface) { character_event = character_interface; };
     void SetHpUi(HpUI& hp_ui);
 
 public:
+    const int MAX_HP;
     void SetHp(const int new_hp) { hp = new_hp; }
     /// <summary>
     /// HPを取得

@@ -8,6 +8,7 @@
 class Character;
 class StageObject;
 class CSVFile;
+class RespawnManager;
 
 /// <summary>
 /// マップ情報の管理
@@ -92,6 +93,12 @@ public:
 	/// <returns>ステージオブジェクトリスト</returns>
 	std::vector<StageObject*> GetStageObjectList() { return stage_object_list; }
 
+	/// <summary>
+	/// チェックポイントのリストを取得
+	/// </summary>
+	/// <returns>チェックポイントリスト</returns>
+	std::vector<Vector2D> GetCheckPointList();
+
 public:
 	
 	/// <inheritdoc />
@@ -157,8 +164,6 @@ private:
 	/// アイテムの位置関係
 	/// </summary>
 	std::vector<std::vector<StageObject*>> item_map;
-
-
 
 private:
 	/// <summary>
