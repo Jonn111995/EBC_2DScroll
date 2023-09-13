@@ -60,6 +60,9 @@ public:
 	virtual void ChangeInvincible() override;
 	virtual void DestroyItem(StageObject& delete_object) override;
 
+	virtual void GetDrawInformPositon(Vector2D& draw_postion) override;
+
+
 
 
 	virtual bool SerchPlayer(Enemy* enemy) override;

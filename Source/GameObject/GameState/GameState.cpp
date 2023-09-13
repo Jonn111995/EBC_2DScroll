@@ -1,9 +1,14 @@
 #include "GameState.h"
+#include "DxLib.h"
 #include "Interface/IGameStateEvent.h"
+#include "../Source/Utility/Vector2D.h"
 
 namespace {
-	const float TIME_UP = 0.f;
 	const int RESPAWN_REMAIN_APP = 1;
+	const float INFORM_TIME = 1.f;
+	const float TIME_UP = 0.f;
+
+	const char* INFORM_UP_RESPAEN_RMAIN = "Respawn Remain UP!!!";
 }
 
 GameState::GameState()
@@ -43,6 +48,16 @@ void GameState::Update(float delta_seconds) {
 	case EGameObjectState::kPLAYING:
 		start_time -= delta_seconds;
 
+		if (is_inform_respawn_remain_up) {
+			inform_count_time += delta_seconds;
+			inform_movement -= plus;
+
+			if (inform_count_time >= INFORM_TIME) {
+				inform_count_time = 0.f;
+				is_inform_respawn_remain_up = false;
+			}
+		}
+
 		if (start_time <= TIME_UP) {
 			//ゲームオーバー処理を呼ぶ
 			game_state_event->TimeOver();
@@ -60,6 +75,19 @@ void GameState::Update(float delta_seconds) {
 	}
 }
 
+void GameState::Draw(const Vector2D& screen_offset) {
+	__super::Draw(screen_offset);
+	if (is_inform_respawn_remain_up) {
+		unsigned int color = GetColor(255, 255, 255);
+		int str_length = strlen(INFORM_UP_RESPAEN_RMAIN);
+		int draw_width = GetDrawStringWidth(INFORM_UP_RESPAEN_RMAIN, str_length);
+
+		Vector2D inform_position;
+		game_state_event->GetDrawInformPositon(inform_position);
+		DrawFormatString(inform_position.x - (draw_width/2), static_cast<float>(inform_position.y + inform_movement), color, INFORM_UP_RESPAEN_RMAIN);
+	}
+}
+
 void GameState::SetScore(const int now_score) {
 	score = now_score;
 }
@@ -74,6 +102,7 @@ void GameState::IncreaseScore() {
 
 	//一定単位毎に残機を増やす
 	if (score % RESPAWN_REMAIN_APP == 0) {
+		is_inform_respawn_remain_up = true;
 		IncreseRespawnRemain();
 	}
 }

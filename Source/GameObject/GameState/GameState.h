@@ -23,6 +23,7 @@ public:
 	virtual void Finalize() override;
 	/// <inheritdoc/>
 	virtual void Update(float delta_seconds) override;
+	virtual void Draw(const Vector2D& screen_offset);
 
 public:
 	/// <summary>
@@ -121,4 +122,15 @@ private:
 	/// クリアしたかどうか？
 	/// </summary>
 	bool is_clear;
+
+	bool is_inform_respawn_remain_up;
+
+	//TODO:: ResapwnManagerと同じ変数なので、後でUtility化出来ないか検討
+	/// <summary>
+	/// 通知カウント時間
+	/// </summary>
+	float inform_count_time;
+	float inform_movement;
+	float initial_velocity = -30;
+	float plus = 1.f;
 };
