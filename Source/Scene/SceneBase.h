@@ -111,10 +111,13 @@ public:
 	/// <returns>true: 衝突した false:衝突してない</returns>
 	bool CheckBoxCollision(StageObject* target, const BoxCollisionParams& collision_params, BoxCollisionParams& hit_collision_params);
 
+	virtual void BookDeleteObject(GameObject* object) { delete_objects_list.push_back(object); }
+	virtual void DestroyBookDeleteObject();
+
 protected:
 	// シーンで生成したオブジェクト
 	std::vector<class GameObject*> objects;
-
+	std::vector<class GameObject*> delete_objects_list;
 	// スクロール用スクリーンオフセット
 	Vector2D screen_offset;
 };

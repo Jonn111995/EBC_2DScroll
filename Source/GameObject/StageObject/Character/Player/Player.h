@@ -118,6 +118,9 @@ protected:
 	/// </summary>
 	virtual void StopAttack();
 
+	virtual void CallDeadEvent() override;
+
+
 private:
 
 	///<summary>

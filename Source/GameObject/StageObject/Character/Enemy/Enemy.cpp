@@ -2,6 +2,14 @@
 #include "DxLib.h"
 #include "../Source/GameObject/StageObject/Character/Interface/CharacterEventInterface.h"
 
+namespace {
+	/// <summary>
+	/// èâë¨ìx
+	/// </summary>
+	float initial_velocity = -25;
+	const float GRAVITY_ACCELARATION = 1.0f;
+}
+
 Enemy::Enemy()
 	: wait_enemy_graphic_handle()
 	, walk_enemy_graphic_handle()
@@ -13,6 +21,7 @@ Enemy::Enemy()
 	, count_time(0.f)
 	
 {
+	SetHp(10);
 	SetAttack(10);
 }
 
@@ -76,6 +85,12 @@ void Enemy::Update(float delta_time) {
 		case EEnemyState::kWALK:
 			Move(delta_time);
 			break;
+
+		case EEnemyState::kDEAD:
+			
+			break;
+		default:
+			break;
 		}
 
 		if (animation_frame <= min_anim_frame) {
@@ -96,6 +111,19 @@ void Enemy::Update(float delta_time) {
 		break;
 
 	case EGameObjectState::kPAUSE:
+		break;
+	case EGameObjectState::kEND:
+		initial_velocity += GRAVITY_ACCELARATION;
+		input_direction.y = initial_velocity;
+
+		Vector2D delta_move_amount = input_direction.Normalize() * GetSpeed() * 2 * delta_time;
+		SetPosition(GetPosition() + delta_move_amount);
+
+		count_time += delta_time;
+		if (count_time >= 2.f) {
+			game_object_state = EGameObjectState::kPAUSE;
+			character_event->DeadEvent(this);
+		}
 		break;
 	}
 }
@@ -168,6 +196,7 @@ void Enemy::EnterState() {
 			max_anim_frame = now_animations.size() - 1.0f;
 		}
 		break;
+	case EEnemyState::kDEAD:
 	case EEnemyState::kDAMAGE:
 		SetSpeed(50.f);
 		now_animations.clear();
@@ -185,6 +214,8 @@ void Enemy::ExitState() {
 	case EEnemyState::kWALK:
 		break;
 	case EEnemyState::kDAMAGE:
+		break;
+	case EEnemyState::kDEAD:
 		break;
 	}
 }

@@ -60,7 +60,7 @@ void SceneBase::DestroyObject(GameObject* object) {
 
 	// íœ
 	(*iterator)->Finalize();
-	objects.erase(iterator);
+	objects.erase(std::remove(objects.begin(), objects.end(), *iterator),objects.end());
 	delete object;
 }
 
@@ -107,4 +107,13 @@ bool SceneBase::CheckBoxCollision(StageObject* target, const BoxCollisionParams&
 		}
 	}
 	return false;
+}
+
+void SceneBase::DestroyBookDeleteObject() {
+
+	for (auto& object : delete_objects_list) {
+		DestroyObject(object);
+	}
+
+	delete_objects_list.clear();
 }

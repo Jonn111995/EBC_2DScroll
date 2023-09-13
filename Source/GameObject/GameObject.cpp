@@ -6,11 +6,6 @@ GameObject::GameObject()
 {
 }
 
-//void GameObject::SetOwnerScene(SceneBase* new_owner_scene)
-//{
-//	owner_scene = new_owner_scene;
-//}
-
 void GameObject::SetDrawSortPriority(int new_priority) {
 	draw_sort_priority = new_priority;
 }

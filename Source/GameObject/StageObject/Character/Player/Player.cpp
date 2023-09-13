@@ -2,6 +2,7 @@
 #include "InputHandler.h"
 #include "../Source/Animation/PlayerAnimResourcer.h"
 #include "../Interface/CharacterEventInterface.h"
+#include "../Player/Interface/IPlayerEvent.h"
 #include "../Source/GameObject/StageObject/Weapon/Hand.h"
 #include "DxLib.h"
 #include <iterator>
@@ -22,6 +23,9 @@ Player::Player()
 	, bIsNoDamage(false)
 	, invincible_time(1.5f)
 {
+	//SetHp(10);
+	SetAttack(10);
+	SetHp(10);
 }
 
 Player::~Player()
@@ -42,7 +46,7 @@ void Player::Initialize() {
 	body_collision.hit_object_types = kENEMY_TYPE | kWEAPON_TYPE;
 	body_collision.object_type = kPLAYER_TYPE;
 	game_object_state = EGameObjectState::kPLAYING;
-	SetHp(100);
+	
 }
 
 void Player::Finalize(){
@@ -144,6 +148,13 @@ void Player::Update(float delta_time) {
 		break;
 	}
 	case EGameObjectState::kPAUSE:
+		break;
+	case EGameObjectState::kEND:
+		count_time += delta_time;
+		if (count_time > 1.5f) {
+			CallDeadEvent();
+			game_object_state = EGameObjectState::kPLAYING;
+		}
 		break;
 	}
 }
@@ -344,6 +355,13 @@ void Player::Attack() {
 
 void Player::StopAttack() {
 	character_event->RemoveWeapon(equip_weapon);
+}
+
+void Player::CallDeadEvent() {
+
+	if (!player_event->ExecuteRespawn()) {
+		__super::CallDeadEvent();
+	}
 }
 
 void Player::StartJump() {

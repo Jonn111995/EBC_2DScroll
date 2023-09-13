@@ -26,6 +26,7 @@ void SceneManager::Update(float DeltaSeconds)
 {
 	// シーンの更新
 	SceneType result_scene_type = current_scene->Update(DeltaSeconds);
+	current_scene->DestroyBookDeleteObject();
 
 	// 現在とUpdateから受け取ったシーンが別の場合、シーンの遷移を行う
 	if (result_scene_type != current_scene->GetSceneType())

@@ -64,6 +64,9 @@ void AttackEnemy::Update(float delta_time) {
 		break;
 	case EGameObjectState::kPAUSE:
 		break;
+	case EGameObjectState::kEND:
+		__super::Update(delta_time);
+		break;
 	}
 }
 

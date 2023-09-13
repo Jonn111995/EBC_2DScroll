@@ -7,7 +7,7 @@ namespace {
 
 GameState::GameState()
 	: score(0)
-	, respawn_remain(0)
+	, respawn_remain(3)
 	, start_time(0)
 	, count_time(0.f)
 	, remain_time(0)
@@ -73,6 +73,19 @@ void GameState::SetRespawnRemain(const int respawn_remain) {
 
 int GameState::GetRespawnRemain() {
 	return respawn_remain;
+}
+
+void GameState::IncreseRespawnRemain() {
+	respawn_remain++;
+	game_state_event->UpdateRespawnRemain(respawn_remain);
+}
+
+void GameState::ReduceRespawnRemain() {
+	respawn_remain--;
+	if (respawn_remain <= 0) {
+		respawn_remain = 0;
+	}
+	game_state_event->UpdateRespawnRemain(respawn_remain);
 }
 
 int GameState::GetRemainTime() const {

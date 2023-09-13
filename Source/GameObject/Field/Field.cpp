@@ -9,6 +9,7 @@
 #include "Ground/Ground.h";
 #include "Ground/Wall.h"
 #include "Ground/Box.h"
+#include "../StageObject/Character/Character.h"
 #include <vector>
 
 
@@ -107,7 +108,6 @@ bool Field::InitializeField(const char* map_file_name){
 
     ScreenInfo* screen_info = ScreenInfo::GetInstance();
     screen_info->SetMapSize(map_data.size(), map_data.at(map_data.size() - 1).size());
-
 }
 
 bool Field::InitializeStageObjectPosition() {
@@ -486,4 +486,28 @@ void Field::SetInitialPosition(StageObject& stage_obj, const MapChipType chip_ty
             }
         }
     }
+}
+
+std::vector<Vector2D> Field::GetCheckPointList() {
+
+    ScreenInfo* screen_info = ScreenInfo::GetInstance();
+    std::vector<Vector2D> check_point_list;
+
+    for (unsigned y = 0; y < map_data.size(); y++) {
+        for (unsigned x = 0; x < map_data.at(y).size(); x++) {
+
+            if (map_data.at(y).at(x) == kPLAYER_START) {
+
+                //キャラクターの画像サイズが、キャラが描かれている範囲より大きいので、左上座標をそのままセットすると、
+                //透過されている部分を含めた左上座標の位置に描画される。
+                //それを避けるため、センターポジションまでのオフセット分だけ引いて、キャラが描かれている左上座標を、
+                //指定したマップの座標位置まで持っていく必要がある。
+                int x_left = (screen_info->GetLeftX() + x * map_chip_size);
+                int y_top = (screen_info->GetLeftY() + y * map_chip_size);
+                check_point_list.push_back(Vector2D(x_left, y_top));
+            }
+        }
+    }
+
+    return check_point_list;
 }

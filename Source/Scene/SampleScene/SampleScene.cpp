@@ -10,6 +10,7 @@
 #include "../Source/GameObject/GameState/GameState.h"
 #include "../Source/GameObject/UI/UIImplement/GameStateUI.h"
 #include "../Source/GameObject/UI/UIImplement/HpUI.h"
+#include "../Source/GameObject/RespawnManager/RespawnManager.h"
 
 
 SampleScene::SampleScene()
@@ -61,8 +62,27 @@ void SampleScene::GiveDamageEvent(StageObject& give_gamage_chara, const StageObj
 }
 
 void SampleScene::UpdateHpUI(const int now_hp) {
-
 	player->UpdateHpUI(now_hp);
+}
+
+void SampleScene::UpdateRespawnRemain(const int respawn_remain) {
+	game_state_ui->SetRespawn(respawn_remain);
+}
+
+void SampleScene::DeadEvent(Character* dead_object) {
+	BookDeleteObject(dead_object);
+}
+
+bool SampleScene::ExecuteRespawn() {
+	
+	game_state->ReduceRespawnRemain();
+	//残機があるか確認
+	if (game_state->GetRespawnRemain() == 0) {
+		return false;
+	}
+	respawn_manager->RespawnObject();
+	hp_ui->InitializeHP(player->GetHp());
+	return true;
 }
 
 
@@ -112,6 +132,8 @@ void SampleScene::Initialize()
 	player->SetHpUi(*hp_ui);
 	field->AddStageObject(*player);
 
+	game_state_ui->SetRespawn(game_state->GetRespawnRemain());
+
 	/*Enemy* enemy = CreateObject<Enemy>();
 	enemy->SetICharacterEvent(this);
 	enemy->SetIEnemyEvent(this);
@@ -123,6 +145,10 @@ void SampleScene::Initialize()
 	field->AddStageObject(*enemy);
 	
 	field->InitializeStageObjectPosition();
+
+	respawn_manager = CreateObject<RespawnManager>();
+	respawn_manager->SetCheckPointList(field->GetCheckPointList());
+	respawn_manager->SetObserveObject(*player);
 
 	play_scene_state = EPlaySceneState::kPLAYING;
 }
@@ -164,11 +190,6 @@ SceneType SampleScene::Update(float delta_seconds) {
 				if (CheckBoxCollision(*iterator, (*iterator)->GetBodyCollision(), opponent)) {
 					(*iterator)->OnHitBoxCollision(*oppnent_iterator, opponent);
 				}
-
-				/*opponent = (*iterator)->GetBodyCollision();
-				if (CheckBoxCollision(*oppnent_iterator, (*oppnent_iterator)->GetBodyCollision(), opponent)) {
-					(*oppnent_iterator)->OnHitBoxCollision(*iterator, opponent);
-				}*/
 			}
 		}
 		return now_scen_type;
