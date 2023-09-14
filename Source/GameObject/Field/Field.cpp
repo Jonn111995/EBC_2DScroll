@@ -14,7 +14,7 @@
 
 
 namespace {
-    const float map_chip_size = 32.f;
+    const float MAP_CHIP_SIZE = 32.f;
     const float wall_y_size = 40.f;
     const float box_y_size = 40.f;
     const float ground_y_size = 48.f;
@@ -60,6 +60,8 @@ void Field::Initialize() {
 }
 
 void Field::Finalize() {
+    __super::Finalize();
+
     stage_object_list.clear();
     delete(csv_file_reader);
     csv_file_reader = nullptr;
@@ -135,11 +137,9 @@ void Field::AddStageObject(StageObject& stage_object) {
 }
 
 void Field::DeleteStageObject(StageObject* stage_object) {
-   
     auto remove_start = std::remove(stage_object_list.begin(), stage_object_list.end(), stage_object);
     stage_object_list.erase(remove_start, stage_object_list.end());
 }
-
 
 bool Field::CheckMoveToX(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision) {
 
@@ -197,24 +197,24 @@ bool Field::CheckMoveToY(const Vector2D& move_to_position, const Vector2D& move_
 
 bool Field::CheckHitGround(Vector2D& opponent_check_position, const Vector2D& oppnent_center, const BoxCollisionParams& collision) {
 
-    int x_position = opponent_check_position.x / map_chip_size;
-    int y_position = opponent_check_position.y / map_chip_size;
+    int x_position = opponent_check_position.x / MAP_CHIP_SIZE;
+    int y_position = opponent_check_position.y / MAP_CHIP_SIZE;
     int object_in_destination = map_data.at(y_position).at(x_position);
 
     if (object_in_destination == kGROUND || object_in_destination == kWALL || object_in_destination == kBOX) {
         ScreenInfo* screen_info = ScreenInfo::GetInstance();
         //マップチップの左上座標を算出
-        int x_left = screen_info->GetLeftX() + map_chip_size * int(x_position);
-        int y_down = screen_info->GetLeftY() + map_chip_size * int(y_position);
+        int x_left = screen_info->GetLeftX() + MAP_CHIP_SIZE * int(x_position);
+        int y_down = screen_info->GetLeftY() + MAP_CHIP_SIZE * int(y_position);
 
         //マップチップの中心座標を算出
-        float ground_center_pos_x = (screen_info->GetLeftX() + map_chip_size * x_position)  + (map_chip_size / 2);
-        float ground_center_pos_y = (screen_info->GetLeftY() + map_chip_size * y_position)  + (map_chip_size / 2);
+        float ground_center_pos_x = (screen_info->GetLeftX() + MAP_CHIP_SIZE * x_position)  + (MAP_CHIP_SIZE / 2);
+        float ground_center_pos_y = (screen_info->GetLeftY() + MAP_CHIP_SIZE * y_position)  + (MAP_CHIP_SIZE / 2);
 
         float distance_x = abs(oppnent_center.x - ground_center_pos_x);
         float distance_y = abs(oppnent_center.y - ground_center_pos_y);
-        float size_x = collision.box_extent.x + (map_chip_size / 2);
-        float size_y = collision.box_extent.y + (map_chip_size / 2);
+        float size_x = collision.box_extent.x + (MAP_CHIP_SIZE / 2);
+        float size_y = collision.box_extent.y + (MAP_CHIP_SIZE / 2);
 
         //差が微小の場合は当たったと見なすための処理
         if (abs(distance_x - size_x) <= .1f) {
@@ -232,16 +232,35 @@ bool Field::CheckHitGround(Vector2D& opponent_check_position, const Vector2D& op
 }
 
 void Field::DrawMap(const Vector2D& screen_offset) {
+    ScreenInfo* screen_info = ScreenInfo::GetInstance();
 
-    int draw_x_chip = static_cast<int>(screen_offset.x / map_chip_size);
-    int draw_y_chip = static_cast<int>(screen_offset.y / map_chip_size);
-    
+    //描画開始マップチップ
+    int draw_x_chip = static_cast<int>(screen_offset.x / MAP_CHIP_SIZE);
+    int draw_y_chip = static_cast<int>(screen_offset.y / MAP_CHIP_SIZE);
+
+    //描画するマップチップの最大値
+    int draw_limit_x = draw_x_chip + screen_info->GetResolutionX() / MAP_CHIP_SIZE + 2;
+    int draw_limit_y = draw_y_chip + screen_info->GetResolutionY() / MAP_CHIP_SIZE + 2;
+
+    //全体マップのマップチップの最大値
+    int limit_size_x = screen_info->GetMapSize().x / MAP_CHIP_SIZE;
+    int limit_size_y = screen_info->GetMapSize().y / MAP_CHIP_SIZE;
+
+    //描画するマップチップの最大値が、全体マップを超えていないか確認
+    if (draw_limit_x >= limit_size_x) {
+        draw_limit_x = limit_size_x;
+    }
+
+    if (draw_limit_y >= limit_size_y) {
+        draw_limit_y = limit_size_y;
+    }
+
     //自身から上に向かって、同じ地面のチップがどれくらいあるか調べる。
     //存在した数が分かれば、自身がどの層か分かるので、その層にあったチップを渡す。
-    for (unsigned y = draw_y_chip; y < map_data.size(); y++) {
+    for (unsigned y = draw_y_chip; y < draw_limit_y; y++) {
         
         std::vector<int> one_line_ground;
-        for (unsigned x = draw_x_chip; x < map_data.at(y).size(); x++) {
+        for (unsigned x = draw_x_chip; x < draw_limit_x; x++) {
 
             int graphic_handle = 0;
             switch (map_data.at(y).at(x)) {
@@ -264,10 +283,9 @@ void Field::DrawMap(const Vector2D& screen_offset) {
             GetGraphSize(graphic_handle, &x_graphic_size, &y_graphic_size);
 
             ScreenInfo* screen_info = ScreenInfo::GetInstance();
-            int display_x_top = static_cast<int>(screen_info->GetLeftX()) + map_chip_size * x;
-            int display_y_top = static_cast<int>(screen_info->GetLeftY()) + map_chip_size * y;
+            int display_x_top = static_cast<int>(screen_info->GetLeftX()) + MAP_CHIP_SIZE * x;
+            int display_y_top = static_cast<int>(screen_info->GetLeftY()) + MAP_CHIP_SIZE * y;
             //マップ全体におけるマップチップの座標から、スクリーン座標の左上座標を引く
-            //500 - 200
             DrawGraph(display_x_top - screen_offset.x, display_y_top - screen_offset.y, graphic_handle, true);
             //デバック用
             unsigned int color = GetColor(255, 255, 255);
@@ -304,7 +322,6 @@ int Field::GetGroundGraphic(const int x, const int y) {
     }else if(ground_chip_num >= 2) {
         return ground_graphic_handle_bottom[x % 3];
     }
-   
 }
 
 void Field::SetInitialPosition(StageObject& stage_obj, const MapChipType chip_type) {
@@ -321,8 +338,8 @@ void Field::SetInitialPosition(StageObject& stage_obj, const MapChipType chip_ty
                 //透過されている部分を含めた左上座標の位置に描画される。
                 //それを避けるため、センターポジションまでのオフセット分だけ引いて、キャラが描かれている左上座標を、
                 //指定したマップの座標位置まで持っていく必要がある。
-                int x_left = (screen_info->GetLeftX() + x * map_chip_size) - collison.center_position.x;
-                int y_top = (screen_info->GetLeftY() + y * map_chip_size) - collison.center_position.y;
+                int x_left = (screen_info->GetLeftX() + x * MAP_CHIP_SIZE) - collison.center_position.x;
+                int y_top = (screen_info->GetLeftY() + y * MAP_CHIP_SIZE) - collison.center_position.y;
                 stage_obj.SetPosition(Vector2D(x_left, y_top));
 
                 float center_pos_x = stage_obj.GetPosition().x + collison.center_position.x;
@@ -345,12 +362,11 @@ std::vector<Vector2D> Field::GetCheckPointList() {
 
             if (map_data.at(y).at(x) == kPLAYER_START) {
 
-                int x_left = (screen_info->GetLeftX() + x * map_chip_size);
-                int y_top = (screen_info->GetLeftY() + y * map_chip_size);
+                int x_left = (screen_info->GetLeftX() + x * MAP_CHIP_SIZE);
+                int y_top = (screen_info->GetLeftY() + y * MAP_CHIP_SIZE);
                 check_point_list.push_back(Vector2D(x_left, y_top));
             }
         }
     }
-
     return check_point_list;
 }
