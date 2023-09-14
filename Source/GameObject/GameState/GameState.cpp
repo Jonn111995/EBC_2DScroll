@@ -84,7 +84,7 @@ void GameState::Draw(const Vector2D& screen_offset) {
 
 		Vector2D inform_position;
 		game_state_event->GetDrawInformPositon(inform_position);
-		DrawFormatString(inform_position.x - (draw_width/2), static_cast<float>(inform_position.y + inform_movement), color, INFORM_UP_RESPAEN_RMAIN);
+		DrawFormatString(inform_position.x -screen_offset.x - (draw_width/2), static_cast<float>(inform_position.y - screen_offset.y + inform_movement), color, INFORM_UP_RESPAEN_RMAIN);
 	}
 }
 

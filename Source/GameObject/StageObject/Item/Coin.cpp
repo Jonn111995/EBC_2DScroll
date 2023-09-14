@@ -34,7 +34,7 @@ void Coin::Draw(const Vector2D& screen_offset) {
 
 	int x, y;
 	GetPosition().ToInt(x, y);
-	DrawGraph(x, y, coin_graphic_handle, true);
+	DrawGraph(x - screen_offset.x, y - screen_offset.y, coin_graphic_handle, true);
 }
 
 void Coin::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {

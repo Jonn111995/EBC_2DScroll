@@ -1,4 +1,5 @@
 #pragma once
+#include "../Utility/Vector2D.h"
 
 /// <summary>
 /// スクリーン情報を保持するシングルトン.
@@ -93,6 +94,7 @@ public:
 
 	//マップサイズを設定する。
 	void SetMapSize(int x, int y);
+	Vector2D GetMapSize() const;
 
 	//左のX座標を取得する。
 	float GetLeftX();

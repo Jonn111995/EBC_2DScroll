@@ -1,4 +1,5 @@
 #include "SceneBase.h"
+#include "Camera.h"
 
 SceneBase::SceneBase()
 	: screen_offset(Vector2D())
@@ -10,8 +11,8 @@ SceneBase::~SceneBase()
 	Finalize();
 }
 
-void SceneBase::Initialize()
-{
+void SceneBase::Initialize() {
+	camera = new Camera();
 }
 
 SceneType SceneBase::Update(float delta_seconds)
@@ -23,8 +24,9 @@ SceneType SceneBase::Update(float delta_seconds)
 	return GetSceneType();
 }
 
-void SceneBase::Draw()
-{
+void SceneBase::Draw() {
+
+	screen_offset =  camera->GetScreenOffset();
 	for (auto iterator = objects.begin(); iterator != objects.end(); ++iterator)
 	{
 		(*iterator)->Draw(screen_offset);

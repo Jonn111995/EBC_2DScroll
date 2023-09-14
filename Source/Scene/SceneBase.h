@@ -6,6 +6,8 @@
 #include "../GameObject/GameObject.h"
 #include "../GameObject/StageObject/StageObject.h"
 
+class Camera;
+
 /**
  * シーンタイプ
  */
@@ -120,4 +122,5 @@ protected:
 	std::vector<class GameObject*> delete_objects_list;
 	// スクロール用スクリーンオフセット
 	Vector2D screen_offset;
+	Camera* camera;
 };

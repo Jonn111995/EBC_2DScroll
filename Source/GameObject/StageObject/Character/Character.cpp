@@ -49,29 +49,32 @@ void Character::Draw(const Vector2D& screen_offset) {
 
 	int x, y;
 	GetPosition().ToInt(x, y);
+
+	int screen_x = x - screen_offset.x;//+ body_collision.box_extent.x;
+	int screen_y = y - screen_offset.y;//+ body_collision.box_extent.y;
 	switch (body_collision.object_type) {
 
 	case kPLAYER_TYPE:
 		
 		if (GetDirection() == kLEFT) {
-			DrawTurnGraph(x, y, now_animations[animation_frame], true);
+			DrawTurnGraph(screen_x, screen_y, now_animations[animation_frame], true);
 		}
 		else {
-			DrawGraph(x, y, now_animations[animation_frame], true);
+			DrawGraph(screen_x, screen_y, now_animations[animation_frame], true);
 		}
 		break;
 	case kENEMY_TYPE:
 
 		if (GetDirection() == kRIGHT) {
-			DrawGraph(x, y, now_animations[animation_frame], true);
+			DrawGraph(screen_x, screen_y, now_animations[animation_frame], true);
 		}
 		else {
-		    DrawTurnGraph(x, y, now_animations[animation_frame], true);
+		    DrawTurnGraph(screen_x, screen_y, now_animations[animation_frame], true);
 		}
 	}
 	unsigned int color = GetColor(255, 0, 0);
-	int x2 = body_collision.center_position2.x - body_collision.box_extent.x;
-	int y2 = body_collision.center_position2.y - body_collision.box_extent.y;
+	int x2 = body_collision.center_position2.x - screen_offset.x - body_collision.box_extent.x;
+	int y2 = body_collision.center_position2.y - screen_offset.y - body_collision.box_extent.y;
 
 	//デバック用
 	DrawBox(x2, y2, x2 + body_collision.box_extent.x * 2, y2 + body_collision.box_extent.y * 2, color, false);

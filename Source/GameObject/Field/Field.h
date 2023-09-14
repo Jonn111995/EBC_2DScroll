@@ -33,14 +33,6 @@ public:
 	bool InitializeStageObjectPosition();
 
 	/// <summary>
-	/// 移動先が移動可能か確認
-	/// </summary>
-	/// <param name="move_to_position">移動先</param>
-	/// <param name="collision">移動するオブジェクトのコリジョン</param>
-	/// <returns>true: 移動可能 false: 移動不可</returns>
-	bool CheckMove(const Vector2D& move_to_position, const Vector2D& move_amount, const BoxCollisionParams& collision);
-
-	/// <summary>
 	/// X方向へ移動出来るか確認
 	/// </summary>
 	/// <param name="now_position">現在の座標</param>
@@ -66,15 +58,6 @@ public:
 	/// <param name="collision"></param>
 	/// <returns></returns>
 	bool CheckHitGround(Vector2D& opponent_check_position, const Vector2D& oppnent_center, const BoxCollisionParams& collision);
-
-
-	/// <summary>
-	/// 移動先が立てるか確認
-	/// </summary>
-	/// <param name="move_to_position">移動先</param>
-	/// <param name="collision">移動するオブジェクトのコリジョン</param>
-	/// <returns>true: 立てる false: 立てない</returns>
-	bool CheckStande(Vector2D& move_to_position, const BoxCollisionParams& collision);
 
 	/// <summary>
 	/// ステージに配置されたオブジェクトを追加
@@ -169,7 +152,7 @@ private:
 	/// <summary>
 	/// マップを描画する
 	/// </summary>
-	void DrawMap();
+	void DrawMap(const Vector2D& screen_offset);
 
 	/// <summary>
 	/// 地面のグラフィックを取得。
