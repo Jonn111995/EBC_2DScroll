@@ -52,6 +52,7 @@ private:
 	/// 残り残機回数を表示
 	/// </summary>
 	void DrawRespawnRemain();
+	void DrawScore();
 private:
 	/// <summary>
 	/// UIに表示する現在スコア

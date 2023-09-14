@@ -102,6 +102,11 @@ void SampleScene::DestroyItem(StageObject& delete_object) {
 	BookDeleteObject(&delete_object);
 }
 
+void SampleScene::GetDrawInformPositon(Vector2D& draw_postion) {
+	BoxCollisionParams player_collision = player->GetBodyCollision();
+	draw_postion = Vector2D(player_collision.center_position2.x, player_collision.center_position2.y - player_collision.box_extent.y * 2 );
+}
+
 
 bool SampleScene::SerchPlayer(Enemy* enemy) {
 
@@ -151,6 +156,7 @@ void SampleScene::Initialize()
 	player->SetHpUi(*hp_ui);
 	field->AddStageObject(*player);
 
+	game_state_ui->SetScore(game_state->GetScore());
 	game_state_ui->SetRespawn(game_state->GetRespawnRemain());
 
 	/*Enemy* enemy = CreateObject<Enemy>();
