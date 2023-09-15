@@ -13,6 +13,8 @@
 #include "../Source/GameObject/UI/UIImplement/HpUI.h"
 #include "../Source/GameObject/RespawnManager/RespawnManager.h"
 #include "../Source/GameObject/StageObject/Item/Coin.h"
+#include "../Source/GameObject/StageObject/Item/InvincibleCan.h"
+
 
 
 SampleScene::SampleScene()
@@ -87,8 +89,9 @@ void SampleScene::ScoreUp() {
 	game_state->IncreaseScore();
 }
 
-void SampleScene::ChangeInvincible()
-{
+void SampleScene::ChangeInvincible(const float invincible_time) {
+	player->SetInvincibleState();
+	player->SetInvincibleTime(invincible_time);
 }
 
 void SampleScene::DestroyItem(StageObject& delete_object) {
@@ -136,7 +139,7 @@ void SampleScene::CreateStageObject() {
 	std::vector<CreateObjectInfo> create_object_info_list = field->GetCreateObjectInfo();
 
 	for (auto& create_object_info : create_object_info_list) {
-		StageObject* created_object;
+		StageObject* created_object = nullptr;
 
 		switch (create_object_info.object_type) {
 
@@ -173,15 +176,22 @@ void SampleScene::CreateStageObject() {
 			
 			break;
 		}
-		/*case kINVINCIBLE_CAN:
-			create_object_info.object_type = kINVINCIBLE_CAN;
-			break;*/
+		case kINVINCIBLE_CAN:
+		{
+			InvincibleCan* invincible_can = CreateObject<InvincibleCan>(create_object_info.initiali_position);
+			invincible_can->SetIItemEvent(this);
+			created_object = invincible_can;
+			break;
+		}
 		default:
 			continue;
 			break;
 		}
-		field->SetInitialPosition(*created_object);
-		field->AddStageObject(*created_object);
+
+		if (created_object != nullptr) {
+			field->SetInitialPosition(*created_object);
+			field->AddStageObject(*created_object);
+		}
 	};
 	
 }

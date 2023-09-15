@@ -1,39 +1,41 @@
-#include "Coin.h"
+#include "InvincibleCan.h"
 #include "DxLib.h"
 #include "Interface/IItemEvent.h"
-Coin::Coin()
-	: coin_graphic_handle(0)
+
+InvincibleCan::InvincibleCan()
+	: invincible_time(10.f)
+	, invincible_can_graphic(0)
 	, item_event(nullptr)
 {
 }
 
-Coin::~Coin()
+InvincibleCan::~InvincibleCan()
 {
 }
 
-void Coin::Initialize() {
+void InvincibleCan::Initialize() {
 	__super::Initialize();
-	coin_graphic_handle = LoadGraph(_T("Resources/Images/mapchip_035.bmp"));
-	
+	invincible_can_graphic = LoadGraph(_T("Resources/Images/mapchip_033.bmp"));
+
 	game_object_state = EGameObjectState::kPLAYING;
-	body_collision.box_extent = Vector2D( 16, 16 );
+	body_collision.box_extent = Vector2D(16, 16);
 	body_collision.center_position = Vector2D(16, 16);
 
 	body_collision.object_type = kITEM_TYPE;
 	body_collision.hit_object_types = kPLAYER_TYPE;
 }
 
-void Coin::Finalize() {
+void InvincibleCan::Finalize() {
 	__super::Finalize();
 	item_event = nullptr;
-	coin_graphic_handle = 0;
+	invincible_can_graphic = 0;
 }
 
-void Coin::Update(float delta_seconds) {
-	__super::Update(delta_seconds);
+void InvincibleCan::Update(float delta_seconds)
+{
 }
 
-void Coin::Draw(const Vector2D& screen_offset) {
+void InvincibleCan::Draw(const Vector2D& screen_offset) {
 	__super::Draw(screen_offset);
 
 	int x, y;
@@ -41,20 +43,21 @@ void Coin::Draw(const Vector2D& screen_offset) {
 
 	int x_graphic_size = 0;
 	int y_graphic_size = 0;
-	GetGraphSize(coin_graphic_handle, &x_graphic_size, &y_graphic_size);
+	GetGraphSize(invincible_can_graphic, &x_graphic_size, &y_graphic_size);
 
-	DrawGraph(x - screen_offset.x, y - screen_offset.y, coin_graphic_handle, true);
+	DrawGraph(x - screen_offset.x, y - screen_offset.y, invincible_can_graphic, true);
 
 	//デバック用
 	unsigned int color = GetColor(255, 255, 255);
 	DrawBox(x - screen_offset.x, y - screen_offset.y, x - screen_offset.x + x_graphic_size, y - screen_offset.y + y_graphic_size, color, false);
 }
 
-void Coin::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
+void InvincibleCan::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
+
 	__super::OnHitBoxCollision(hit_object, hit_collision);
 
 	if (game_object_state == EGameObjectState::kPLAYING) {
-		item_event->ScoreUp();
+		item_event->ChangeInvincible(invincible_time);
 		item_event->DestroyItem(*this);
 		game_object_state = EGameObjectState::kEND;
 	}

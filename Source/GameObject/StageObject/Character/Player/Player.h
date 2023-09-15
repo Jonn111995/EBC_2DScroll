@@ -96,6 +96,8 @@ public:
 
 public:
 	void SetIPlayerEvent(IPlayerEvent* interface) { player_event = interface; }
+	void SetInvincibleTime(float time) { invincible_time = time; };
+	void SetInvincibleState();
 
 protected:
 	/// <summary>

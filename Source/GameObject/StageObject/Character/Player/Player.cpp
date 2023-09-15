@@ -11,6 +11,7 @@
 namespace {
 	const float AIR_RESISTANCE = 0.8f;
 	const float RESET_INITIAL_VELOCITY = 0.0f;
+	const float DEFAULT_INVINCIBLE_TIME = 1.5f;
 }
 
 Player::Player()
@@ -21,7 +22,7 @@ Player::Player()
 	, initial_velocity(0.f)
 	, bIsCanJump(true)
 	, bIsNoDamage(false)
-	, invincible_time(1.5f)
+	, invincible_time(DEFAULT_INVINCIBLE_TIME)
 {
 	SetAttack(10);
 	//SetHp(10);
@@ -105,6 +106,7 @@ void Player::Update(float delta_time) {
 				ChangePlayerState(kIDLE);
 				bIsNoDamage = false;
 				is_get_damaged = false;
+				invincible_time = DEFAULT_INVINCIBLE_TIME;
 				count_time = 0.f;
 			}
 		}
@@ -125,8 +127,6 @@ void Player::Update(float delta_time) {
 				//KnockBack(delta_time, knock_back_dir);
 			}
 			else if (count_time > 0.4f) {
-				is_reject_input = false;
-				bIsNoDamage = true;
 				ChangePlayerState(kINVINCIBLE);
 			}
 			break;
@@ -184,6 +184,9 @@ void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollision
 		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
 		__super::OnHitBoxCollision(hit_object, hit_collision);
 	}
+	else if (bIsNoDamage && hit_collision.object_type & kENEMY_TYPE) {
+		character_event->GiveDamageEvent(*this, *hit_object, 1000);
+	}
 }
 
 void Player::ChangePlayerState(const EPlayerState new_state) {
@@ -208,6 +211,10 @@ void Player::EnterState() {
 	case kATTACK:
 		Attack();
 		break;
+	case kINVINCIBLE:
+		is_reject_input = false;
+		bIsNoDamage = true;
+		break;
 	case kDEAD:
 		break;
 	}
@@ -227,9 +234,15 @@ void Player::ExitState() {
 	case kATTACK:
 		character_event->RemoveWeapon(equip_weapon);
 		break;
+	case kINVINCIBLE:
+		break;
 	case kDEAD:
 		break;
 	}
+}
+
+void Player::SetInvincibleState() {
+	ChangePlayerState(kINVINCIBLE);
 }
 
 void Player::ChangeAnimState(const float delta_time = 0.0f, const Vector2D& delta_position = Vector2D(0.f,0.f)) {
