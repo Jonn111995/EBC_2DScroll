@@ -3,16 +3,18 @@
 /// <summary>
 /// マップチップの種類
 /// </summary>
-enum MapChipType {
+enum  MapChipType {
 
     kNONE = 0,
-    kGROUND,
+    kGROUND = 1,
     kWALL,
     kBROKEN_WALL,
     kBOX,
     kGIMMICK_BOX,
     kGOAL,
     kPLAYER_START,
-    kENEMY,
-    kITEM,
+    kBASE_ENEMY = 8,
+    kATTACK_ENEMY,
+    kCOIN = 10,
+    kINVINCIBLE_CAN 
 };

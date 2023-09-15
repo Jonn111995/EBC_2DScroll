@@ -1,14 +1,14 @@
 #include "SceneBase.h"
 #include "Camera.h"
+#include <algorithm>
 
 SceneBase::SceneBase()
 	: screen_offset(Vector2D())
+	, camera(nullptr)
 {
 }
 
-SceneBase::~SceneBase()
-{
-	Finalize();
+SceneBase::~SceneBase() {
 }
 
 void SceneBase::Initialize() {
@@ -27,20 +27,24 @@ SceneType SceneBase::Update(float delta_seconds)
 void SceneBase::Draw() {
 
 	screen_offset =  camera->GetScreenOffset();
-	for (auto iterator = objects.begin(); iterator != objects.end(); ++iterator)
-	{
+
+	//描画順にソート
+	std::sort(objects.begin(), objects.end(),
+		[](const GameObject* a, const GameObject* b) {return a->GetDrawSortPriority() < b->GetDrawSortPriority(); });
+
+	for (auto iterator = objects.begin(); iterator != objects.end(); ++iterator) {
 		(*iterator)->Draw(screen_offset);
 	}
 }
 
 void SceneBase::Finalize() {
-	// 全てのオブジェクトを破棄
 	DestroyAllObjects();
+	delete camera;
+	camera = nullptr;
 }
 
 void SceneBase::DestroyObject(GameObject* object) {
-	if (object == nullptr)
-	{
+	if (object == nullptr) {
 		return;
 	}
 

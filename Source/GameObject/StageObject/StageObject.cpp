@@ -34,5 +34,4 @@ void StageObject::SetCenterPosition(const Vector2D& new_position) {
 }
 
 void StageObject::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
-
 }

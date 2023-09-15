@@ -143,7 +143,8 @@ public:
 	/// </summary>
 	virtual void TimeOver() override;
 	
-
+private:
+	void CreateStageObject();
 private:
 
 	/// <summary>

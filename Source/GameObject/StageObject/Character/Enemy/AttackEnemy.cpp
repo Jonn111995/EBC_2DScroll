@@ -75,8 +75,8 @@ void AttackEnemy::Draw(const Vector2D& screen_offset) {
 	DrawFormatString(0, 64, color, "X=%f, Y=%f:::::", serch_range.serch_range_center.x, serch_range.serch_range_center.y);
 
 	
-	int x2 = serch_range.serch_range_center.x - serch_range.serch_range_extent.x;
-	int y2 = serch_range.serch_range_center.y - serch_range.serch_range_extent.y;
+	int x2 = serch_range.serch_range_center.x - serch_range.serch_range_extent.x -screen_offset.x;
+	int y2 = serch_range.serch_range_center.y - serch_range.serch_range_extent.y -screen_offset.y;
 	//デバック用
 	DrawBox(x2, y2, x2 + serch_range.serch_range_extent.x * 2, y2 + serch_range.serch_range_extent.y * 2, color, false);
 

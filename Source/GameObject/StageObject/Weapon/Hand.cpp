@@ -26,8 +26,8 @@ void Hand::Draw(const Vector2D& screen_offset)
 {
 	//デバック用
 	unsigned int color = GetColor(255, 0, 0);
-	int x2 = body_collision.center_position2.x - body_collision.box_extent.x;
-	int y2 = body_collision.center_position2.y - body_collision.box_extent.y;
+	int x2 = body_collision.center_position2.x - body_collision.box_extent.x -screen_offset.x;
+	int y2 = body_collision.center_position2.y - body_collision.box_extent.y - screen_offset.y;
 	DrawBox(x2, y2, x2 + body_collision.box_extent.x * 2, y2 + body_collision.box_extent.y * 2, color, false);
 }
 

@@ -112,25 +112,25 @@ bool Field::InitializeField(const char* map_file_name){
     screen_info->SetMapSize(map_data.at(map_data.size() - 1).size(), map_data.size());
 }
 
-bool Field::InitializeStageObjectPosition() {
-    
-    for (auto& stage_obj : stage_object_list) {
-        BoxCollisionParams stage_object_collision = stage_obj->GetBodyCollision();
-        switch (stage_object_collision.object_type) {
-
-        case kPLAYER_TYPE:
-            SetInitialPosition(*stage_obj, kPLAYER_START);
-            break;
-        case kENEMY_TYPE:
-            SetInitialPosition(*stage_obj, kENEMY);
-            break;
-        case kITEM_TYPE:
-            SetInitialPosition(*stage_obj, kITEM);
-            break;
-        }
-    }
-    return false;
-}
+//bool Field::InitializeStageObjectPosition() {
+//    
+//    for (auto& stage_obj : stage_object_list) {
+//        BoxCollisionParams stage_object_collision = stage_obj->GetBodyCollision();
+//        switch (stage_object_collision.object_type) {
+//
+//        case kPLAYER_TYPE:
+//            SetInitialPosition(*stage_obj, kPLAYER_START);
+//            break;
+//        case kENEMY_TYPE:
+//            SetInitialPosition(*stage_obj, kBASE_ENEMY);
+//            break;
+//        case kITEM_TYPE:
+//            SetInitialPosition(*stage_obj, kCOIN);
+//            break;
+//        }
+//    }
+//    return false;
+//}
 
 void Field::AddStageObject(StageObject& stage_object) {
     stage_object_list.push_back(&stage_object);
@@ -289,7 +289,7 @@ void Field::DrawMap(const Vector2D& screen_offset) {
             DrawGraph(display_x_top - screen_offset.x, display_y_top - screen_offset.y, graphic_handle, true);
             //デバック用
             unsigned int color = GetColor(255, 255, 255);
-            DrawBox(display_x_top, display_y_top, display_x_top + x_graphic_size, display_y_top + y_graphic_size, color, false);
+            DrawBox(display_x_top - screen_offset.x, display_y_top - screen_offset.y, display_x_top - screen_offset.x + x_graphic_size, display_y_top - screen_offset.y + y_graphic_size, color, false);
         }
     }
 }
@@ -324,32 +324,46 @@ int Field::GetGroundGraphic(const int x, const int y) {
     }
 }
 
-void Field::SetInitialPosition(StageObject& stage_obj, const MapChipType chip_type) {
-   
+//void Field::SetInitialPosition(StageObject& stage_obj, const MapChipType chip_type) {
+//   
+//    ScreenInfo* screen_info = ScreenInfo::GetInstance();
+//   
+//    for (unsigned y = 0; y < map_data.size(); y++) {
+//        for (unsigned x = 0; x < map_data.at(y).size(); x++) {
+//
+//            if (map_data.at(y).at(x) == chip_type) {
+//
+//                const BoxCollisionParams collison = stage_obj.GetBodyCollision();
+//                //キャラクターの画像サイズが、キャラが描かれている範囲より大きいので、左上座標をそのままセットすると、
+//                //透過されている部分を含めた左上座標の位置に描画される。
+//                //それを避けるため、センターポジションまでのオフセット分だけ引いて、キャラが描かれている左上座標を、
+//                //指定したマップの座標位置まで持っていく必要がある。
+//                int x_left = (screen_info->GetLeftX() + x * MAP_CHIP_SIZE) - collison.center_position.x;
+//                int y_top = (screen_info->GetLeftY() + y * MAP_CHIP_SIZE) - collison.center_position.y;
+//                stage_obj.SetPosition(Vector2D(x_left, y_top));
+//
+//                float center_pos_x = stage_obj.GetPosition().x + collison.center_position.x;
+//                float center_pos_y = stage_obj.GetPosition().y + collison.center_position.y;
+//                stage_obj.SetCenterPosition(Vector2D(center_pos_x, center_pos_y));
+//
+//                return;
+//            }
+//        }
+//    }
+//}
+
+void Field::SetInitialPosition(StageObject& stage_obj)
+{
     ScreenInfo* screen_info = ScreenInfo::GetInstance();
-   
-    for (unsigned y = 0; y < map_data.size(); y++) {
-        for (unsigned x = 0; x < map_data.at(y).size(); x++) {
-
-            if (map_data.at(y).at(x) == chip_type) {
-
-                const BoxCollisionParams collison = stage_obj.GetBodyCollision();
-                //キャラクターの画像サイズが、キャラが描かれている範囲より大きいので、左上座標をそのままセットすると、
-                //透過されている部分を含めた左上座標の位置に描画される。
-                //それを避けるため、センターポジションまでのオフセット分だけ引いて、キャラが描かれている左上座標を、
-                //指定したマップの座標位置まで持っていく必要がある。
-                int x_left = (screen_info->GetLeftX() + x * MAP_CHIP_SIZE) - collison.center_position.x;
-                int y_top = (screen_info->GetLeftY() + y * MAP_CHIP_SIZE) - collison.center_position.y;
-                stage_obj.SetPosition(Vector2D(x_left, y_top));
-
-                float center_pos_x = stage_obj.GetPosition().x + collison.center_position.x;
-                float center_pos_y = stage_obj.GetPosition().y + collison.center_position.y;
-                stage_obj.SetCenterPosition(Vector2D(center_pos_x, center_pos_y));
-
-                return;
-            }
-        }
+    const BoxCollisionParams collison = stage_obj.GetBodyCollision();
+    //キャラクターの画像サイズが、キャラが描かれている範囲より大きいので、左上座標をそのままセットすると、
+    //透過されている部分を含めた左上座標の位置に描画される。
+    //それを避けるため、センターポジションまでのオフセット分だけ引いて、キャラが描かれている左上座標を、
+    //指定したマップの座標位置まで持っていく必要がある。
+    if (stage_obj.GetBodyCollision().object_type != kITEM_TYPE) {
+        stage_obj.SetPosition(Vector2D(stage_obj.GetPosition() - collison.center_position));
     }
+    stage_obj.SetCenterPosition(Vector2D(stage_obj.GetPosition() + collison.center_position));
 }
 
 std::vector<Vector2D> Field::GetCheckPointList() {
@@ -369,4 +383,47 @@ std::vector<Vector2D> Field::GetCheckPointList() {
         }
     }
     return check_point_list;
+}
+
+std::vector<CreateObjectInfo> Field::GetCreateObjectInfo() {
+    std::vector<CreateObjectInfo> return_info;
+    ScreenInfo* screen_info = ScreenInfo::GetInstance();
+
+    for (unsigned y = 0; y < map_data.size(); y++) {
+        for (unsigned x = 0; x < map_data.at(y).size(); x++) {
+            CreateObjectInfo create_object_info;
+
+            int x_left = screen_info->GetLeftX() + x * MAP_CHIP_SIZE;
+            int y_top = screen_info->GetLeftY() + y * MAP_CHIP_SIZE;
+            create_object_info.initiali_position = Vector2D(x_left, y_top);
+
+            switch(map_data.at(y).at(x)) {
+            
+            case kPLAYER_START:
+                create_object_info.object_type = kPLAYER_START;
+                break;
+            case kBASE_ENEMY:
+                create_object_info.object_type = kBASE_ENEMY;
+                break;
+            case kATTACK_ENEMY:
+                create_object_info.object_type = kATTACK_ENEMY;
+                break;
+            case kCOIN:
+                create_object_info.object_type = kCOIN;
+                break;
+            case kINVINCIBLE_CAN:
+                create_object_info.object_type = kINVINCIBLE_CAN;
+                break;
+            default:
+                create_object_info.object_type = kNONE;
+                break;
+            }
+
+            if (create_object_info.object_type != kNONE) {
+                return_info.push_back(create_object_info);
+            }
+
+        }
+    }
+    return return_info;
 }

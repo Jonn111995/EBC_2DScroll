@@ -5,11 +5,17 @@
 
 class Character;
 
+/// <summary>
+/// リスポーンマネージャのステート
+/// </summary>
 enum class ERespawnManagerState {
-	kOBSERVE,
-	kINFORM_PASS_POINT
+	kOBSERVE,			//チェックポイント監視中
+	kINFORM_PASS_POINT	//通過通知中
 };
 
+/// <summary>
+/// リスポーン処理を管理
+/// </summary>
 class RespawnManager : public GameObject{
 public:
 	RespawnManager();
