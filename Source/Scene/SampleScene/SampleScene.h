@@ -113,7 +113,7 @@ public:
 	/// <summary>
 	/// プレイヤーを無敵状態に変更
 	/// </summary>
-	virtual void ChangeInvincible() override;
+	virtual void ChangeInvincible(const float invincible_time) override;
 	/// <summary>
 	/// アイテムを削除
 	/// </summary>
