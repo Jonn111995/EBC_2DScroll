@@ -9,6 +9,7 @@ GameStateUI::GameStateUI()
 	, display_respawn_remain(0)
 	, stage_name("")
 {
+	draw_sort_priority = 1;
 }
 
 GameStateUI::~GameStateUI()

@@ -23,9 +23,8 @@ Player::Player()
 	, bIsNoDamage(false)
 	, invincible_time(1.5f)
 {
-	//SetHp(10);
 	SetAttack(10);
-	SetHp(10);
+	//SetHp(10);
 }
 
 Player::~Player()

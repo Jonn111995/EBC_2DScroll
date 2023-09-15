@@ -222,6 +222,6 @@ void Enemy::ExitState() {
 
 void Enemy::ChangeEnemyState(const EEnemyState new_state) {
 	ExitState();
-	ChangeEnemyState(new_state);
+	enemy_state = new_state;
 	EnterState();
 }

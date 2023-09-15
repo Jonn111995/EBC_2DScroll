@@ -10,6 +10,12 @@ class StageObject;
 class CSVFile;
 class RespawnManager;
 
+struct CreateObjectInfo {
+public:
+	Vector2D initiali_position;
+	MapChipType object_type;
+};
+
 /// <summary>
 /// マップ情報の管理
 /// </summary>
@@ -26,11 +32,11 @@ public:
 	/// <returns>true: 初期化成功 false:　初期化失敗</returns>
 	bool InitializeField(const char* map_file_name);
 
-	/// <summary>
+	/*/// <summary>
 	/// キャラクターの初期位置を検索し、セットする
 	/// </summary>
 	/// <returns></returns>
-	bool InitializeStageObjectPosition();
+	bool InitializeStageObjectPosition();*/
 
 	/// <summary>
 	/// X方向へ移動出来るか確認
@@ -82,6 +88,12 @@ public:
 	/// <returns>チェックポイントリスト</returns>
 	std::vector<Vector2D> GetCheckPointList();
 
+	std::vector<CreateObjectInfo> GetCreateObjectInfo();
+	/// <summary>
+	/// フィールドにおける初期位置をセットする
+	/// </summary>
+	/// <param name="stage_obj">位置を設定するオブジェクト</param>
+	void SetInitialPosition(StageObject& stage_obj);
 public:
 	
 	/// <inheritdoc />
@@ -148,6 +160,7 @@ private:
 	/// </summary>
 	std::vector<std::vector<StageObject*>> item_map;
 
+
 private:
 	/// <summary>
 	/// マップを描画する
@@ -159,11 +172,11 @@ private:
 	/// </summary>
 	int GetGroundGraphic(const int x, const int y);
 
-	/// <summary>
+	/*/// <summary>
 	/// 初期位置をセットする
 	/// </summary>
 	/// <param name="stage_obj"></param>
 	/// <param name="chip_type"></param>
-	void SetInitialPosition(StageObject& stage_obj, const MapChipType chip_type);
+	void SetInitialPosition(StageObject& stage_obj, const MapChipType chip_type);*/
 };
 

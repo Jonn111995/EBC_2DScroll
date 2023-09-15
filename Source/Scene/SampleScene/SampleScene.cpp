@@ -127,9 +127,66 @@ void SampleScene::TimeOver() {
 
 }
 
-void SampleScene::Initialize()
-{
-	// êeÉNÉâÉXÇÃInitialize()
+void SampleScene::CreateStageObject() {
+
+	if (field == nullptr) {
+		return;
+	}
+
+	std::vector<CreateObjectInfo> create_object_info_list = field->GetCreateObjectInfo();
+
+	for (auto& create_object_info : create_object_info_list) {
+		StageObject* created_object;
+
+		switch (create_object_info.object_type) {
+
+		case kPLAYER_START:
+			if (player != nullptr) { continue; };
+
+			player = CreateObject<Player>(create_object_info.initiali_position);
+			player->SetICharacterEvent(this);
+			player->SetIPlayerEvent(this);
+
+			created_object = player;
+			break;
+		case kBASE_ENEMY:
+		{
+			Enemy* enemy = CreateObject<Enemy>(create_object_info.initiali_position);
+			enemy->SetICharacterEvent(this);
+			enemy->SetIEnemyEvent(this);
+			created_object = enemy;
+			break;
+		}
+		case kATTACK_ENEMY:
+		{
+			AttackEnemy* enemy = CreateObject<AttackEnemy>(create_object_info.initiali_position);
+			enemy->SetICharacterEvent(this);
+			enemy->SetIEnemyEvent(this);
+			created_object = enemy;
+			break;
+		}
+		case kCOIN:
+		{
+			Coin* coin = CreateObject<Coin>(create_object_info.initiali_position);
+			coin->SetIItemEvent(this);
+			created_object = coin;
+			
+			break;
+		}
+		/*case kINVINCIBLE_CAN:
+			create_object_info.object_type = kINVINCIBLE_CAN;
+			break;*/
+		default:
+			continue;
+			break;
+		}
+		field->SetInitialPosition(*created_object);
+		field->AddStageObject(*created_object);
+	};
+	
+}
+
+void SampleScene::Initialize() {
 	__super::Initialize();
 
 	ScreenInfo::CreateInstance();
@@ -143,30 +200,12 @@ void SampleScene::Initialize()
 	
 	field = CreateObject<Field>();
 	field->InitializeField("C/Users/n5919/EBC_2DScroll/Source/CSVFile/mapdata.csv");
-	player = CreateObject<Player>();
-	player->SetICharacterEvent(this);
-	player->SetIPlayerEvent(this);
-	player->SetHpUi(*hp_ui);
-	field->AddStageObject(*player);
+
+	CreateStageObject();
 
 	game_state_ui->SetScore(game_state->GetScore());
 	game_state_ui->SetRespawn(game_state->GetRespawnRemain());
-
-	/*Enemy* enemy = CreateObject<Enemy>();
-	enemy->SetICharacterEvent(this);
-	enemy->SetIEnemyEvent(this);
-	field->AddStageObject(*enemy);*/
-
-	AttackEnemy* enemy = CreateObject<AttackEnemy>();
-	enemy->SetICharacterEvent(this);
-	enemy->SetIEnemyEvent(this);
-	field->AddStageObject(*enemy);
-	Coin* coin = CreateObject<Coin>();
-	coin->SetIItemEvent(this);
-	field->AddStageObject(*coin);
-
-	field->InitializeStageObjectPosition();
-
+	player->SetHpUi(*hp_ui);
 	respawn_manager = CreateObject<RespawnManager>();
 	respawn_manager->SetCheckPointList(field->GetCheckPointList());
 	respawn_manager->SetObserveObject(*player);
@@ -205,7 +244,7 @@ SceneType SampleScene::Update(float delta_seconds) {
 		for (auto iterator = stage_obj_list.begin(); iterator != stage_obj_list.end(); ++iterator) {
 			for (auto oppnent_iterator = stage_obj_list.begin(); oppnent_iterator != stage_obj_list.end(); ++oppnent_iterator) {
 
-				if (iterator == oppnent_iterator) {
+				if (iterator == oppnent_iterator || (*oppnent_iterator)->GetGameObjectState() == EGameObjectState::kEND) {
 					continue;
 				}
 

@@ -9,6 +9,7 @@ HpUI::HpUI()
 	, hp_guage_width(100)
 	, hp_guage(0)
 {
+	draw_sort_priority = 1;
 }
 
 HpUI::~HpUI()

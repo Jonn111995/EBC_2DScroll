@@ -14,7 +14,11 @@ Coin::~Coin()
 void Coin::Initialize() {
 	__super::Initialize();
 	coin_graphic_handle = LoadGraph(_T("Resources/Images/mapchip_035.bmp"));
+	
 	game_object_state = EGameObjectState::kPLAYING;
+	body_collision.box_extent = Vector2D( 16, 16 );
+	body_collision.center_position = Vector2D(16, 16);
+
 	body_collision.object_type = kITEM_TYPE;
 	body_collision.hit_object_types = kPLAYER_TYPE;
 }
@@ -38,6 +42,13 @@ void Coin::Draw(const Vector2D& screen_offset) {
 	int x_graphic_size = 0;
 	int y_graphic_size = 0;
 	GetGraphSize(coin_graphic_handle, &x_graphic_size, &y_graphic_size);
+
+	//DrawGraph(x, y, coin_graphic_handle, true);
+
+	////デバック用
+	//unsigned int color = GetColor(255, 255, 255);
+	//DrawBox(x , y , x + body_collision.box_extent.x*2, y + body_collision.box_extent.y*2 , color, false);
+
 	DrawGraph(x - screen_offset.x, y - screen_offset.y, coin_graphic_handle, true);
 
 	//デバック用
