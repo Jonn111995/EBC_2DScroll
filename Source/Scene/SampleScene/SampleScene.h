@@ -8,6 +8,8 @@ class Player;
 class GameState;
 class GameStateUI;
 class HpUI;
+class StartUI;
+class FinishUI;
 class RespawnManager;
 
 enum class EPlaySceneState : unsigned short{
@@ -104,7 +106,7 @@ public:
 	/// </summary>
 	/// <returns>リスポーン成功</returns>
 	virtual bool ExecuteRespawn() override;
-
+	virtual void FInishUI(UIComponent* ui_component) override;
 	/// <summary>
 	/// ゲームクリア処理を実行
 	/// </summary>
@@ -153,7 +155,7 @@ public:
 private:
 	void CreateStageObject();
 private:
-
+	SceneType now_scen_type;
 	/// <summary>
 	/// Play Sceneのステート
 	/// </summary>
@@ -188,4 +190,7 @@ private:
 	/// キャラクターのHpUI
 	/// </summary>
 	HpUI* hp_ui;
+
+	StartUI* start_ui;
+	FinishUI* finish_ui;
 };

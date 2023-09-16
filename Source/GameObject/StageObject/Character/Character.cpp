@@ -13,7 +13,6 @@ Character::Character()
 	, deffence(0)
 	, move_speed(MOVEMENT_SPEED)
 	, is_move(false)
-	, is_get_damaged(false)
 	, direction(kRIGHT)
 	, character_event(nullptr)
 	, hp_ui(nullptr)
@@ -120,7 +119,7 @@ void Character::GiveDamage(Character& receive_damage_chara, int damage) {
 }
 
 void Character::GetDamage(Character& give_damage_chara, const int damage) {
-	is_get_damaged = true;
+	is_no_damage = true;
 	this->hp -= damage;
 
 	if (hp_ui != nullptr) {

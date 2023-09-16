@@ -33,6 +33,10 @@ void SceneBase::Draw() {
 		[](const GameObject* a, const GameObject* b) {return a->GetDrawSortPriority() < b->GetDrawSortPriority(); });
 
 	for (auto iterator = objects.begin(); iterator != objects.end(); ++iterator) {
+		if ((*iterator)->GetActivation() == EActivation::kNONE_ACTIVE) {
+			continue;
+		}
+
 		(*iterator)->Draw(screen_offset);
 	}
 }

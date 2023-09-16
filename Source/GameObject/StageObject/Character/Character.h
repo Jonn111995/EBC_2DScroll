@@ -134,12 +134,6 @@ public:
     void CallGiveDamageEvent(StageObject& give_gamage_chara, const StageObject& opponent_chara, const int damage);
 
     /// <summary>
-    /// ダメージを受けている最中か?
-    /// </summary>
-    /// <returns>true: 受けている false: 受けていない</returns>
-    bool GetIsGetDmaged() { return is_get_damaged; }
-
-    /// <summary>
     /// HPUIを更新する
     /// </summary>
     /// <param name="new_hp">新しいHP</param>
@@ -156,6 +150,8 @@ public:
     /// <param name="hp_ui"></param>
     void SetHpUi(HpUI& hp_ui);
 
+    bool GetIsNoDamage() const { return is_no_damage; }
+
 protected:
    
     /// <summary>
@@ -169,10 +165,9 @@ protected:
     HpUI* hp_ui;
 
     /// <summary>
-    /// ダメージを受けている最中か?
+    /// ダメージを受けないか？
     /// </summary>
-    bool is_get_damaged;
-
+    bool is_no_damage;
     /// <summary>
     /// 移動ベクトル
     /// </summary>

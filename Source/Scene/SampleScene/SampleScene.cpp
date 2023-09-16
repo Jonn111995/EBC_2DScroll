@@ -11,6 +11,8 @@
 #include "../Source/GameObject/GameState/GameState.h"
 #include "../Source/GameObject/UI/UIImplement/GameStateUI.h"
 #include "../Source/GameObject/UI/UIImplement/HpUI.h"
+#include "../Source/GameObject/UI/UIImplement/StartUI.h"
+#include "../Source/GameObject/UI/UIImplement/FinishUI.h"
 #include "../Source/GameObject/RespawnManager/RespawnManager.h"
 #include "../Source/GameObject/StageObject/Item/Coin.h"
 #include "../Source/GameObject/StageObject/Item/InvincibleCan.h"
@@ -52,7 +54,7 @@ void SampleScene::GiveDamageEvent(StageObject& give_gamage_chara, const StageObj
 		}
 
 		if(receive_damage_chara != nullptr ) {
-			if (!receive_damage_chara->GetIsGetDmaged()) {
+			if (!receive_damage_chara->GetIsNoDamage()) {
 				chara->GiveDamage(*receive_damage_chara, damage);
 			}
 		}
@@ -95,6 +97,30 @@ bool SampleScene::ExecuteRespawn() {
 	respawn_manager->RespawnObject();
 	hp_ui->InitializeHP(player->GetHp());
 	return true;
+}
+
+void SampleScene::FInishUI(UIComponent* ui_component) {
+	//削除もあり。
+	ui_component->SetEnd();
+	ui_component->OffActive();
+
+	switch (play_scene_state) {
+	case EPlaySceneState::kWAIT_END_START_UI:
+
+		for (auto& object : objects) {
+			object->SetPlaying();
+			object->OnActive();
+		}
+		start_ui->OffActive();
+		finish_ui->OffActive();
+
+		play_scene_state = EPlaySceneState::kPLAYING;
+		break;
+
+	case EPlaySceneState::kWAIT_END_FINISH_UI:
+		play_scene_state = EPlaySceneState::kFINISH;
+		break;
+	}
 }
 
 void SampleScene::GameClear() {
@@ -242,6 +268,10 @@ void SampleScene::Initialize() {
 	game_state->SetIGameStateEvent(this);
 	game_state_ui = CreateObject<GameStateUI>();
 	hp_ui = CreateObject<HpUI>();
+	start_ui = CreateObject<StartUI>();
+	start_ui->SetIUIEvent(this);
+	finish_ui = CreateObject<FinishUI>();
+	finish_ui->SetIUIEvent(this);
 	
 	field = CreateObject<Field>();
 	field->InitializeField("C/Users/n5919/EBC_2DScroll/Source/CSVFile/mapdata.csv");
@@ -257,7 +287,7 @@ void SampleScene::Initialize() {
 
 	camera->UpdateCamera(player->GetPosition());
 
-	play_scene_state = EPlaySceneState::kPLAYING;
+	play_scene_state = EPlaySceneState::kPRE_START;
 }
 
 void SampleScene::Finalize() {
@@ -265,33 +295,38 @@ void SampleScene::Finalize() {
 }
 
 SceneType SampleScene::Update(float delta_seconds) {
+	
 	switch (play_scene_state) {
 	case EPlaySceneState::kPRE_START:
 		//ここでキャラを動かないようにする
+		for (auto& object : objects) {
+			object->SetPause();
+			object->OffActive();
+		}
+		field->OnActive();
+		play_scene_state = EPlaySceneState::kSTART_UI;
+		
+		return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kSTART_UI:
+		//StartUIを出す
+		start_ui->SetPlaying();
+		start_ui->OnActive();
+		start_ui->SetUIState(EUIState::kSHOW);
+		play_scene_state = EPlaySceneState::kWAIT_END_START_UI;
+		
+		return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kWAIT_END_START_UI:
+		//StartUIの表示が終わるまで待機
+	
+		return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kPLAYING:
 	{
-		if (game_state != nullptr && game_state->GetGameObjectState() == EGameObjectState::kPRE_START) {
-			game_state->SetPlaying();
-			game_state_ui->OnActive();
-			hp_ui->OnActive();
-		}
-
-		SceneType now_scen_type = __super::Update(delta_seconds);
-
+		now_scen_type = __super::Update(delta_seconds);
 		std::vector<StageObject*> stage_obj_list = field->GetStageObjectList();
 
-		/*for (int i = 0; i < delete_objects_list.size(); i++) {
-			for (int j = 0; j < stage_obj_list.size(); j++) {
-				if (delete_objects_list[i] == stage_obj_list[j]) {
-					field->DeleteStageObject(stage_obj_list[j]);
-				}
-			}
-		}*/
 		for (int i = 0; i < delete_objects_list.size(); i++) {
 			for (int j = 0; j < stage_obj_list.size(); j++) {
 				if (delete_objects_list[i] == stage_obj_list[j]) {
@@ -326,12 +361,31 @@ SceneType SampleScene::Update(float delta_seconds) {
 		break;
 	}
 	case EPlaySceneState::kFINISH_UI:
+
+		game_state->SetPause();
+		game_state->OffActive();
+		player->SetEnd();
+		respawn_manager->SetEnd();
+		respawn_manager->OffActive();
+
+		if (game_state->GetbIsClear()) {
+			finish_ui->SetDisplayString("GAME CLEAR!!!");
+		}
+		else {
+			finish_ui->SetDisplayString("GAME OVER...");
+		}
+		finish_ui->OnActive();
+		finish_ui->SetUIState(EUIState::kSHOW);
+		play_scene_state = EPlaySceneState::kWAIT_END_FINISH_UI;
+		return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kWAIT_END_FINISH_UI:
+		return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kPAUSE:
 		break;
 	case EPlaySceneState::kFINISH:
+		return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kFinished:
 		break;

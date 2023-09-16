@@ -1,7 +1,13 @@
 #include "UIComponent.h"
 
 UIComponent::UIComponent()
+	: ui_state(EUIState::kHIDE)
+	, ui_event(nullptr)
+	, ui_graphic(0)
+	, display_count_time(0.f)
 {
+	draw_sort_priority = 1;
+	active_state = EActivation::kNONE_ACTIVE;
 }
 
 UIComponent::~UIComponent()
