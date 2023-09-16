@@ -5,8 +5,9 @@
 #include "../Source/GameObject/GameState/Interface/IGameStateEvent.h"
 #include "../Source/GameObject/StageObject/Item/Interface/IItemEvent.h"
 #include "../Source/GameObject/UI/Interface/IUIEvent.h"
+#include "../Source/GameObject/StageObject/KillObject/Interface/IKillEvent.h"
 
 class TitleSceneInterface 
-	: public CharacterEventInterface, public IPlayerEvent, public IEnemyEvent, public IGameStateEvent, public IItemEvent, public IUIEvent {
+	: public CharacterEventInterface, public IPlayerEvent, public IEnemyEvent, public IGameStateEvent, public IItemEvent, public IUIEvent, public IKillEvent {
 
 };

@@ -6,6 +6,7 @@ enum class EGameObjectState : unsigned short {
 	kPRE_START,	//初期フェーズ
 	kPLAYING,	//処理フェーズ
 	kPAUSE,		//ポーズフェーズ
+	kPRE_END,	//終了前フェーズ
 	kEND,		//終了フェーズ
 };
 

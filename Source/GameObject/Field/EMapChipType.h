@@ -16,5 +16,6 @@ enum  MapChipType {
     kBASE_ENEMY = 8,
     kATTACK_ENEMY,
     kCOIN = 10,
-    kINVINCIBLE_CAN 
+    kINVINCIBLE_CAN,
+    kKILL_POINT = 99
 };

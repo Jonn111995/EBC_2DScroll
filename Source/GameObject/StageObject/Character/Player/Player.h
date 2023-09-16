@@ -9,12 +9,10 @@ class PlayerAnimResourcer;
 class BaseWeapon;
 class IPlayerEvent;
 
-
 namespace {
-	/// <summary>
-	/// 重力加速力
-	/// </summary>
-	const float GRAVITY_ACCELARATION = 1.0f;
+	const float AIR_RESISTANCE = 0.8f;
+	const float RESET_INITIAL_VELOCITY = 0.0f;
+	const float DEFAULT_INVINCIBLE_TIME = 1.5f;
 }
 
 /// <summary>
@@ -22,9 +20,51 @@ namespace {
 /// </summary>
 class Player : public Character {
 
-protected:
-	IPlayerEvent* player_event;
+public:
+	Player();
+	virtual ~Player();
 
+public:
+	/// <inheritdoc/>
+	virtual void Initialize() override;
+	/// <inheritdoc/>
+	virtual void Finalize() override;
+	/// <inheritdoc/>
+	virtual void Update(float delta_time) override;
+	/// <inheritdoc/>
+	virtual void Draw(const Vector2D& screen_offset) override;
+	/// <inheritdoc/>
+	virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) override;
+
+public:
+	/// <summary>
+	/// プレイヤーイベントをセット
+	/// </summary>
+	void SetIPlayerEvent(IPlayerEvent* interface) { player_event = interface; }
+	/// <summary>
+	/// 無敵時間をセット
+	/// </summary>
+	/// <param name="time">毎フレーム時間</param>
+	void SetInvincibleTime(float time) { invincible_time = time; };
+	/// <summary>
+	/// アイテムを使用中か？
+	/// </summary>
+	/// <param name="is_use">使用しているかどうか?</param>
+	void SetIsUseItem(bool is_use) { is_use_item = is_use; }
+	/// <summary>
+	/// 無敵ステートに変更
+	/// </summary>
+	void SetInvincibleState();
+	/// <summary>
+	/// 死亡ステートに変更
+	/// </summary>
+	void SetDeadState() override;
+
+protected:
+	/// <summary>
+	/// プレイヤーイベント
+	/// </summary>
+	IPlayerEvent* player_event;
 private:
 	/// <summary>
 	/// 入力チェック機能
@@ -52,19 +92,14 @@ private:
 	EPlayerAnimState player_anim_state;
 
 	/// <summary>
+	/// 無敵時間
+	/// </summary>
+	float invincible_time;
+
+	/// <summary>
 	/// ジャンプ出来るかどうか
 	/// </summary>
 	bool bIsCanJump;
-
-	/// <summary>
-	/// 初速度
-	/// </summary>
-	float initial_velocity;
-
-	/// <summary>
-	/// 毎フレーム時間の計測時間
-	/// </summary>
-	float count_time;
 
 	/// <summary>
 	/// ダメージを受けないか？
@@ -72,43 +107,27 @@ private:
 	bool bIsNoDamage;
 
 	/// <summary>
+	/// アイテムを使用しているか？
+	/// </summary>
+	bool is_use_item;
+
+	/// <summary>
 	/// 入力を受け付けるかどうか
 	/// </summary>
 	bool is_reject_input;
 
-	float invincible_time;
-
-public:
-	Player();
-	virtual ~Player();
-
-public:
-	/// <inheritdoc/>
-	virtual void Initialize() override;
-	/// <inheritdoc/>
-	virtual void Finalize() override;
-	/// <inheritdoc/>
-	virtual void Update(float delta_time) override;
-	/// <inheritdoc/>
-	virtual void Draw(const Vector2D& screen_offset) override;
-	/// <inheritdoc/>
-	virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) override;
-
-public:
-	void SetIPlayerEvent(IPlayerEvent* interface) { player_event = interface; }
-	void SetInvincibleTime(float time) { invincible_time = time; };
-	void SetInvincibleState();
-
 protected:
+	/// <summary>
+	/// プレイヤーの状態を変更する
+	/// </summary>
+	/// <param name="new_state">新しい状態</param>
+	void ChangePlayerState(const EPlayerState new_state);
 	/// <summary>
 	/// アニメーションを変更する
 	/// </summary>
 	/// <param name="delta_time">毎フレーム時間</param>
 	/// <param name="delta_move_amount">更新前と後の移動量の差</param>
 	void ChangeAnimState(const float delta_time, const Vector2D& delta_move_amount);
-
-	//削除するかも
-	virtual void KnockBack(const float delta_time, const Vector2D& recoil_velocity) override;
 
 	/// <summary>
 	/// 攻撃を開始
@@ -120,8 +139,8 @@ protected:
 	/// </summary>
 	virtual void StopAttack();
 
-	virtual void CallDeadEvent() override;
-
+	virtual bool DeadMove(const float delta_time) override;
+	virtual void CallDestroy() override;
 
 private:
 
@@ -134,12 +153,6 @@ private:
 	/// 状態が終わるときの終了処理
 	/// </summary>
 	void ExitState();
-
-	/// <summary>
-	/// プレイヤーの状態を変更する
-	/// </summary>
-	/// <param name="new_state">新しい状態</param>
-	void ChangePlayerState(const EPlayerState new_state);
 
 	/// <summary>
 	/// アニメーションステートが変更されたときの開始処理
