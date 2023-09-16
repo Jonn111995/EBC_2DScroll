@@ -15,6 +15,7 @@
 #include "../Source/GameObject/StageObject/Item/Coin.h"
 #include "../Source/GameObject/StageObject/Item/InvincibleCan.h"
 #include "../Source/GameObject/StageObject/KillObject/KillObject.h"
+#include "../Source/GameObject/StageObject/Goal/Goal.h"
 
 
 
@@ -70,7 +71,7 @@ void SampleScene::UpdateRespawnRemainUI(const int respawn_remain) {
 	game_state_ui->SetRespawn(respawn_remain);
 }
 
-void SampleScene::DeadEvent(const StageObject* dead_object) {
+void SampleScene::DeadEvent(StageObject* dead_object) {
 	BookDeleteObject(dead_object);
 }
 
@@ -85,12 +86,20 @@ bool SampleScene::ExecuteRespawn() {
 	game_state->ReduceRespawnRemain();
 	//残機があるか確認
 	if (game_state->GetRespawnRemain() == 0) {
+		//ゲームオーバー処理
+		game_state->SetbIsClear(false);
+		play_scene_state = EPlaySceneState::kFINISH_UI;
 		return false;
 	}
 
 	respawn_manager->RespawnObject();
 	hp_ui->InitializeHP(player->GetHp());
 	return true;
+}
+
+void SampleScene::GameClear() {
+	game_state->SetbIsClear(true);
+	play_scene_state = EPlaySceneState::kFINISH_UI;
 }
 
 void SampleScene::ScoreUp() {
@@ -136,24 +145,26 @@ void SampleScene::UpdateTimeUI(int remain_time) {
 }
 
 void SampleScene::TimeOver() {
-
+	game_state->SetbIsClear(false);
+	play_scene_state = EPlaySceneState::kFINISH_UI;
 }
 
 void SampleScene::CreateStageObject() {
-
+	//fieldオブジェクトが必須のため。
 	if (field == nullptr) {
 		return;
 	}
 
 	std::vector<CreateObjectInfo> create_object_info_list = field->GetCreateObjectInfo();
-
 	for (auto& create_object_info : create_object_info_list) {
-		StageObject* created_object = nullptr;
 
+		StageObject* created_object = nullptr;
 		switch (create_object_info.object_type) {
 
 		case kPLAYER_START:
-			if (player != nullptr) { continue; };
+			if (player != nullptr) {
+				continue; 
+			};
 
 			player = CreateObject<Player>(create_object_info.initiali_position);
 			player->SetICharacterEvent(this);
@@ -182,7 +193,6 @@ void SampleScene::CreateStageObject() {
 			Coin* coin = CreateObject<Coin>(create_object_info.initiali_position);
 			coin->SetIItemEvent(this);
 			created_object = coin;
-			
 			break;
 		}
 		case kINVINCIBLE_CAN:
@@ -198,6 +208,14 @@ void SampleScene::CreateStageObject() {
 			kill_object->SetIStageObjectEvent(this);
 			kill_object->SetIKillEvent(this);
 			created_object = kill_object;
+			break;
+		}
+		case kGOAL:
+		{
+			//TODO::後で位置を修正
+			Goal* goal = CreateObject<Goal>(create_object_info.initiali_position - Vector2D(12, 32));
+			goal->SetIGoalEvent(this);
+			created_object = goal;
 			break;
 		}
 		default:
@@ -243,7 +261,6 @@ void SampleScene::Initialize() {
 }
 
 void SampleScene::Finalize() {
-	// 親クラスのFinalize()
 	__super::Finalize();
 }
 
@@ -267,6 +284,22 @@ SceneType SampleScene::Update(float delta_seconds) {
 		SceneType now_scen_type = __super::Update(delta_seconds);
 
 		std::vector<StageObject*> stage_obj_list = field->GetStageObjectList();
+
+		/*for (int i = 0; i < delete_objects_list.size(); i++) {
+			for (int j = 0; j < stage_obj_list.size(); j++) {
+				if (delete_objects_list[i] == stage_obj_list[j]) {
+					field->DeleteStageObject(stage_obj_list[j]);
+				}
+			}
+		}*/
+		for (int i = 0; i < delete_objects_list.size(); i++) {
+			for (int j = 0; j < stage_obj_list.size(); j++) {
+				if (delete_objects_list[i] == stage_obj_list[j]) {
+					field->DeleteStageObject(stage_obj_list[j]);
+					stage_obj_list.erase(std::remove(stage_obj_list.begin(), stage_obj_list.end(), stage_obj_list[j]), stage_obj_list.end());
+				}
+			}
+		}
 
 		for (auto iterator = stage_obj_list.begin(); iterator != stage_obj_list.end(); ++iterator) {
 			for (auto oppnent_iterator = stage_obj_list.begin(); oppnent_iterator != stage_obj_list.end(); ++oppnent_iterator) {
@@ -305,9 +338,7 @@ SceneType SampleScene::Update(float delta_seconds) {
 	}
 }
 
-void SampleScene::Draw()
-{
-	// 親クラスのDraw()
+void SampleScene::Draw() {
 	__super::Draw();
 }
 

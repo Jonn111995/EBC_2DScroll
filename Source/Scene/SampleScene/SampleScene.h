@@ -96,7 +96,7 @@ public:
 	/// キャラの死亡イベント
 	/// </summary>
 	/// <param name="dead_object"></param>
-	virtual void DeadEvent(const StageObject* dead_object) override;
+	virtual void DeadEvent(StageObject* dead_object) override;
 	virtual void KillEvent(const StageObject* kill_target) override;
 
 	/// <summary>
@@ -104,6 +104,12 @@ public:
 	/// </summary>
 	/// <returns>リスポーン成功</returns>
 	virtual bool ExecuteRespawn() override;
+
+	/// <summary>
+	/// ゲームクリア処理を実行
+	/// </summary>
+	virtual void GameClear() override;
+
 
 	//~ Begin Item Interface
 	
