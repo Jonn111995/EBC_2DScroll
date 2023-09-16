@@ -14,11 +14,9 @@ Player::Player()
 	, player_state(EPlayerState::kIDLE)
 	, player_anim_state(EPlayerAnimState::kIDLE_ANIM)
 	, bIsCanJump(true)
-	, bIsNoDamage(false)
 	, invincible_time(DEFAULT_INVINCIBLE_TIME)
 {
 	SetAttack(10);
-	//SetHp(10);
 }
 
 Player::~Player()
@@ -34,6 +32,7 @@ void Player::Initialize() {
 	equip_weapon->Initialize();
 	equip_weapon->SetOwner(this);
 	resourcer->Initialize();
+	now_animations = resourcer->GetAnimaitonHandle(kIDLE);
 	body_collision.center_position = Vector2D(64, 84);
 	body_collision.box_extent = Vector2D(12, 24);
 	body_collision.hit_object_types = kENEMY_TYPE | kWEAPON_TYPE | kKILL_TYPE;
@@ -92,13 +91,12 @@ void Player::Update(float delta_time) {
 		//更新後の座標と比較して、移動量を出すため取得。
 		Vector2D pre_position = GetPosition();
 
-		if (bIsNoDamage) {
+		if (is_no_damage) {
 			count_time += delta_time;
 
 			if (count_time > invincible_time) {
 				ChangePlayerState(kIDLE);
-				bIsNoDamage = false;
-				is_get_damaged = false;
+				is_no_damage = false;
 				invincible_time = DEFAULT_INVINCIBLE_TIME;
 				count_time = 0.f;
 			}
@@ -144,6 +142,8 @@ void Player::Update(float delta_time) {
 	case EGameObjectState::kPAUSE:
 		break;
 	case EGameObjectState::kEND:
+		ChangePlayerState(kIDLE);
+		ChangeAnimState(delta_time, Vector2D(0.f, 0.f));
 		break;
 	}
 }
@@ -153,7 +153,7 @@ void Player::Draw(const Vector2D& screen_offset) {
 	unsigned int color = GetColor(255, 0, 0);
 	DrawFormatString(0, 0, color, "X=%f, Y=%f:::::", body_collision.center_position2.x, body_collision.center_position2.y);
 
-	if (player_state == kDAMAGE || bIsNoDamage) {
+	if (player_state == kDAMAGE || is_no_damage) {
 		if (((int)(count_time * 10) % (int)(0.2f * 10)) == 0.f) {
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 64);
 		}
@@ -173,7 +173,7 @@ void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollision
 		return;
 	}
 
-	if (!bIsNoDamage && (hit_collision.object_type & kENEMY_TYPE || hit_collision.object_type & kWEAPON_TYPE)) {
+	if (!is_no_damage && (hit_collision.object_type & kENEMY_TYPE || hit_collision.object_type & kWEAPON_TYPE)) {
 		ChangePlayerState(kDAMAGE);
 		__super::OnHitBoxCollision(hit_object, hit_collision);
 	}
@@ -206,15 +206,14 @@ void Player::EnterState() {
 		break;
 	case kINVINCIBLE:
 		is_reject_input = false;
-		bIsNoDamage = true;
+		is_no_damage = true;
 		break;
 	case kDAMAGE:
-	//	body_collision.collision_type = kOverlap;
 		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
 		break;
 	case kDEAD:
 		count_time = 0.f;
-		bIsNoDamage = false;
+		is_no_damage = false;
 		is_reject_input = true;
 		initial_velocity = INITIAL_JUMP_VELOCITY;
 		SetSpeed(100.f);

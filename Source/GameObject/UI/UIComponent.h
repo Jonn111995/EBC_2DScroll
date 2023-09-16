@@ -1,7 +1,17 @@
 #pragma once
 #include "../GameObject.h"
+#include "../Source/Utility/Vector2D.h"
 
 class IUIEvent;
+
+namespace {
+	const float DISPLAY_TIME = 2.f;
+}
+
+enum class EUIState : unsigned short {
+	kSHOW,
+	kHIDE
+};
 
 class UIComponent : public GameObject {
 public:
@@ -23,13 +33,15 @@ public:
 	/// </summary>
 	/// <param name="ui_event"></param>
 	void SetIUIEvent(IUIEvent* ui_event) { this->ui_event = ui_event; }
-
+	void SetUIState(EUIState ui_state) { this->ui_state = ui_state; }
 protected:
 	int ui_graphic;
+	float display_count_time;
 	/// <summary>
 	/// UIƒCƒxƒ“ƒg
 	/// </summary>
 	IUIEvent* ui_event;
+	EUIState ui_state;
 
 private:
 	void SetUIGraphic(const int new_graphic) { ui_graphic = new_graphic; }

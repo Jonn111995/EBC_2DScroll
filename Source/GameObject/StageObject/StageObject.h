@@ -12,7 +12,7 @@ class StageObject : public GameObject {
 public:
 	StageObject();
 	virtual ~StageObject();
-
+public:
 	/// <inheritdoc/>
 	virtual void Initialize() override;
 	/// <inheritdoc/>

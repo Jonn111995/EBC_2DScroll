@@ -1,7 +1,8 @@
 #pragma once
-#include "../Source/Utility/Vector2D.h"
+
+class UIComponent;
 
 class IUIEvent {
 public:
-	//virtual void GetDrawPositon(Vector2D& draw_postion) = 0;
+	virtual void FInishUI(UIComponent* ui_component) = 0;
 };

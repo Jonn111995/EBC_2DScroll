@@ -88,6 +88,8 @@ private:
 	/// </summary>
 	bool is_pass_check_point;
 
+	bool is_pass_last;
+
 	/// <summary>
 	/// 通知カウント時間
 	/// </summary>

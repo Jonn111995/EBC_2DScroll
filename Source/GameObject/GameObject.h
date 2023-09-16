@@ -28,7 +28,7 @@ public:
 	/// <summary>
 	/// ‰Šú‰»
 	/// </summary>
-	virtual void Initialize() {}
+	virtual void Initialize();
 
 	/// <summary>
 	/// XV
@@ -86,6 +86,8 @@ public:
 	/// ‹x~ó‘Ô‚É•ÏX
 	/// </summary>
 	void OffActive() { active_state = EActivation::kNONE_ACTIVE; }
+
+	EActivation GetActivation() const { return active_state; }
 
 protected:
 	/// <summary>

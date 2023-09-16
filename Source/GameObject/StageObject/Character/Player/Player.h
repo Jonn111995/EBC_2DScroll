@@ -101,10 +101,7 @@ private:
 	/// </summary>
 	bool bIsCanJump;
 
-	/// <summary>
-	/// ダメージを受けないか？
-	/// </summary>
-	bool bIsNoDamage;
+	
 
 	/// <summary>
 	/// アイテムを使用しているか？

@@ -65,7 +65,7 @@ void Enemy::Update(float delta_time) {
 				Move(delta_time);
 			}
 			else if (1.f < count_time) {
-				is_get_damaged = false;
+				is_no_damage = false;
 				count_time = 0.f;
 				ChangeEnemyState(EEnemyState::kWALK);
 			}

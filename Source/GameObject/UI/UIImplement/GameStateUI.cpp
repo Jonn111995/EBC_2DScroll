@@ -18,7 +18,6 @@ GameStateUI::~GameStateUI()
 
 void GameStateUI::Initialize() {
 	__super::Initialize();
-	active_state = EActivation::kNONE_ACTIVE;
 }
 
 void GameStateUI::Finalize() {
@@ -31,9 +30,9 @@ void GameStateUI::Update(float delta_seconds) {
 
 void GameStateUI::Draw(const Vector2D& screen_offset) {
 	__super::Draw(screen_offset);
-	if (active_state == EActivation::kNONE_ACTIVE) {
+	/*if (active_state == EActivation::kNONE_ACTIVE) {
 		return;
-	}
+	}*/
 
 	DrawTime();
 	DrawRespawnRemain();

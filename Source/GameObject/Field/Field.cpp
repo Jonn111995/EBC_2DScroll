@@ -417,6 +417,9 @@ std::vector<CreateObjectInfo> Field::GetCreateObjectInfo() {
             case kKILL_POINT:
                 create_object_info.object_type = kKILL_POINT;
                 break;
+            case kGOAL:
+                create_object_info.object_type = kGOAL;
+                break;
             default:
                 create_object_info.object_type = kNONE;
                 break;

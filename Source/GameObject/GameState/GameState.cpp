@@ -21,6 +21,7 @@ GameState::GameState()
 	, is_clear(false)
 	, game_state_event(nullptr)
 {
+	game_object_state = EGameObjectState::kPAUSE;
 }
 
 GameState::~GameState()

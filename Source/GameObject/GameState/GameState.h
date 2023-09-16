@@ -23,7 +23,8 @@ public:
 	virtual void Finalize() override;
 	/// <inheritdoc/>
 	virtual void Update(float delta_seconds) override;
-	virtual void Draw(const Vector2D& screen_offset);
+	/// <inheritdoc/>
+	virtual void Draw(const Vector2D& screen_offset) override;
 
 public:
 	/// <summary>

@@ -1,13 +1,15 @@
 #pragma once
 #include "../StageObject.h"
 
-class IItemEvent;
+class IGoalEvent;
 
-class Coin : public StageObject {
+/// <summary>
+/// ゴール
+/// </summary>
+class Goal :public StageObject {
 public:
-	Coin();
-	virtual ~Coin();
-
+	Goal();
+	virtual ~Goal();
 public:
 	/// <inheritdoc/>
 	virtual void Initialize() override;
@@ -21,18 +23,19 @@ public:
 	virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision);
 public:
 	/// <summary>
-	/// アイテムイベントをセット
+	/// ゴールイベントをセット
 	/// </summary>
-	/// <param name="item_event">アイテムイベントインターフェース</param>
-	void SetIItemEvent(IItemEvent* item_event) { this->item_event = item_event; }
-
+	/// <param name="goal_event">ゴールイベントインターフェース</param>
+	void SetIGoalEvent(IGoalEvent* goal_event) { this->goal_event = goal_event; }
 private:
 	/// <summary>
-	/// アイテムイベントインターフェース
+	/// ゴールイベント
 	/// </summary>
-	IItemEvent* item_event;
+	IGoalEvent* goal_event;
+
 	/// <summary>
-	/// コインのグラフィックハンドル
+	/// ゴールのグラフィックハンドル
 	/// </summary>
-	int coin_graphic_handle;
+	int goal_graphic_handle;
+
 };
