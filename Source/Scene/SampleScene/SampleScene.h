@@ -96,7 +96,8 @@ public:
 	/// キャラの死亡イベント
 	/// </summary>
 	/// <param name="dead_object"></param>
-	virtual void DeadEvent(Character* dead_object) override;
+	virtual void DeadEvent(const StageObject* dead_object) override;
+	virtual void KillEvent(const StageObject* kill_target) override;
 
 	/// <summary>
 	/// リスポーン処理を実行

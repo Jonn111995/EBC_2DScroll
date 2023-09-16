@@ -414,6 +414,9 @@ std::vector<CreateObjectInfo> Field::GetCreateObjectInfo() {
             case kINVINCIBLE_CAN:
                 create_object_info.object_type = kINVINCIBLE_CAN;
                 break;
+            case kKILL_POINT:
+                create_object_info.object_type = kKILL_POINT;
+                break;
             default:
                 create_object_info.object_type = kNONE;
                 break;

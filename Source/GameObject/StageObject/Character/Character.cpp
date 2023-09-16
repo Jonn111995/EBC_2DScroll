@@ -12,15 +12,19 @@ Character::Character()
 	, attack(0)
 	, deffence(0)
 	, move_speed(MOVEMENT_SPEED)
-	, bIsMove(false)
+	, is_move(false)
+	, is_get_damaged(false)
 	, direction(kRIGHT)
 	, character_event(nullptr)
+	, hp_ui(nullptr)
 	, input_direction({0.f,0.f})
 	, now_animations()
 	, animation_frame(0.f)
 	, anim_speed(0.f)
 	, min_anim_frame(0.f)
 	, max_anim_frame(0.f)
+	, initial_velocity(0.f)
+	, count_time(0.f)
 {
 }
 
@@ -39,19 +43,17 @@ void Character::Finalize() {
 
 void Character::Update(float delta_time) {
 	__super::Update(delta_time);
-
 	Move(delta_time);
 }
 
 void Character::Draw(const Vector2D& screen_offset) {
-
 	__super::Draw(screen_offset);
 
 	int x, y;
 	GetPosition().ToInt(x, y);
 
-	int screen_x = x - screen_offset.x;//+ body_collision.box_extent.x;
-	int screen_y = y - screen_offset.y;//+ body_collision.box_extent.y;
+	int screen_x = x - screen_offset.x;
+	int screen_y = y - screen_offset.y;
 	switch (body_collision.object_type) {
 
 	case kPLAYER_TYPE:
@@ -89,11 +91,10 @@ void Character::OnHitBoxCollision(const StageObject* hit_object, const BoxCollis
 	is_hitted_surface++;
 
 	if (*is_hitted_surface) {
-
-		knock_back_dir = { 1,0 };
+		knock_back_dir = { 1.f, 0.f };
 	}
 	else {
-		knock_back_dir = { -1, 0 };
+		knock_back_dir = { -1.f, 0.f };
 	}
 }
 
@@ -103,9 +104,12 @@ void Character::SetHpUi(HpUI& hp_ui) {
 	this->hp_ui->InitializeHP(hp);
 }
 
-void Character::GiveDamage(Character& receive_damage_chara, int damage) {
+void Character::SetDeadState() {
+	//ここでは中身を実装しない
+	//オーバーライドして中身を実装
+}
 
-	
+void Character::GiveDamage(Character& receive_damage_chara, int damage) {
 	int true_damage = damage - receive_damage_chara.GetDeffence();
 
 	if (true_damage <= 0) {
@@ -116,62 +120,25 @@ void Character::GiveDamage(Character& receive_damage_chara, int damage) {
 }
 
 void Character::GetDamage(Character& give_damage_chara, const int damage) {
-
 	is_get_damaged = true;
 	this->hp -= damage;
+
 	if (hp_ui != nullptr) {
 		this->character_event->UpdateHpUI(this->hp);
 	}
-	if (hp <= 0) {
-		hp = 0;
-		//死亡状態にする
-		this->SetEnd();
-		//さらにキャラの死亡イベントを呼ぶ。
-		//character_event->DeadEvent(this);
-	}
-	
 
+	if (hp <= 0) {
+		hp = 0;	
+		this->SetDeadState();
+	}
 }
 
 void Character::CallGiveDamageEvent(StageObject& give_gamage_chara, const StageObject& opponent_chara, const int damage) {
-
 	character_event->GiveDamageEvent(give_gamage_chara, opponent_chara, damage);
 }
 
 void Character::UpdateHpUI(const int new_hp) {
 	hp_ui->SetHP(new_hp);
-}
-
-void Character::KnockBack(const float delta_time, const Vector2D& recoil_velocity) {
-
-	Vector2D delta_move_amount;
-	Vector2D new_position = GetPosition();
-	input_direction = recoil_velocity;
-	delta_move_amount = input_direction.Normalize() * MOVEMENT_SPEED * delta_time;
-	bool is_can_move_x = character_event->CheckCanMoveToX(GetPosition(), delta_move_amount, body_collision);
-
-	if (is_can_move_x) {
-		new_position.x += delta_move_amount.x;
-	}
-
-	input_direction.y += 50.0f;
-	float move_amount = input_direction.Normalize().y * MOVEMENT_SPEED * delta_time;
-	delta_move_amount.y += move_amount;
-
-	bool is_can_move_y = character_event->CheckCanMoveToY(GetPosition(), delta_move_amount, body_collision);
-	if (is_can_move_y) {
-		new_position.y += delta_move_amount.y;
-	}
-	else {
-		delta_move_amount.y -= move_amount;
-		new_position.y = GetPosition().y;
-	}
-
-	Vector2D amount = new_position - GetPosition();
-	body_collision.center_position2 += amount;
-	//リセットしないと前回のフレームの値に次のフレームの値が足されてしまうのでリセット。
-	input_direction = { 0.f, 0.f };
-	SetPosition(new_position);
 }
 
 void Character::Move(float delta_time) {
@@ -215,6 +182,22 @@ void Character::ReverseDirection() {
 	}
 }
 
-void Character::CallDeadEvent() {
+bool Character::DeadMove(const float delta_time) {
+	initial_velocity += GRAVITY_ACCELARATION;
+	input_direction.y = initial_velocity;
+
+	Vector2D delta_move_amount = input_direction.Normalize() * GetSpeed() * 2 * delta_time;
+	SetPosition(GetPosition() + delta_move_amount);
+
+	count_time += delta_time;
+	if (count_time >= DEAD_MOVE_TIME) {
+		count_time = 0.f;
+		input_direction.y = 0.f;
+		return true;
+	}
+	return false;
+}
+
+void Character::CallDestroy() {
 	character_event->DeadEvent(this);
 }

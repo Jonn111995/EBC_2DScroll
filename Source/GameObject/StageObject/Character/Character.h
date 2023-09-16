@@ -11,6 +11,18 @@ namespace {
     /// 移動スピード
     /// </summary>
     const float MOVEMENT_SPEED = 300.f;
+    /// <summary>
+    /// 重力加速力
+    /// </summary>
+    const float GRAVITY_ACCELARATION = 1.0f;
+    /// <summary>
+    /// ジャンプの際の上方への初速度
+    /// </summary>
+    const int INITIAL_JUMP_VELOCITY = -25;
+    /// <summary>
+    /// 死亡時のモーションの秒数
+    /// </summary>
+    const float DEAD_MOVE_TIME = 1.5f;
 }
 
 class Character :public StageObject {
@@ -18,101 +30,6 @@ class Character :public StageObject {
 public:
     Character();
     virtual ~Character();
-private:
-    /// <summary>
-    /// HP
-    /// </summary>
-    int hp;
-
-    /// <summary>
-    /// 攻撃力
-    /// </summary>
-    int attack;
-
-    /// <summary>
-    /// 防御力
-    /// </summary>
-    int deffence;
-
-    /// <summary>
-    /// 移動スピード
-    /// </summary>
-    float move_speed;
-
-    /// <summary>
-    /// 動いているかどうか
-    /// </summary>
-    bool bIsMove;
-
-    /// <summary>
-    /// 移動方向
-    /// </summary>
-    CharacterDirection direction;
-
-protected:
-    /// <summary>
-    /// キャラクターイベントインターフェース
-    /// </summary>
-    CharacterEventInterface* character_event;
-
-    /// <summary>
-    /// 移動ベクトル
-    /// </summary>
-    Vector2D input_direction;
-
-    /// <summary>
-    /// 現在のアニメーション
-    /// </summary>
-    std::vector<int> now_animations;
-
-    /// <summary>
-    /// アニメーションを変化させる値
-    /// </summary>
-    float animation_frame;
-
-    /// <summary>
-    /// アニメーションスピード
-    /// </summary>
-    float anim_speed;
-
-    /// <summary>
-    /// アニメーションフレームの最小値
-    /// </summary>
-    float min_anim_frame;
-
-    /// <summary>
-    /// アニメーションフレームの最大値
-    /// </summary>
-    float max_anim_frame;
-
-    bool is_get_damaged;
-    HpUI* hp_ui;
-protected:
-    /// <summary>
-    /// 移動処理
-    /// </summary>
-    /// <param name="delta_time">毎フレーム時間</param>
-    virtual void Move(float delta_time);
-
-    /// <summary>
-    /// ノックバックする
-    /// </summary>
-    /// <param name="delta_time">毎フレーム時間</param>
-    /// <param name="knock_back_dir">ノックバックする方向</param>
-    virtual void KnockBack(const float delta_time, const Vector2D& knock_back_dir);
-
-    /// <summary>
-    /// キャラの向きを反対に変更。
-    /// </summary>
-    void ReverseDirection();
-
-    virtual void CallDeadEvent();
-
-protected:
-    /// <summary>
-    /// ノックバックのベクトル
-    /// </summary>
-    Vector2D knock_back_dir;
 
 public:
     /// <inheritdoc/>
@@ -126,21 +43,24 @@ public:
     /// <inheritdoc/>
     virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) override;
 
-    /// <summary>
-    /// キャラクターイベントインターフェースを設定
-    /// </summary>
-    void SetICharacterEvent(CharacterEventInterface* character_interface) { character_event = character_interface; };
-    void SetHpUi(HpUI& hp_ui);
-
 public:
-    const int MAX_HP;
+
+    /// <summary>
+    /// HPをセットする
+    /// </summary>
+    /// <param name="new_hp"></param>
     void SetHp(const int new_hp) { hp = new_hp; }
     /// <summary>
     /// HPを取得
     /// </summary>
     /// <returns>HP</returns>
     int GetHp() const { return hp; }
+    int GetMaxHp() const { return MAX_HP; }
 
+    /// <summary>
+    /// 攻撃力をセットする
+    /// </summary>
+    /// <param name="attack"></param>
     void SetAttack(const int attack) { this->attack = attack; }
     /// <summary>
     /// 攻撃力を取得
@@ -173,18 +93,18 @@ public:
     ///   true:移動している
     ///   false:移動していない
     /// </param>
-    void SetbIsMove(const bool bIs_move) { bIsMove = bIs_move; }
+    void SetIsMove(const bool is_move) { this->is_move = is_move; }
 
     /// <summary>
     /// 移動しているかどうかを取得
     /// </summary>
-    bool GetbIsMove() const { return bIsMove; }
+    bool GetIsMove() const { return is_move; }
 
     /// <summary>
     /// キャラの移動方向を設定
     /// </summary>
     /// <param name="new_direction">移動方向</param>
-    void SetDirection(CharacterDirection new_direction) { direction = new_direction;}
+    void SetDirection(CharacterDirection new_direction) { direction = new_direction; }
 
     /// <summary>
     /// キャラの移動方向を取得
@@ -205,10 +125,162 @@ public:
     /// <param name="damage">ダメージ</param>
     void GetDamage(Character& opponent, const int damage);
 
+    /// <summary>
+    /// ダメージを与えるイベントを呼ぶ
+    /// </summary>
+    /// <param name="give_gamage_chara"></param>
+    /// <param name="opponent_chara"></param>
+    /// <param name="damage"></param>
     void CallGiveDamageEvent(StageObject& give_gamage_chara, const StageObject& opponent_chara, const int damage);
 
+    /// <summary>
+    /// ダメージを受けている最中か?
+    /// </summary>
+    /// <returns>true: 受けている false: 受けていない</returns>
     bool GetIsGetDmaged() { return is_get_damaged; }
 
+    /// <summary>
+    /// HPUIを更新する
+    /// </summary>
+    /// <param name="new_hp">新しいHP</param>
     void UpdateHpUI(const int new_hp);
+
+    /// <summary>
+   /// キャラクターイベントインターフェースを設定
+   /// </summary>
+    void SetICharacterEvent(CharacterEventInterface* character_interface) { character_event = character_interface; };
+
+    /// <summary>
+    /// HPUIをセットする
+    /// </summary>
+    /// <param name="hp_ui"></param>
+    void SetHpUi(HpUI& hp_ui);
+
+protected:
+   
+    /// <summary>
+    /// キャラクターイベントインターフェース
+    /// </summary>
+    CharacterEventInterface* character_event;
+
+    /// <summary>
+    /// HPUI
+    /// </summary>
+    HpUI* hp_ui;
+
+    /// <summary>
+    /// ダメージを受けている最中か?
+    /// </summary>
+    bool is_get_damaged;
+
+    /// <summary>
+    /// 移動ベクトル
+    /// </summary>
+    Vector2D input_direction;
+
+    /// <summary>
+    /// 初速度
+    /// </summary>
+    float initial_velocity;
+
+    /// <summary>
+    /// 毎フレーム時間の計測時間
+    /// </summary>
+    float count_time;
+
+    /// <summary>
+    /// 現在のアニメーション
+    /// </summary>
+    std::vector<int> now_animations;
+
+    /// <summary>
+    /// アニメーションを変化させる値
+    /// </summary>
+    float animation_frame;
+
+    /// <summary>
+    /// アニメーションスピード
+    /// </summary>
+    float anim_speed;
+
+    /// <summary>
+    /// アニメーションフレームの最小値
+    /// </summary>
+    float min_anim_frame;
+
+    /// <summary>
+    /// アニメーションフレームの最大値
+    /// </summary>
+    float max_anim_frame;
+
+    /// <summary>
+    /// ノックバックのベクトル
+    /// </summary>
+    Vector2D knock_back_dir;
+
+protected:
+    /// <summary>
+    /// 移動処理
+    /// </summary>
+    /// <param name="delta_time">毎フレーム時間</param>
+    virtual void Move(float delta_time);
+
+    /// <summary>
+    /// キャラの向きを反対に変更。
+    /// </summary>
+    void ReverseDirection();
+
+    /// <summary>
+    /// 死亡状態に変更する。オーバーライド前提
+    /// </summary>
+    virtual void SetDeadState();
+
+    /// <summary>
+    /// 死亡時の移動モーション
+    /// </summary>
+    /// <param name="delta_time">毎フレーム時間</param>
+    /// <returns>true: モーション完了 false: 未完了</returns>
+    virtual bool DeadMove(const float delta_time);
+
+    /// <summary>
+    /// 自身を削除
+    /// </summary>
+    virtual void CallDestroy();
+
+private:
+    /// <summary>
+    /// HP
+    /// </summary>
+    int hp;
+
+    /// <summary>
+    /// 最大HP
+    /// </summary>
+    const int MAX_HP;
+
+    /// <summary>
+    /// 攻撃力
+    /// </summary>
+    int attack;
+
+    /// <summary>
+    /// 防御力
+    /// </summary>
+    int deffence;
+
+    /// <summary>
+    /// 移動スピード
+    /// </summary>
+    float move_speed;
+
+    /// <summary>
+    /// 動いているかどうか
+    /// </summary>
+    bool is_move;
+
+    /// <summary>
+    /// 移動方向
+    /// </summary>
+    CharacterDirection direction;
 };
 

@@ -14,6 +14,7 @@
 #include "../Source/GameObject/RespawnManager/RespawnManager.h"
 #include "../Source/GameObject/StageObject/Item/Coin.h"
 #include "../Source/GameObject/StageObject/Item/InvincibleCan.h"
+#include "../Source/GameObject/StageObject/KillObject/KillObject.h"
 
 
 
@@ -69,17 +70,24 @@ void SampleScene::UpdateRespawnRemainUI(const int respawn_remain) {
 	game_state_ui->SetRespawn(respawn_remain);
 }
 
-void SampleScene::DeadEvent(Character* dead_object) {
+void SampleScene::DeadEvent(const StageObject* dead_object) {
 	BookDeleteObject(dead_object);
 }
 
+void SampleScene::KillEvent(const StageObject* kill_target) {
+
+	if (kill_target == player) {
+		player->SetDeadState();
+	}
+}
+
 bool SampleScene::ExecuteRespawn() {
-	
 	game_state->ReduceRespawnRemain();
 	//残機があるか確認
 	if (game_state->GetRespawnRemain() == 0) {
 		return false;
 	}
+
 	respawn_manager->RespawnObject();
 	hp_ui->InitializeHP(player->GetHp());
 	return true;
@@ -91,6 +99,7 @@ void SampleScene::ScoreUp() {
 
 void SampleScene::ChangeInvincible(const float invincible_time) {
 	player->SetInvincibleState();
+	player->SetIsUseItem(true);
 	player->SetInvincibleTime(invincible_time);
 }
 
@@ -183,6 +192,14 @@ void SampleScene::CreateStageObject() {
 			created_object = invincible_can;
 			break;
 		}
+		case kKILL_POINT:
+		{
+			KillObject* kill_object = CreateObject<KillObject>(create_object_info.initiali_position);
+			kill_object->SetIStageObjectEvent(this);
+			kill_object->SetIKillEvent(this);
+			created_object = kill_object;
+			break;
+		}
 		default:
 			continue;
 			break;
@@ -254,12 +271,17 @@ SceneType SampleScene::Update(float delta_seconds) {
 		for (auto iterator = stage_obj_list.begin(); iterator != stage_obj_list.end(); ++iterator) {
 			for (auto oppnent_iterator = stage_obj_list.begin(); oppnent_iterator != stage_obj_list.end(); ++oppnent_iterator) {
 
+				BoxCollisionParams own = (*iterator)->GetBodyCollision();
+				BoxCollisionParams opponent = (*oppnent_iterator)->GetBodyCollision();
+
 				if (iterator == oppnent_iterator || (*oppnent_iterator)->GetGameObjectState() == EGameObjectState::kEND) {
 					continue;
 				}
+				if (own.collision_type == kOverlap || opponent.collision_type == kOverlap) {
+					continue;
+				}
 
-				BoxCollisionParams opponent = (*oppnent_iterator)->GetBodyCollision();
-				if (CheckBoxCollision(*iterator, (*iterator)->GetBodyCollision(), opponent)) {
+				if (CheckBoxCollision(*iterator, own, opponent)) {
 					(*iterator)->OnHitBoxCollision(*oppnent_iterator, opponent);
 				}
 			}

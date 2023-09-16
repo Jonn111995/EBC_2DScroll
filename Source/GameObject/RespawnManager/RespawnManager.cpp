@@ -96,5 +96,5 @@ void RespawnManager::RespawnObject() {
     float center_pos_y = observe_object->GetPosition().y + observe_object->GetBodyCollision().center_position.y;
     observe_object->SetCenterPosition(Vector2D(center_pos_x, center_pos_y));
 
-    observe_object->SetHp(observe_object->MAX_HP);
+    observe_object->SetHp(observe_object->GetMaxHp());
 }

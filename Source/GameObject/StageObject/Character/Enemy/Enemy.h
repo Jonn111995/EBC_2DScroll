@@ -31,6 +31,7 @@ class Enemy : public Character {
 public:
     Enemy();
     virtual~Enemy();
+public:
     /// <inheritdoc/>
     virtual void Initialize() override;
     /// <inheritdoc/>
@@ -41,6 +42,8 @@ public:
     virtual void Draw(const Vector2D& screen_offset) override;
     /// <inheritdoc/>
     virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) override;
+    /// <inheritdoc/>
+    virtual void SetDeadState() override;
 
 public:
     /// <summary>
@@ -62,7 +65,6 @@ public:
     void SetIEnemyEvent(IEnemyEvent* new_interface) { enemy_event = new_interface; }
 
 protected:
-
     /// <summary>
     /// 敵キャライベント
     /// </summary>
@@ -99,23 +101,23 @@ protected:
     EEnemyState enemy_state;
 
     /// <summary>
-    /// 毎フレーム時間の合計時間
-    /// </summary>
-    float count_time;
-
-    /// <summary>
     /// 索敵範囲
     /// </summary>
     SerchRange serch_range;
 
-    /// <summary>
-    /// 初速度
-    /// </summary>
-    float initial_velocity = -25;
-
 protected:
     /// <inheritdoc />
     virtual void Move(float delta_time) override;
+    /// <summary>
+    /// 死亡時のモーション
+    /// </summary>
+    /// <param name="delta_time">毎フレーム時間</param>
+    /// <returns>true: モーション完了 false: 未完了</returns>
+    virtual bool DeadMove(const float delta_time) override;
+    /// <summary>
+    /// 自身を削除
+    /// </summary>
+    virtual void CallDestroy() override;
 
 protected:
     /// <summary>

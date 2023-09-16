@@ -43,7 +43,7 @@ void SceneBase::Finalize() {
 	camera = nullptr;
 }
 
-void SceneBase::DestroyObject(GameObject* object) {
+void SceneBase::DestroyObject(const GameObject* object) {
 	if (object == nullptr) {
 		return;
 	}

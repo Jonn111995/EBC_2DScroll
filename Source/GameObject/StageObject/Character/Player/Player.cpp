@@ -8,18 +8,11 @@
 #include <iterator>
 #include <math.h>
 
-namespace {
-	const float AIR_RESISTANCE = 0.8f;
-	const float RESET_INITIAL_VELOCITY = 0.0f;
-	const float DEFAULT_INVINCIBLE_TIME = 1.5f;
-}
-
 Player::Player()
 	:input_handler(nullptr)
 	, resourcer(nullptr)
 	, player_state(EPlayerState::kIDLE)
 	, player_anim_state(EPlayerAnimState::kIDLE_ANIM)
-	, initial_velocity(0.f)
 	, bIsCanJump(true)
 	, bIsNoDamage(false)
 	, invincible_time(DEFAULT_INVINCIBLE_TIME)
@@ -43,7 +36,7 @@ void Player::Initialize() {
 	resourcer->Initialize();
 	body_collision.center_position = Vector2D(64, 84);
 	body_collision.box_extent = Vector2D(12, 24);
-	body_collision.hit_object_types = kENEMY_TYPE | kWEAPON_TYPE;
+	body_collision.hit_object_types = kENEMY_TYPE | kWEAPON_TYPE | kKILL_TYPE;
 	body_collision.object_type = kPLAYER_TYPE;
 	game_object_state = EGameObjectState::kPLAYING;
 	
@@ -117,14 +110,11 @@ void Player::Update(float delta_time) {
 			break;
 		case kDAMAGE:
 			count_time += delta_time;
-			if (count_time < 0.1f) {
 
+			if (count_time < 0.1f) {
 				is_reject_input = true;
-				Vector2D recoil_dir = { 0.f, 0.f };
 				input_direction = knock_back_dir;
-				//今のところMoveで代用可能
 				Move(delta_time);
-				//KnockBack(delta_time, knock_back_dir);
 			}
 			else if (count_time > 0.4f) {
 				ChangePlayerState(kINVINCIBLE);
@@ -134,7 +124,12 @@ void Player::Update(float delta_time) {
 			if (animation_frame >= max_anim_frame - 0.2f) {
 				ChangePlayerState(kIDLE);
 			}
-
+			break;
+		case kDEAD: 
+			if (DeadMove(delta_time)) {
+				CallDestroy();
+			}
+			break;
 		case kINVINCIBLE:
 			//無敵状態の時は移動処理もさせたいので、breakを置かずにフォースルーする。
 		default:
@@ -143,17 +138,12 @@ void Player::Update(float delta_time) {
 			break;
 		}
 
-		ChangeAnimState(delta_time, (GetPosition() - pre_position));
+		ChangeAnimState(delta_time, GetPosition() - pre_position);
 		break;
 	}
 	case EGameObjectState::kPAUSE:
 		break;
 	case EGameObjectState::kEND:
-		count_time += delta_time;
-		if (count_time > 1.5f) {
-			CallDeadEvent();
-			game_object_state = EGameObjectState::kPLAYING;
-		}
 		break;
 	}
 }
@@ -179,12 +169,15 @@ void Player::Draw(const Vector2D& screen_offset) {
 
 void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {
 
-	if (!bIsNoDamage) {
+	if (player_state == kDEAD) {
+		return;
+	}
+
+	if (!bIsNoDamage && (hit_collision.object_type & kENEMY_TYPE || hit_collision.object_type & kWEAPON_TYPE)) {
 		ChangePlayerState(kDAMAGE);
-		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
 		__super::OnHitBoxCollision(hit_object, hit_collision);
 	}
-	else if (bIsNoDamage && hit_collision.object_type & kENEMY_TYPE) {
+	else if (is_use_item && hit_collision.object_type & kENEMY_TYPE) {
 		character_event->GiveDamageEvent(*this, *hit_object, 1000);
 	}
 }
@@ -215,7 +208,17 @@ void Player::EnterState() {
 		is_reject_input = false;
 		bIsNoDamage = true;
 		break;
+	case kDAMAGE:
+	//	body_collision.collision_type = kOverlap;
+		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
+		break;
 	case kDEAD:
+		count_time = 0.f;
+		bIsNoDamage = false;
+		is_reject_input = true;
+		initial_velocity = INITIAL_JUMP_VELOCITY;
+		SetSpeed(100.f);
+		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
 		break;
 	}
 }
@@ -235,8 +238,14 @@ void Player::ExitState() {
 		character_event->RemoveWeapon(equip_weapon);
 		break;
 	case kINVINCIBLE:
+		
+		break;
+	case kDAMAGE:
+		//body_collision.collision_type = kBLOCK;
 		break;
 	case kDEAD:
+		is_reject_input = false;
+		SetSpeed(MOVEMENT_SPEED);
 		break;
 	}
 }
@@ -245,41 +254,56 @@ void Player::SetInvincibleState() {
 	ChangePlayerState(kINVINCIBLE);
 }
 
+void Player::SetDeadState() {
+	if (player_state == kDEAD) {
+		return;
+	}
+
+	ChangePlayerState(kDEAD);
+}
+
+
 void Player::ChangeAnimState(const float delta_time = 0.0f, const Vector2D& delta_position = Vector2D(0.f,0.f)) {
 
 	//delta_positionは、更新前と後の移動量
-	if (player_state == kIDLE) {
-		player_anim_state = kIDLE_ANIM;
-	}
+	
+	SetIsMove(false);
 
-	if (delta_position == Vector2D(0.0f, 0.0f)) {
+	if (delta_position == Vector2D(0.0f, 0.0f) || player_state == kDEAD) {
 
 		if (player_state == kATTACK) {
 			player_anim_state = kATTACK_ANIM;
 		}
-		else if (player_state == kDAMAGE) {
+		else if (player_state == kDAMAGE || player_state == kDEAD) {
 			player_anim_state = kDAMAGE_ANIM;
 		}
 		else {
 			player_anim_state = kIDLE_ANIM;
 		}
+		
+	}
+	else {
+		SetIsMove(true);
 	}
 
-	if (delta_position.x != 0.0f && delta_position.y == 0.0f) {
-		player_anim_state = kRUN_ANIM;
-	}
+	if (GetIsMove()) {
 
-	//ジャンプ中は、ベクトルの値によってアニメーションを変える
-	if (delta_position.y < 0.0f) {
-		player_anim_state = kJUMP_UP_ANIM;
-	}
-	else if (delta_position.y > 0.0f) {
-
-		if (delta_position.x != 0.0f) {
-			player_anim_state = kJUMP_MOVE_ANIM;
+		if (delta_position.x != 0.0f && delta_position.y == 0.0f) {
+			player_anim_state = kRUN_ANIM;
 		}
-		else {
-			player_anim_state = kJUMP_FALL_ANIM;
+
+		//ジャンプ中は、ベクトルの値によってアニメーションを変える
+		if (delta_position.y < 0.0f) {
+			player_anim_state = kJUMP_UP_ANIM;
+		}
+		else if (delta_position.y > 0.0f) {
+
+			if (delta_position.x != 0.0f) {
+				player_anim_state = kJUMP_MOVE_ANIM;
+			}
+			else {
+				player_anim_state = kJUMP_FALL_ANIM;
+			}
 		}
 	}
 
@@ -355,9 +379,6 @@ void Player::UpdateAnimFrame(const float delta_time) {
 	}
 }
 
-void Player::KnockBack(const float delta_time, const Vector2D& recoil_velocity) {
-	__super::KnockBack(delta_time, recoil_velocity);
-}
 
 void Player::Attack() {
 	equip_weapon->SetWeaponDirection();
@@ -369,10 +390,17 @@ void Player::StopAttack() {
 	character_event->RemoveWeapon(equip_weapon);
 }
 
-void Player::CallDeadEvent() {
+bool Player::DeadMove(const float delta_time) {
+	return __super::DeadMove(delta_time);
+}
 
+void Player::CallDestroy() {
 	if (!player_event->ExecuteRespawn()) {
-		__super::CallDeadEvent();
+		game_object_state = EGameObjectState::kEND;
+		__super::CallDestroy();
+	}
+	else {
+		ChangePlayerState(kIDLE);
 	}
 }
 
@@ -380,7 +408,7 @@ void Player::StartJump() {
 
 	if (bIsCanJump) {
 		bIsCanJump = false;
-		initial_velocity = -25;
+		initial_velocity = INITIAL_JUMP_VELOCITY;
 	}
 }
 

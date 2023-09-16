@@ -54,6 +54,7 @@ void HpUI::Draw(const Vector2D& screen_offset) {
 
 	//HPバーの囲い
 	DrawBox(screen_info->GetLeftX(), screen_info->GetLeftY() + 32 + 127, screen_info->GetLeftX() + hp_guage_width +1, 128 + 49, GetColor(255, 255, 255), false);
+	DrawBox(screen_info->GetLeftX(), screen_info->GetLeftY() + 32 + 128, screen_info->GetLeftX() + hp_guage_width, 128 + 48, GetColor(0, 0, 0), true);
 	//HPバーの中身
 	DrawBox(screen_info->GetLeftX(), screen_info->GetLeftY() + 32+128, screen_info->GetLeftX() + hp_guage, 128+48, GetColor(red, green, blue), true);
 	
