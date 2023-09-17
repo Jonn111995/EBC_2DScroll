@@ -92,9 +92,4 @@ bool InputHandler::CheckJumpButton(float time) {
 
 bool InputHandler::CheckAttackButton(float time) {
 	return CheckMouseKeepingClick(MOUSE_INPUT_LEFT, check_key_status[kATTACK_B], time, push_time[kATTACK_B]);//) {
-	//	//check_key_status[kATTACK_B] = true;
-	//	return true;
-	//}
-	//check_key_status[kATTACK_B] = false;
-	//return false;
 }

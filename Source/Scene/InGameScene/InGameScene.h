@@ -12,7 +12,7 @@ class StartUI;
 class FinishUI;
 class RespawnManager;
 
-enum class EPlaySceneState : unsigned short{
+enum class EPlaySceneState : unsigned short {
 
 	kPRE_START,			//準備中
 	kSTART_UI,			//スタートUI表示フェーズ
@@ -26,19 +26,18 @@ enum class EPlaySceneState : unsigned short{
 	kFinished,			//終了済みフェーズ
 };
 
-/**
- * サンプルシーン
- * サンプル用に簡易的に実装
- */
-class SampleScene : public SceneBase, public IInGameScene
+/// <summary>
+///	プレイ画面
+/// </summary>
+class InGameScene : public SceneBase, public IInGameScene
 {
 public:
-	SampleScene();
-	virtual ~SampleScene() {}
+	InGameScene();
+	virtual ~InGameScene();
 
 public:
 	//~ Begin SceneBase interface
-	virtual void Initialize() override;	
+	virtual void Initialize() override;
 	virtual void Finalize() override;
 	virtual SceneType Update(float delta_seconds) override;
 	virtual void Draw() override;
@@ -114,7 +113,7 @@ public:
 
 
 	//~ Begin Item Interface
-	
+
 	/// <summary>
 	/// GameStateのScoreを増加
 	/// </summary>
@@ -151,10 +150,11 @@ public:
 	/// 制限時間オーバーのイベント
 	/// </summary>
 	virtual void TimeOver() override;
-	
+
 private:
 	void CreateStageObject();
 private:
+	int in_game_back_graphic;
 	SceneType now_scen_type;
 	/// <summary>
 	/// Play Sceneのステート

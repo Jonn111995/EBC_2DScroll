@@ -97,6 +97,7 @@ void Player::Update(float delta_time) {
 			if (count_time > invincible_time) {
 				ChangePlayerState(kIDLE);
 				is_no_damage = false;
+				is_use_item = false;
 				invincible_time = DEFAULT_INVINCIBLE_TIME;
 				count_time = 0.f;
 			}
@@ -215,6 +216,8 @@ void Player::EnterState() {
 		count_time = 0.f;
 		is_no_damage = false;
 		is_reject_input = true;
+		is_use_item = false;
+		invincible_time = 1.5;
 		initial_velocity = INITIAL_JUMP_VELOCITY;
 		SetSpeed(100.f);
 		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
