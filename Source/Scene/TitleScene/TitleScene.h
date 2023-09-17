@@ -1,6 +1,7 @@
 #pragma once
 #include "../SceneBase.h"
 
+
 class TitleScene : public SceneBase {
 public:
 	TitleScene();
@@ -32,7 +33,7 @@ public:
 	/// シーンタイプの取得
 	/// </summary>
 	/// <returns>シーンタイプ</returns>
-	virtual SceneType GetSceneType() const = 0;
+	virtual SceneType GetSceneType() const override { return SceneType::TITLE_SCENE; };
 
 	/// <summary>
 	/// 削除予定のオブジェクトを予約
@@ -44,4 +45,6 @@ public:
 	/// 削除予定のオブジェクトを削除
 	/// </summary>
 	virtual void DestroyBookDeleteObject();
+private:
+	int title_graphic;
 };

@@ -1,4 +1,5 @@
 #include "InGameScene.h"
+#include "DxLib.h"
 #include "../Camera.h"
 #include "../Source/System/ScreenInfo.h"
 #include "../../GameObject/SampleObject/SampleObject.h"
@@ -263,6 +264,7 @@ InGameScene::~InGameScene()
 
 void InGameScene::Initialize() {
 	__super::Initialize();
+	in_game_back_graphic = LoadGraph("Resources/Images/pipo-bg001.jpg");
 
 	ScreenInfo::CreateInstance();
 	ScreenInfo* screen_info = ScreenInfo::GetInstance();
@@ -290,7 +292,10 @@ void InGameScene::Initialize() {
 	respawn_manager->SetObserveObject(*player);
 
 	camera->UpdateCamera(player->GetPosition());
-
+	for (auto& object : objects) {
+		object->SetPause();
+		object->OffActive();
+	}
 	play_scene_state = EPlaySceneState::kPRE_START;
 }
 
@@ -299,7 +304,6 @@ void InGameScene::Finalize() {
 }
 
 SceneType InGameScene::Update(float delta_seconds) {
-
 	switch (play_scene_state) {
 	case EPlaySceneState::kPRE_START:
 		//ここでキャラを動かないようにする
@@ -310,7 +314,7 @@ SceneType InGameScene::Update(float delta_seconds) {
 		field->OnActive();
 		play_scene_state = EPlaySceneState::kSTART_UI;
 
-		return __super::Update(delta_seconds);
+		//return 
 		break;
 	case EPlaySceneState::kSTART_UI:
 		//StartUIを出す
@@ -319,12 +323,12 @@ SceneType InGameScene::Update(float delta_seconds) {
 		start_ui->SetUIState(EUIState::kSHOW);
 		play_scene_state = EPlaySceneState::kWAIT_END_START_UI;
 
-		return __super::Update(delta_seconds);
+		//return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kWAIT_END_START_UI:
 		//StartUIの表示が終わるまで待機
 
-		return __super::Update(delta_seconds);
+	//	return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kPLAYING:
 	{
@@ -381,22 +385,24 @@ SceneType InGameScene::Update(float delta_seconds) {
 		finish_ui->OnActive();
 		finish_ui->SetUIState(EUIState::kSHOW);
 		play_scene_state = EPlaySceneState::kWAIT_END_FINISH_UI;
-		return __super::Update(delta_seconds);
+		//return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kWAIT_END_FINISH_UI:
-		return __super::Update(delta_seconds);
+		//return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kPAUSE:
 		break;
 	case EPlaySceneState::kFINISH:
-		return __super::Update(delta_seconds);
+		//return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kFinished:
 		break;
 	}
+	return 	now_scen_type = __super::Update(delta_seconds);
 }
 
 void InGameScene::Draw() {
+	DrawGraph(0, 0, in_game_back_graphic, true);
 	__super::Draw();
 }
 

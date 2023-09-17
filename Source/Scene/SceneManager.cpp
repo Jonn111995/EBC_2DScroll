@@ -4,6 +4,8 @@
 #include "DxLib.h"
 
 #include "SceneBase.h"
+#include "BootScene/BootScene.h"
+#include "TitleScene/TitleScene.h"
 #include "InGameScene/InGameScene.h"
 
 SceneManager::SceneManager()
@@ -19,7 +21,7 @@ SceneManager::~SceneManager()
 void SceneManager::Initialize()
 {
 	// 開始シーンをSAMPLE_SCENEに設定
-	ChangeScene(SceneType::IN_GAME_SCENE);
+	ChangeScene(SceneType::BOOT_SCENE);
 }
 
 void SceneManager::Update(float DeltaSeconds)
@@ -87,6 +89,12 @@ SceneBase* SceneManager::CreateScene(SceneType new_scene_type)
 {
 	switch (new_scene_type)
 	{
+	case SceneType::BOOT_SCENE:
+		return new BootScene();
+
+	case SceneType::TITLE_SCENE:
+		return new TitleScene();
+
 	case SceneType::IN_GAME_SCENE:	
 		return new InGameScene();
 	default:					

@@ -40,7 +40,7 @@ public:
 	/// <summary>
 	/// プレイヤーイベントをセット
 	/// </summary>
-	void SetIPlayerEvent(IPlayerEvent* interface) { player_event = interface; }
+	void SetIPlayerEvent(IPlayerEvent* player_event) { this->player_event = player_event; }
 	/// <summary>
 	/// 無敵時間をセット
 	/// </summary>

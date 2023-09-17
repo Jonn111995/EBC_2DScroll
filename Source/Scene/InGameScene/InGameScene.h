@@ -154,6 +154,7 @@ public:
 private:
 	void CreateStageObject();
 private:
+	int in_game_back_graphic;
 	SceneType now_scen_type;
 	/// <summary>
 	/// Play Sceneのステート
