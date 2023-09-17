@@ -1,52 +1,38 @@
 #pragma once
 #include "../SceneBase.h"
 
-
+/// <summary>
+/// タイトル画面
+/// </summary>
 class TitleScene : public SceneBase {
 public:
 	TitleScene();
 	virtual ~TitleScene();
 public:
-	/// <summary>
-	/// 初期化
-	/// </summary>
-	virtual void Initialize();
-
-	/// <summary>
-	/// 更新
-	/// </summary>
-	/// <param name="delta_seconds">毎フレーム時間</param>
-	/// <returns>次に遷移するシーンタイプ</returns>
-	virtual SceneType Update(float delta_seconds);
-
-	/// <summary>
-	/// 描画
-	/// </summary>
-	virtual void Draw();
-
-	/// <summary>
-	/// 解放
-	/// </summary>
-	virtual void Finalize();
-
-	/// <summary>
-	/// シーンタイプの取得
-	/// </summary>
-	/// <returns>シーンタイプ</returns>
+	/// <inheritdoc />
+	virtual void Initialize() override;
+	/// <inheritdoc />
+	virtual SceneType Update(float delta_seconds) override;
+	/// <inheritdoc />
+	virtual void Draw() override;
+	/// <inheritdoc />
+	virtual void Finalize() override;
+	/// <inheritdoc />
 	virtual SceneType GetSceneType() const override { return SceneType::TITLE_SCENE; };
 
-	/// <summary>
-	/// 削除予定のオブジェクトを予約
-	/// </summary>
-	/// <param name="delete_object">削除対象オブジェクト</param>
-	virtual void BookDeleteObject(GameObject* delete_object) { delete_objects_list.push_back(delete_object); }
-
-	/// <summary>
-	/// 削除予定のオブジェクトを削除
-	/// </summary>
-	virtual void DestroyBookDeleteObject();
 private:
+	/// <summary>
+	/// タイトル画面の背景
+	/// </summary>
 	int title_graphic;
+	/// <summary>
+	/// 決定ボタンの効果音
+	/// </summary>
 	int decide_sound;
+	/// <summary>
+	/// タイトル画面のBGM
+	/// </summary>
 	int title_bgm;
+
+	int title_font;
 };
