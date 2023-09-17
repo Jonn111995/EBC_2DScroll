@@ -213,6 +213,8 @@ protected:
     /// </summary>
     Vector2D knock_back_dir;
 
+    int get_damage_sound;
+
 protected:
     /// <summary>
     /// ˆÚ“®ˆ—

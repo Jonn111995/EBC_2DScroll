@@ -1,5 +1,6 @@
 #include "GameState.h"
 #include "DxLib.h"
+#include "../Source/System/SoundManager.h"
 #include "Interface/IGameStateEvent.h"
 #include "../Source/Utility/Vector2D.h"
 
@@ -30,7 +31,8 @@ GameState::~GameState()
 
 void GameState::Initialize() {
 	__super::Initialize();
-
+	SoundManager* sound_manager = SoundManager::GetInstance();
+	up_respawnremain__sound = sound_manager->LoadSoundResource("Resources/Sounds/SE/se_up_respawn_remain.mp3");
 	//‰¼
 	start_time = 60;
 }
@@ -55,6 +57,7 @@ void GameState::Update(float delta_seconds) {
 
 			if (inform_count_time >= INFORM_TIME) {
 				inform_count_time = 0.f;
+				inform_movement = 0.f;
 				is_inform_respawn_remain_up = false;
 			}
 		}
@@ -87,6 +90,9 @@ void GameState::Draw(const Vector2D& screen_offset) {
 		game_state_event->GetDrawInformPositon(inform_position);
 		DrawFormatString(inform_position.x -screen_offset.x - (draw_width/2), static_cast<float>(inform_position.y - screen_offset.y + inform_movement), color, INFORM_UP_RESPAEN_RMAIN);
 	}
+	else {
+
+	}
 }
 
 void GameState::SetScore(const int now_score) {
@@ -105,6 +111,7 @@ void GameState::IncreaseScore() {
 	if (score % RESPAWN_REMAIN_APP == 0) {
 		is_inform_respawn_remain_up = true;
 		IncreseRespawnRemain();
+		SoundManager::GetInstance()->PlayLoadSound(up_respawnremain__sound);
 	}
 }
 

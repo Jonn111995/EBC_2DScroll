@@ -35,4 +35,8 @@ private:
 	/// コインのグラフィックハンドル
 	/// </summary>
 	int coin_graphic_handle;
+	/// <summary>
+	/// コイン獲得の効果音ハンドル
+	/// </summary>
+	int get_coin_sound;
 };

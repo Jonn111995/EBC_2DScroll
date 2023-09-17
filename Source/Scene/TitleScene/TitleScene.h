@@ -47,4 +47,6 @@ public:
 	virtual void DestroyBookDeleteObject();
 private:
 	int title_graphic;
+	int decide_sound;
+	int title_bgm;
 };

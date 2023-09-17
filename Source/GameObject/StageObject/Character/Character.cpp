@@ -1,5 +1,6 @@
 #include "Character.h"
 #include "DxLib.h"
+#include "../Source/System/SoundManager.h"
 #include "Interface/CharacterEventInterface.h"
 #include "../Source/GameObject/UI/UIImplement/HpUI.h"
 
@@ -32,6 +33,8 @@ Character::~Character() {
 
 void Character::Initialize() {
 	__super::Initialize();
+	SoundManager* sound_manager = SoundManager::GetInstance();
+	get_damage_sound = sound_manager->LoadSoundResource("Resources/Sounds/SE/Action/se_get_damage.mp3");
 }
 
 void Character::Finalize() {
@@ -119,6 +122,8 @@ void Character::GiveDamage(Character& receive_damage_chara, int damage) {
 }
 
 void Character::GetDamage(Character& give_damage_chara, const int damage) {
+	SoundManager* sound_manager = SoundManager::GetInstance();
+	sound_manager->PlayLoadSound(get_damage_sound);
 	is_no_damage = true;
 	this->hp -= damage;
 

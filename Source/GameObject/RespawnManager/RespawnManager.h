@@ -25,7 +25,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	virtual void Initialize() {}
+	virtual void Initialize();
 
 	/// <summary>
 	/// 更新
@@ -84,10 +84,18 @@ private:
 	std::vector<Vector2D> check_point_list;
 
 	/// <summary>
+	/// チェックポイント通過時の効果音
+	/// </summary>
+	int inform_pass_check_point_sound;
+
+	/// <summary>
 	/// チェックポイントを通過したか？
 	/// </summary>
 	bool is_pass_check_point;
 
+	/// <summary>
+	/// 最後のチェックポイントを通過したか？
+	/// </summary>
 	bool is_pass_last;
 
 	/// <summary>

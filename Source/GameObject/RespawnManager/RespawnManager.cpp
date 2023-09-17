@@ -1,6 +1,7 @@
 #include "RespawnManager.h"
 #include "DxLib.h"
 #include "../../System/ScreenInfo.h"
+#include "../../System/SoundManager.h"
 #include"../Source/GameObject/StageObject/Character/Character.h"
 
 namespace {
@@ -19,6 +20,12 @@ RespawnManager::~RespawnManager()
 {
 }
 
+void RespawnManager::Initialize() {
+    __super::Initialize();
+    SoundManager* sound_manager = SoundManager::GetInstance();
+    inform_pass_check_point_sound = sound_manager->LoadSoundResource("Resources/Sounds/SE/se_pass_check_point.mp3");
+}
+
 void RespawnManager::Update(float delta_seconds) {
     __super::Update(delta_seconds);
     switch (game_object_state) {
@@ -26,15 +33,18 @@ void RespawnManager::Update(float delta_seconds) {
         switch (now_state) {
         case ERespawnManagerState::kOBSERVE:
             if (observe_object != nullptr) {
-
                 Vector2D object_pos = observe_object->GetPosition();
 
+                //チェックポイント通過確認
                 if (object_pos.x >= next_check_point.x) {
+                   
                     is_pass_check_point = true;
                     now_check_point = next_check_point;
                     inform_movement = initial_velocity;
+                    SoundManager::GetInstance()->PlayLoadSound(inform_pass_check_point_sound);
                     now_state = ERespawnManagerState::kINFORM_PASS_POINT;
 
+                    //次のチェックポイント設定
                     for (int i = 0; i < check_point_list.size(); i++) {
                         if (now_check_point == check_point_list[i]) {
 
@@ -48,14 +58,6 @@ void RespawnManager::Update(float delta_seconds) {
 
                         }
                     }
-
-                    /* for (auto itr = check_point_list.begin(); itr != check_point_list.end(); ++itr) {
-
-                         if (*itr == now_check_point && itr != check_point_list.end()) {
-                             ++itr;
-                             next_check_point = *itr;
-                         }
-                     }*/
                 }
             }
             break;

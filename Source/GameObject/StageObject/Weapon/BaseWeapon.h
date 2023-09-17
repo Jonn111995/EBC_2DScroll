@@ -45,10 +45,8 @@ public:
 
 protected:
 	int attack;
+	int attack_sound;
 	Character* owner;
 	EWeaponDirection now_direction;
 	EWeaponType weapon_type;
-	
-
-
 };
