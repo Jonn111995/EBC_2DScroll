@@ -1,5 +1,6 @@
 #include "InvincibleCan.h"
 #include "DxLib.h"
+#include "../Source/System/SoundManager.h"
 #include "Interface/IItemEvent.h"
 
 InvincibleCan::InvincibleCan()
@@ -16,6 +17,9 @@ InvincibleCan::~InvincibleCan()
 void InvincibleCan::Initialize() {
 	__super::Initialize();
 	invincible_can_graphic = LoadGraph(_T("Resources/Images/mapchip_033.bmp"));
+
+	SoundManager* sound_manager = SoundManager::GetInstance();
+	get_invincible_can_sound = sound_manager->LoadSoundResource("Resources/Sounds/SE/se_get_invincible_can.mp3");
 
 	game_object_state = EGameObjectState::kPLAYING;
 	body_collision.box_extent = Vector2D(16, 16);
@@ -57,7 +61,11 @@ void InvincibleCan::OnHitBoxCollision(const StageObject* hit_object, const BoxCo
 	__super::OnHitBoxCollision(hit_object, hit_collision);
 
 	if (game_object_state == EGameObjectState::kPLAYING) {
+		SoundManager* sound_manager = SoundManager::GetInstance();
+		sound_manager->PlayLoadSound(get_invincible_can_sound);
+
 		item_event->ChangeInvincible(invincible_time);
+
 		item_event->DestroyItem(*this);
 		game_object_state = EGameObjectState::kEND;
 	}

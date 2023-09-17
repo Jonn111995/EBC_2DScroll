@@ -1,5 +1,6 @@
 #include "Hand.h"
 #include "DxLib.h"
+#include "../Source/System/SoundManager.h"
 
 Hand::Hand()
 {
@@ -11,6 +12,8 @@ Hand::~Hand()
 
 void Hand::Initialize() {
 	__super::Initialize();
+	SoundManager* sound_manager = SoundManager::GetInstance();
+	attack_sound = sound_manager->LoadSoundResource("Resources/Sounds/SE/Action/se_attack.mp3");
 	attack = 10;
 }
 
@@ -36,5 +39,7 @@ void Hand::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionPa
 }
 
 void Hand::SetAttackRange(const BoxCollisionParams& owner_collision) {
+	SoundManager* sound_manager = SoundManager::GetInstance();
+	sound_manager->PlayLoadSound(attack_sound);
 	__super::SetAttackRange(owner_collision);
 }

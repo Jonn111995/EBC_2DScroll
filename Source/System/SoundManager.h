@@ -33,7 +33,7 @@ public:
 	int LoadSoundResource(const char* file_name);
 	void UnLoadSoundResource(int sound_handle);
 	void UnLoadAllSoundResource();
-	void PlayLoadSound(int sound_handle, bool is_loop);
+	void PlayLoadSound(int sound_handle, bool is_loop = false);
 	void StopSound(int sound_handle);
 
 public:

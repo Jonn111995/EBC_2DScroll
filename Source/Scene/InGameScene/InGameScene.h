@@ -150,11 +150,17 @@ public:
 	/// 制限時間オーバーのイベント
 	/// </summary>
 	virtual void TimeOver() override;
+	virtual void FinishInvincibleState() override;
+
 
 private:
 	void CreateStageObject();
 private:
 	int in_game_back_graphic;
+	int in_game_bgm;
+	int invincible_bgm;
+	int goal_sound;
+
 	SceneType now_scen_type;
 	/// <summary>
 	/// Play Sceneのステート
@@ -193,4 +199,6 @@ private:
 
 	StartUI* start_ui;
 	FinishUI* finish_ui;
+
+
 };

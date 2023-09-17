@@ -2,6 +2,7 @@
 #include "DxLib.h"
 #include "../Camera.h"
 #include "../Source/System/ScreenInfo.h"
+#include "../Source/System/SoundManager.h"
 #include "../../GameObject/SampleObject/SampleObject.h"
 #include "../Source/GameObject/StageObject/Character/Player/Player.h"
 #include "../Source/GameObject/Field/Field.h"
@@ -76,7 +77,7 @@ void InGameScene::DeadEvent(StageObject* dead_object) {
 
 void InGameScene::KillEvent(const StageObject* kill_target) {
 
-	if (kill_target == player) {
+	if (kill_target == player && player->GetPlayerState() != EPlayerState::kDEAD) {
 		player->SetDeadState();
 	}
 }
@@ -133,6 +134,8 @@ void InGameScene::ChangeInvincible(const float invincible_time) {
 	player->SetInvincibleState();
 	player->SetIsUseItem(true);
 	player->SetInvincibleTime(invincible_time);
+	/*SoundManager::GetInstance()->StopSound(in_game_bgm);
+	SoundManager::GetInstance()->PlayLoadSound(invincible_bgm);*/
 }
 
 void InGameScene::DestroyItem(StageObject& delete_object) {
@@ -143,7 +146,6 @@ void InGameScene::GetDrawInformPositon(Vector2D& draw_postion) {
 	BoxCollisionParams player_collision = player->GetBodyCollision();
 	draw_postion = Vector2D(player_collision.center_position2.x, player_collision.center_position2.y - player_collision.box_extent.y * 2);
 }
-
 
 bool InGameScene::SerchPlayer(Enemy* enemy) {
 
@@ -170,6 +172,11 @@ void InGameScene::UpdateTimeUI(int remain_time) {
 void InGameScene::TimeOver() {
 	game_state->SetbIsClear(false);
 	play_scene_state = EPlaySceneState::kFINISH_UI;
+}
+
+void InGameScene::FinishInvincibleState() {
+	SoundManager::GetInstance()->StopSound(invincible_bgm);
+	SoundManager::GetInstance()->PlayLoadSound(in_game_bgm);
 }
 
 void InGameScene::CreateStageObject() {
@@ -296,11 +303,21 @@ void InGameScene::Initialize() {
 		object->SetPause();
 		object->OffActive();
 	}
+
+	SoundManager* sound_manager = SoundManager::GetInstance();
+	goal_sound = sound_manager->LoadSoundResource("Resources/Sounds/SE/se_goal.mp3");
+	in_game_bgm = sound_manager->LoadSoundResource("Resources/Sounds/BGM/InGameBGM_28.mp3");
+	invincible_bgm = sound_manager->LoadSoundResource("Resources/Sounds/BGM/bgm_Invincible.mp3");
+
+	sound_manager->PlayLoadSound(in_game_bgm, true);
 	play_scene_state = EPlaySceneState::kPRE_START;
 }
 
 void InGameScene::Finalize() {
 	__super::Finalize();
+	SoundManager* sound_manager = SoundManager::GetInstance();
+	sound_manager->UnLoadSoundResource(in_game_bgm);
+	in_game_bgm = 0;
 }
 
 SceneType InGameScene::Update(float delta_seconds) {
@@ -369,6 +386,9 @@ SceneType InGameScene::Update(float delta_seconds) {
 		break;
 	}
 	case EPlaySceneState::kFINISH_UI:
+
+		SoundManager::GetInstance()->StopSound(in_game_bgm);
+		SoundManager::GetInstance()->PlayLoadSound(goal_sound);
 
 		game_state->SetPause();
 		game_state->OffActive();

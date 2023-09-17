@@ -64,7 +64,7 @@ void SoundManager::PlayLoadSound(int sound_handle, bool is_loop) {
 		PlaySoundMem(sound_handle, DX_PLAYTYPE_LOOP);
 	}
 	else {
-		PlaySoundMem(sound_handle, DX_PLAYTYPE_NORMAL);
+		PlaySoundMem(sound_handle, DX_PLAYTYPE_BACK);
 	}
 }
 

@@ -89,6 +89,12 @@ private:
 	/// ゲームステートのイベントインターフェース
 	/// </summary>
 	IGameStateEvent* game_state_event;
+
+	/// <summary>
+	/// 残機UPの効果音
+	/// </summary>
+	int up_respawnremain__sound;
+
 	/// <summary>
 	/// スコア
 	/// </summary>

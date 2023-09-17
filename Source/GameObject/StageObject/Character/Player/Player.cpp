@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "../Source/System/SoundManager.h"
 #include "InputHandler.h"
 #include "../Source/Animation/PlayerAnimResourcer.h"
 #include "../Interface/CharacterEventInterface.h"
@@ -17,6 +18,7 @@ Player::Player()
 	, invincible_time(DEFAULT_INVINCIBLE_TIME)
 {
 	SetAttack(10);
+	SetHp(10);
 }
 
 Player::~Player()
@@ -38,6 +40,10 @@ void Player::Initialize() {
 	body_collision.hit_object_types = kENEMY_TYPE | kWEAPON_TYPE | kKILL_TYPE;
 	body_collision.object_type = kPLAYER_TYPE;
 	game_object_state = EGameObjectState::kPLAYING;
+
+	SoundManager* sound_manager = SoundManager::GetInstance();
+	jump_sound = sound_manager->LoadSoundResource("Resources/Sounds/SE/Action/se_jump.mp3");
+	dead_sound = sound_manager->LoadSoundResource("Resources/Sounds/SE/se_dead.mp3");
 	
 }
 
@@ -59,6 +65,7 @@ void Player::Finalize(){
 }
 
 void Player::Update(float delta_time) {
+	SoundManager* sound_manager = SoundManager::GetInstance();
 
 	switch (game_object_state) {
 	case EGameObjectState::kPLAYING:
@@ -79,8 +86,10 @@ void Player::Update(float delta_time) {
 				StartJump();
 			}
 
-			if (input_button_status[kATTACK_B]) {
-				ChangePlayerState(kATTACK);
+			if (bIsCanJump) {
+				if (input_button_status[kATTACK_B]) {
+					ChangePlayerState(kATTACK);
+				}
 			}
 
 			if (!bIsCanJump) {
@@ -100,12 +109,15 @@ void Player::Update(float delta_time) {
 				is_use_item = false;
 				invincible_time = DEFAULT_INVINCIBLE_TIME;
 				count_time = 0.f;
+
+				//player_event->FinishInvincibleState();
 			}
 		}
 
 		switch (player_state) {
 		case kJUMP:
 			JumpMove(delta_time);
+			
 			break;
 		case kDAMAGE:
 			count_time += delta_time;
@@ -260,6 +272,7 @@ void Player::SetDeadState() {
 	if (player_state == kDEAD) {
 		return;
 	}
+	SoundManager::GetInstance()->PlayLoadSound(dead_sound);
 
 	ChangePlayerState(kDEAD);
 }
@@ -411,6 +424,8 @@ void Player::StartJump() {
 	if (bIsCanJump) {
 		bIsCanJump = false;
 		initial_velocity = INITIAL_JUMP_VELOCITY;
+		SoundManager* sound_manager = SoundManager::GetInstance();
+		sound_manager->PlayLoadSound(jump_sound);
 	}
 }
 

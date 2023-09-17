@@ -1,5 +1,6 @@
 #include "Coin.h"
 #include "DxLib.h"
+#include "../Source/System/SoundManager.h"
 #include "Interface/IItemEvent.h"
 Coin::Coin()
 	: coin_graphic_handle(0)
@@ -15,6 +16,8 @@ void Coin::Initialize() {
 	__super::Initialize();
 	coin_graphic_handle = LoadGraph(_T("Resources/Images/mapchip_035.bmp"));
 	
+	SoundManager* sound_manager = SoundManager::GetInstance();
+	get_coin_sound = sound_manager->LoadSoundResource("Resources/Sounds/SE/se_get_coin.mp3");
 	game_object_state = EGameObjectState::kPLAYING;
 	body_collision.box_extent = Vector2D( 16, 16 );
 	body_collision.center_position = Vector2D(16, 16);
@@ -54,7 +57,11 @@ void Coin::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionPa
 	__super::OnHitBoxCollision(hit_object, hit_collision);
 
 	if (game_object_state == EGameObjectState::kPLAYING) {
+		SoundManager* sound_manager = SoundManager::GetInstance();
+		sound_manager->PlayLoadSound(get_coin_sound);
+
 		item_event->ScoreUp();
+
 		item_event->DestroyItem(*this);
 		game_object_state = EGameObjectState::kEND;
 	}

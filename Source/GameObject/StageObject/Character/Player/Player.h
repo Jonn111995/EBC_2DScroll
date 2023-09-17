@@ -56,6 +56,10 @@ public:
 	/// </summary>
 	void SetInvincibleState();
 	/// <summary>
+	/// プレイヤーのステートを取得
+	/// </summary>
+	EPlayerState GetPlayerState() const { return player_state; };
+	/// <summary>
 	/// 死亡ステートに変更
 	/// </summary>
 	void SetDeadState() override;
@@ -65,6 +69,8 @@ protected:
 	/// プレイヤーイベント
 	/// </summary>
 	IPlayerEvent* player_event;
+	int dead_sound;
+
 private:
 	/// <summary>
 	/// 入力チェック機能
@@ -101,8 +107,6 @@ private:
 	/// </summary>
 	bool bIsCanJump;
 
-	
-
 	/// <summary>
 	/// アイテムを使用しているか？
 	/// </summary>
@@ -112,6 +116,8 @@ private:
 	/// 入力を受け付けるかどうか
 	/// </summary>
 	bool is_reject_input;
+
+	int jump_sound;
 
 protected:
 	/// <summary>
