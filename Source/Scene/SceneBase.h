@@ -14,6 +14,7 @@ class Camera;
 /// </summary>
 enum class SceneType : unsigned short
 {
+	NONE,
 	BOOT_SCENE,
 	TITLE_SCENE,
 	IN_GAME_SCENE,

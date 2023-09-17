@@ -3,7 +3,8 @@
 #include <algorithm>
 
 SceneBase::SceneBase()
-	: screen_offset(Vector2D())
+	: screen_offset()
+	, now_scene_type(SceneType::NONE)
 	, camera(nullptr)
 {
 }
