@@ -8,56 +8,73 @@
 
 class Camera;
 
-/**
- * シーンタイプ
- */
+/// <summary>
+/// シーンタイプ
+/// </summary>
 enum class SceneType : unsigned short
 {
-	SAMPLE_SCENE,
+	BOOT_SCENE,
+	TITLE_SCENE,
+	IN_GAME_SCENE,
 };
 
+/// <summary>
+/// シーンのステート
+/// </summary>
 enum class SceneState : unsigned short {
 	kPRESTART,
 	kPLAYING,
 	kEND
 };
 
-/**
- * シーンの基底クラス
- */
+/// <summary>
+/// シーンの基底クラス
+/// </summary>
 class SceneBase {
 public:
 	SceneBase();
 	virtual ~SceneBase();
 
 public:
-	/**
-	 * 初期化
-	 */
+	
+	/// <summary>
+	/// 初期化
+	/// </summary>
 	virtual void Initialize();
 
-	/**
-	 * 更新
-	 * @param	delta_seconds	前フレームとの差分時間(s)
-	 * @return	次に遷移するシーンタイプ
-	 */
+	/// <summary>
+	/// 更新
+	/// </summary>
+	/// <param name="delta_seconds">毎フレーム時間</param>
+	/// <returns>次に遷移するシーンタイプ</returns>
 	virtual SceneType Update(float delta_seconds);
 
-	/** 
-	 * 描画
-	 */
+	/// <summary>
+	/// 描画
+	/// </summary>
 	virtual void Draw();
 
-	/**
-	 * 解放
-	 */
+	/// <summary>
+	/// 解放
+	/// </summary>
 	virtual void Finalize();
 
-	/**
-	 * シーンタイプの取得
-	 * @return シーンタイプ
-	 */
+	/// <summary>
+	/// シーンタイプの取得
+	/// </summary>
+	/// <returns>シーンタイプ</returns>
 	virtual SceneType GetSceneType() const = 0;
+
+	/// <summary>
+	/// 削除予定のオブジェクトを予約
+	/// </summary>
+	/// <param name="delete_object">削除対象オブジェクト</param>
+	virtual void BookDeleteObject(GameObject* delete_object) { delete_objects_list.push_back(delete_object); }
+
+	/// <summary>
+	/// 削除予定のオブジェクトを削除
+	/// </summary>
+	virtual void DestroyBookDeleteObject();
 
 	/**
 	 * GameObjectの生成
@@ -113,14 +130,21 @@ public:
 	/// <returns>true: 衝突した false:衝突してない</returns>
 	bool CheckBoxCollision(StageObject* target, const BoxCollisionParams& collision_params, BoxCollisionParams& hit_collision_params);
 
-	virtual void BookDeleteObject(GameObject* object) { delete_objects_list.push_back(object); }
-	virtual void DestroyBookDeleteObject();
-
 protected:
-	// シーンで生成したオブジェクト
+	/// <summary>
+	/// シーンで生成したオブジェクト群
+	/// </summary>
 	std::vector<class GameObject*> objects;
+	/// <summary>
+	/// 削除予定のオブジェクトリスト
+	/// </summary>
 	std::vector<class GameObject*> delete_objects_list;
-	// スクロール用スクリーンオフセット
+	/// <summary>
+	/// スクロール用オフセット
+	/// </summary>
 	Vector2D screen_offset;
+	/// <summary>
+	/// カメラ
+	/// </summary>
 	Camera* camera;
 };

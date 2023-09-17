@@ -8,7 +8,7 @@
 #include "../Source/GameObject/StageObject/KillObject/Interface/IKillEvent.h"
 #include "../Source/GameObject/StageObject/Goal/Interface/IGoalEvent.h"
 
-class TitleSceneInterface 
+class IInGameScene 
 	: public CharacterEventInterface, public IPlayerEvent, public IEnemyEvent, public IGameStateEvent, public IItemEvent, public IUIEvent, public IKillEvent, public IGoalEvent {
 
 };
