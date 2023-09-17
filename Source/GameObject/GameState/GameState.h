@@ -77,6 +77,8 @@ public:
 	bool GetbIsClear() const;
 
 	void SetIGameStateEvent(IGameStateEvent* game_state_event_interface) { game_state_event = game_state_event_interface; }
+
+	///
 	//void GetBeforeState(DataSuccessor&);
 
 private:
@@ -130,6 +132,9 @@ private:
 	/// </summary>
 	bool is_clear;
 
+	/// <summary>
+	/// 残機UPを通知中か?
+	/// </summary>
 	bool is_inform_respawn_remain_up;
 
 	//TODO:: ResapwnManagerと同じ変数なので、後でUtility化出来ないか検討

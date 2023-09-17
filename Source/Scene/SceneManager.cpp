@@ -13,38 +13,31 @@ SceneManager::SceneManager()
 {
 }
 
-SceneManager::~SceneManager()
-{
-	Finalize();
+SceneManager::~SceneManager() {
 }
 
-void SceneManager::Initialize()
-{
-	// 開始シーンをSAMPLE_SCENEに設定
+void SceneManager::Initialize() {
+	//最初は必ずBoot画面から始まる
 	ChangeScene(SceneType::BOOT_SCENE);
 }
 
-void SceneManager::Update(float DeltaSeconds)
-{
-	// シーンの更新
+void SceneManager::Update(float DeltaSeconds) {
+
 	SceneType result_scene_type = current_scene->Update(DeltaSeconds);
 	current_scene->DestroyBookDeleteObject();
 
 	// 現在とUpdateから受け取ったシーンが別の場合、シーンの遷移を行う
-	if (result_scene_type != current_scene->GetSceneType())
-	{
+	if (result_scene_type != current_scene->GetSceneType()) {
 		ChangeScene(result_scene_type);
 	}
 
-	// 描画
 	Draw();
 }
 
-void SceneManager::Finalize()
-{
+void SceneManager::Finalize() {
+
 	// CurrentSceneの解放
-	if (current_scene != nullptr)
-	{
+	if (current_scene != nullptr) {
 		current_scene->Finalize();
 		delete current_scene;
 		current_scene = nullptr;
@@ -66,17 +59,17 @@ void SceneManager::Draw()
 	ScreenFlip();
 }
 
-void SceneManager::ChangeScene(SceneType new_scene_type)
-{
+void SceneManager::ChangeScene(SceneType new_scene_type) {
 	// シーンの生成
 	SceneBase* new_scene = CreateScene(new_scene_type);
 	assert(new_scene != nullptr);
 
 	// 現在のシーンの解放
 	// 最初のシーン生成時のみCurrentSceneがnullptr
-	if (current_scene != nullptr)
-	{
+	if (current_scene != nullptr) {
+
 		current_scene->Finalize();
+		InheritPreSceneData(*current_scene, *new_scene);
 		delete current_scene;
 	}
 
@@ -95,9 +88,16 @@ SceneBase* SceneManager::CreateScene(SceneType new_scene_type)
 	case SceneType::TITLE_SCENE:
 		return new TitleScene();
 
+	case SceneType::NEXT_STAGE:
+	//次のステージ==IN_GAME_SCENEのためフォースルー
 	case SceneType::IN_GAME_SCENE:	
 		return new InGameScene();
 	default:					
 		return nullptr;
 	}
+}
+
+void SceneManager::InheritPreSceneData(const SceneBase& pre_scene, SceneBase& new_scene) {
+	InheritInfo pre_game_data = pre_scene.GetInheritInfo();
+	new_scene.SetInheritInfo(pre_game_data);
 }

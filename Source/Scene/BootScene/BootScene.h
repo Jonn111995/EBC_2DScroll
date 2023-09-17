@@ -7,7 +7,6 @@ namespace {
 }
 
 enum class EBootSceneState {
-
 	kPLAYING,
 	kEND,
 };

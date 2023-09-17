@@ -44,6 +44,8 @@ void TitleScene::Finalize() {
 	sound_manager->StopSound(title_bgm);
 	sound_manager->UnLoadSoundResource(title_bgm);
 
+	inherit_info.stage_id = EStageID::kSTAGE_1_1;
+
 	DeleteGraph(title_graphic);
 	title_graphic = 0;
 	title_bgm = 0;

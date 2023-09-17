@@ -13,7 +13,10 @@ BootScene::~BootScene()
 
 void BootScene::Initialize() {
 	__super::Initialize();
-
+	inherit_info.score = 0;
+	inherit_info.respawn_remain = 0;
+	inherit_info.stage_name = "";
+	inherit_info.stage_id = EStageID::kNONE;
 }
 
 SceneType BootScene::Update(float delta_seconds) {

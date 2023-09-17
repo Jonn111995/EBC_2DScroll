@@ -36,7 +36,9 @@ public:
 	void SetUIState(EUIState ui_state) { this->ui_state = ui_state; }
 protected:
 	int ui_graphic;
+	int font_handle;
 	float display_count_time;
+
 	/// <summary>
 	/// UIƒCƒxƒ“ƒg
 	/// </summary>

@@ -274,7 +274,7 @@ void SampleScene::Initialize() {
 	finish_ui->SetIUIEvent(this);
 	
 	field = CreateObject<Field>();
-	field->InitializeField("C/Users/n5919/EBC_2DScroll/Source/CSVFile/mapdata.csv");
+	//field->InitializeField("C/Us);
 
 	CreateStageObject();
 

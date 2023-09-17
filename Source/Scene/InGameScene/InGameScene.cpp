@@ -1,4 +1,5 @@
 #include "InGameScene.h"
+#include <cassert>
 #include "DxLib.h"
 #include "../Camera.h"
 #include "../Source/System/ScreenInfo.h"
@@ -261,6 +262,25 @@ void InGameScene::CreateStageObject() {
 
 }
 
+SceneType InGameScene::CheckExistNextStage() {
+	//ゲーム状態を保存
+	inherit_info.score = game_state->GetScore();
+	inherit_info.respawn_remain = game_state->GetRespawnRemain();
+	inherit_info.stage_name = game_state->GetStageName();
+
+	//次ステージの確認とセット
+	int stage_id = static_cast<int>(inherit_info.stage_id);
+	stage_id++;
+	EStageID stage_id_enum = static_cast<EStageID>(stage_id);
+	inherit_info.stage_id = stage_id_enum;
+
+	if (stage_id_enum == EStageID::kNONE_STAGE) {
+		//仮。本当はリザルトレベルに遷移したい
+		return SceneType::BOOT_SCENE;
+	}
+	return SceneType::NEXT_STAGE;
+}
+
 InGameScene::InGameScene()
 {
 }
@@ -279,6 +299,8 @@ void InGameScene::Initialize() {
 
 	game_state = CreateObject<GameState>();
 	game_state->SetIGameStateEvent(this);
+	game_state->SetScore(inherit_info.score);
+	game_state->SetRespawnRemain(inherit_info.respawn_remain);
 	game_state_ui = CreateObject<GameStateUI>();
 	hp_ui = CreateObject<HpUI>();
 	start_ui = CreateObject<StartUI>();
@@ -287,7 +309,7 @@ void InGameScene::Initialize() {
 	finish_ui->SetIUIEvent(this);
 
 	field = CreateObject<Field>();
-	field->InitializeField("C/Users/n5919/EBC_2DScroll/Source/CSVFile/mapdata.csv");
+	assert(field->InitializeField(inherit_info.stage_id));
 
 	CreateStageObject();
 
@@ -300,7 +322,6 @@ void InGameScene::Initialize() {
 
 	camera->UpdateCamera(player->GetPosition());
 	for (auto& object : objects) {
-		object->SetPause();
 		object->OffActive();
 	}
 
@@ -315,8 +336,8 @@ void InGameScene::Initialize() {
 
 void InGameScene::Finalize() {
 	__super::Finalize();
-	SoundManager* sound_manager = SoundManager::GetInstance();
-	sound_manager->UnLoadSoundResource(in_game_bgm);
+
+	//SoundManager::GetInstance()->UnLoadAllSoundResource();
 	in_game_bgm = 0;
 }
 
@@ -326,12 +347,9 @@ SceneType InGameScene::Update(float delta_seconds) {
 		//ここでキャラを動かないようにする
 		for (auto& object : objects) {
 			object->SetPause();
-			object->OffActive();
 		}
 		field->OnActive();
 		play_scene_state = EPlaySceneState::kSTART_UI;
-
-		//return 
 		break;
 	case EPlaySceneState::kSTART_UI:
 		//StartUIを出す
@@ -339,17 +357,14 @@ SceneType InGameScene::Update(float delta_seconds) {
 		start_ui->OnActive();
 		start_ui->SetUIState(EUIState::kSHOW);
 		play_scene_state = EPlaySceneState::kWAIT_END_START_UI;
-
-		//return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kWAIT_END_START_UI:
 		//StartUIの表示が終わるまで待機
-
-	//	return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kPLAYING:
 	{
-		now_scen_type = __super::Update(delta_seconds);
+		//ゲーム進行中
+		now_scene_type = __super::Update(delta_seconds);
 		std::vector<StageObject*> stage_obj_list = field->GetStageObjectList();
 
 		for (int i = 0; i < delete_objects_list.size(); i++) {
@@ -382,11 +397,11 @@ SceneType InGameScene::Update(float delta_seconds) {
 
 		camera->UpdateCamera(player->GetPosition());
 
-		return now_scen_type;
+		return now_scene_type;
 		break;
 	}
 	case EPlaySceneState::kFINISH_UI:
-
+		//終了時UIを表示
 		SoundManager::GetInstance()->StopSound(in_game_bgm);
 		SoundManager::GetInstance()->PlayLoadSound(goal_sound);
 
@@ -405,20 +420,25 @@ SceneType InGameScene::Update(float delta_seconds) {
 		finish_ui->OnActive();
 		finish_ui->SetUIState(EUIState::kSHOW);
 		play_scene_state = EPlaySceneState::kWAIT_END_FINISH_UI;
-		//return __super::Update(delta_seconds);
 		break;
 	case EPlaySceneState::kWAIT_END_FINISH_UI:
-		//return __super::Update(delta_seconds);
+		//FInishUIの表示終了を待機。
 		break;
 	case EPlaySceneState::kPAUSE:
+		//TODO::未実装::ポーズ中
 		break;
 	case EPlaySceneState::kFINISH:
-		//return __super::Update(delta_seconds);
+	{
+		
+		play_scene_state = EPlaySceneState::kFinished;
+		return now_scene_type = CheckExistNextStage();
+	}
 		break;
 	case EPlaySceneState::kFinished:
+		return now_scene_type;
 		break;
 	}
-	return 	now_scen_type = __super::Update(delta_seconds);
+	return 	now_scene_type = __super::Update(delta_seconds);
 }
 
 void InGameScene::Draw() {

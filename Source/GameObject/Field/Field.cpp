@@ -1,12 +1,13 @@
 #include "Field.h"
 #include "DxLib.h"
 #include "../Source/System/ScreenInfo.h"
+#include "../Source/System/StageDetaPaths.h"
 #include <iostream>
 #include "../CSVData/CSVFile.h"
 #include "EMapChipType.h"
 #include "../Source/Utility/Vector2D.h"
 #include "../Source/Utility/BoxCollisionParams.h"
-#include "Ground/Ground.h";
+#include "Ground/Ground.h"
 #include "Ground/Wall.h"
 #include "Ground/Box.h"
 #include "../StageObject/Character/Character.h"
@@ -72,7 +73,7 @@ void Field::Draw(const Vector2D& screen_offset){
     DrawMap(screen_offset);
 }
 
-bool Field::InitializeField(const char* map_file_name){
+bool Field::InitializeField(EStageID stage_id){
 
     //グラフィックハンドル読み込み
     char file_name[100];
@@ -100,16 +101,18 @@ bool Field::InitializeField(const char* map_file_name){
     box_graphic_handle = LoadGraph("Resources/Images/mapchip_017.bmp");
     LoadDivGraph("Resources/Images/mapchip_017.bmp", 7, 4, 2, 32, 32, gimmick_box_graphic_handle);
 
-    //CSV読み込み
-	csv_file_reader = new CSVFile();
-	if (!csv_file_reader->Read(map_file_name)) {
-		std::cout << u8"マップの初期化に失敗しました" << std::endl;
-		return false;
-	}
-	map_data = csv_file_reader->GetData();
+    return BuildStage(stage_id);
 
-    ScreenInfo* screen_info = ScreenInfo::GetInstance();
-    screen_info->SetMapSize(map_data.at(map_data.size() - 1).size(), map_data.size());
+ //   //CSV読み込み
+	//csv_file_reader = new CSVFile();
+	//if (!csv_file_reader->Read(map_file_name)) {
+	//	std::cout << u8"マップの初期化に失敗しました" << std::endl;
+	//	return false;
+	//}
+	//map_data = csv_file_reader->GetData();
+
+ //   ScreenInfo* screen_info = ScreenInfo::GetInstance();
+ //   screen_info->SetMapSize(map_data.at(map_data.size() - 1).size(), map_data.size());
 }
 
 //bool Field::InitializeStageObjectPosition() {
@@ -229,6 +232,32 @@ bool Field::CheckHitGround(Vector2D& opponent_check_position, const Vector2D& op
         }
     }
     return true;
+}
+
+bool Field::BuildStage(EStageID stage_id) {
+  
+    csv_file_reader = new CSVFile();
+    if (!csv_file_reader->Read(GetStagePath(stage_id))) {
+        std::cout << u8"マップの初期化に失敗しました" << std::endl;
+        return false;
+    }
+
+    map_data = csv_file_reader->GetData();
+    ScreenInfo* screen_info = ScreenInfo::GetInstance();
+    screen_info->SetMapSize(map_data.at(map_data.size() - 1).size(), map_data.size());
+    return true;
+}
+
+const char* Field::GetStagePath(EStageID stage_id) {
+    switch (stage_id) {
+    case EStageID::kSTAGE_1_1:
+        return STAGE_1_1;
+    case EStageID::kSTAGE_1_2:
+        return STAGE_1_2;
+    default:
+        return "no_data";
+        break;
+    }
 }
 
 void Field::DrawMap(const Vector2D& screen_offset) {

@@ -1,9 +1,11 @@
 #pragma once
 #include "../GameObject.h"
+#include "../Source/Scene/EStageID.h"
 #include <vector>
 #include "../Source/Utility/Vector2D.h"
 #include "../Source/Utility/BoxCollisionParams.h"
 #include "EMapChipType.h"
+#include "../Source/Scene/EStageID.h"
 
 class Character;
 class StageObject;
@@ -30,7 +32,7 @@ public:
 	/// </summary>
 	/// <param name="map_file_name">読み込むマップデータファイル</param>
 	/// <returns>true: 初期化成功 false:　初期化失敗</returns>
-	bool InitializeField(const char* map_file_name);
+	bool InitializeField(EStageID stage_id);
 
 	/*/// <summary>
 	/// キャラクターの初期位置を検索し、セットする
@@ -162,6 +164,9 @@ private:
 
 
 private:
+
+	bool BuildStage(const EStageID stage_id);
+	const char* GetStagePath(const EStageID stage_id);
 	/// <summary>
 	/// マップを描画する
 	/// </summary>
