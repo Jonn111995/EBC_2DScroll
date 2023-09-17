@@ -15,12 +15,11 @@ void SceneBase::Initialize() {
 	camera = new Camera();
 }
 
-SceneType SceneBase::Update(float delta_seconds)
-{
+SceneType SceneBase::Update(float delta_seconds) {
+
 	for (auto iterator = objects.begin(); iterator != objects.end(); ++iterator) {
 		(*iterator)->Update(delta_seconds);
 	}
-
 	return GetSceneType();
 }
 
@@ -36,15 +35,14 @@ void SceneBase::Draw() {
 		if ((*iterator)->GetActivation() == EActivation::kNONE_ACTIVE) {
 			continue;
 		}
-
 		(*iterator)->Draw(screen_offset);
 	}
 }
 
 void SceneBase::Finalize() {
-	DestroyAllObjects();
 	delete camera;
 	camera = nullptr;
+	DestroyAllObjects();
 }
 
 void SceneBase::DestroyObject(const GameObject* object) {
@@ -54,17 +52,14 @@ void SceneBase::DestroyObject(const GameObject* object) {
 
 	// 削除対象の検索
 	auto iterator = objects.begin();
-	for (; iterator != objects.end(); ++iterator)
-	{
-		if ((*iterator) == object)
-		{
+	for (; iterator != objects.end(); ++iterator) {
+		if ((*iterator) == object){
 			break;
 		}
 	}
 
 	// 見つからなかった場合は抜ける
-	if (iterator == objects.end())
-	{
+	if (iterator == objects.end()) {
 		return;
 	}
 
@@ -75,8 +70,7 @@ void SceneBase::DestroyObject(const GameObject* object) {
 }
 
 void SceneBase::DestroyAllObjects() {
-	for (auto iterator = objects.begin(); iterator != objects.end(); ++iterator)
-	{
+	for (auto iterator = objects.begin(); iterator != objects.end(); ++iterator) {
 		(*iterator)->Finalize();
 		delete (*iterator);
 	}
@@ -95,12 +89,11 @@ bool SceneBase::CheckBoxCollision(StageObject* target, const BoxCollisionParams&
 		//distance_ｘがマイナスであれば、基準のオブジェクトが他方よりも右にある。
 		//distance_yがマイナスであれば。基準のオブジェクトが他方よりも上にある
 	
-
 		//差が微小の場合は当たったと見なすための処理
-		if (abs(distance_x - size_x) <= .1f) {
+		if (abs(distance_x - size_x) <= 0.1f) {
 			distance_x = size_x;
 		}
-		if (abs(distance_y - size_y) <= .1f) {
+		if (abs(distance_y - size_y) <= 0.1f) {
 			distance_y = size_y;
 		}
 

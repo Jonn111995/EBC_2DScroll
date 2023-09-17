@@ -44,13 +44,12 @@ void SoundManager::UnLoadSoundResource(int sound_handle) {
 		if (it->second == sound_handle) {
 			
 			it = loaded_sounds.erase(it);
+			DeleteSoundMem(sound_handle);
 		}
 		else {
 			++it;
 		}
 	}
-
-	DeleteSoundMem(sound_handle);
 }
 
 void SoundManager::UnLoadAllSoundResource() {

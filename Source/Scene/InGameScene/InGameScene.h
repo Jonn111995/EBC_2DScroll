@@ -65,11 +65,13 @@ public:
 	/// </summary>
 	/// <param name="weapon">使用した武器</param>
 	virtual void AddWeapon(BaseWeapon& weapon) override;
+
 	/// <summary>
 	/// 武器オブジェクトを当たり判定配列から削除する
 	/// </summary>
 	/// <param name="weapon">使用した武器</param>
 	virtual void RemoveWeapon(BaseWeapon* weapon) override;
+
 	/// <summary>
 	/// HPを与えるイベント
 	/// </summary>
@@ -77,16 +79,19 @@ public:
 	/// <param name="opponent_chara">ダメージを受けるオブジェクト</param>
 	/// <param name="damage">ダメージ数</param>
 	virtual void GiveDamageEvent(StageObject& give_gamage_chara, const StageObject& opponent_chara, const int damage) override;
+
 	/// <summary>
 	/// HPUIの値を更新する
 	/// </summary>
 	/// <param name="now_hp">新しいHP</param>
 	virtual void UpdateHpUI(const int now_hp) override;
+
 	/// <summary>
 	/// 残機数を更新する
 	/// </summary>
 	/// <param name="respawn_remain">新しい残機数</param>
 	virtual void UpdateRespawnRemainUI(const int respawn_remain) override;
+
 	/// <summary>
 	/// スコアを更新する
 	/// </summary>
@@ -98,6 +103,11 @@ public:
 	/// </summary>
 	/// <param name="dead_object"></param>
 	virtual void DeadEvent(StageObject* dead_object) override;
+
+	/// <summary>
+	/// プレイヤーを死亡状態に変える
+	/// </summary>
+	/// <param name="kill_target"></param>
 	virtual void KillEvent(const StageObject* kill_target) override;
 
 	/// <summary>
@@ -105,7 +115,13 @@ public:
 	/// </summary>
 	/// <returns>リスポーン成功</returns>
 	virtual bool ExecuteRespawn() override;
+
+	/// <summary>
+	/// UIの表示終了時イベント
+	/// </summary>
+	/// <param name="ui_component"></param>
 	virtual void FInishUI(UIComponent* ui_component) override;
+
 	/// <summary>
 	/// ゲームクリア処理を実行
 	/// </summary>
@@ -135,33 +151,55 @@ public:
 	/// </summary>
 	/// <param name="draw_postion"></param>
 	virtual void GetDrawInformPositon(Vector2D& draw_postion) override;
+
 	/// <summary>
 	/// プレイヤーを敵が索敵する
 	/// </summary>
 	/// <param name="enemy">索敵する敵</param>
 	/// <returns> true: 発見した false: 発見出来なかった</returns>
 	virtual bool SerchPlayer(Enemy* enemy) override;
+
 	/// <summary>
 	/// 時間UIを更新する
 	/// </summary>
 	/// <param name="remain_time">残り時間</param>
 	virtual void UpdateTimeUI(int remain_time) override;
+
 	/// <summary>
 	/// 制限時間オーバーのイベント
 	/// </summary>
 	virtual void TimeOver() override;
 	virtual void FinishInvincibleState() override;
 
+private:
+	/// <summary>
+	/// ステージオブジェクトを生成する
+	/// </summary>
+	void CreateStageObject();
+
+	SceneType CheckExistNextStage();
 
 private:
-	void CreateStageObject();
-private:
+	/// <summary>
+	/// ステージ背景
+	/// </summary>
 	int in_game_back_graphic;
+
+	/// <summary>
+	/// プレイ中のBGM
+	/// </summary>
 	int in_game_bgm;
+
+	/// <summary>
+	/// 無敵状態時のBGM
+	/// </summary>
 	int invincible_bgm;
+
+	/// <summary>
+	/// ゴールした時の効果音
+	/// </summary>
 	int goal_sound;
 
-	SceneType now_scen_type;
 	/// <summary>
 	/// Play Sceneのステート
 	/// </summary>
@@ -197,8 +235,13 @@ private:
 	/// </summary>
 	HpUI* hp_ui;
 
+	/// <summary>
+	/// スタート時UI
+	/// </summary>
 	StartUI* start_ui;
+
+	/// <summary>
+	/// 終了時UI
+	/// </summary>
 	FinishUI* finish_ui;
-
-
 };

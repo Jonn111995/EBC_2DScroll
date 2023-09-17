@@ -1,6 +1,8 @@
 #include "DxLib.h"
 
 #include "System/SystemTypes.h"
+#include "System/SoundManager.h"
+#include "System/ScreenInfo.h"
 #include "Scene/SceneManager.h"
 
 // プログラムは WinMain から始まります
@@ -20,6 +22,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// 透過色を設定
 	SetTransColor(TRANS_COLOR_R, TRANS_COLOR_G, TRANS_COLOR_B);
 
+	//シングルトンの生成
+	ScreenInfo::CreateInstance();
+	SoundManager::CreateInstance();
+	ScreenInfo::GetInstance()->Initialize();
+	SoundManager::GetInstance()->Initialize();
+
 	// SceneManagerの生成
 	SceneManager* scene_manager = new SceneManager();
 	scene_manager->Initialize();
@@ -36,16 +44,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		float delta_seconds = (float)(current_frame_time - prev_frame_time) / 1000.0f;
 		prev_frame_time = current_frame_time;
 		
-
 		// SceneManagerの更新
 		scene_manager->Update(delta_seconds);
 
-		if (GetNowCount() - prev_frame_time < loop_time)
-		{
+		if (GetNowCount() - prev_frame_time < loop_time) {
 			Sleep(loop_time - (GetNowCount() - prev_frame_time));
 		}
-
 	}
+
+	//シングルトン破棄
+	ScreenInfo::DeleteInstance();
+	SoundManager::DeleteInstance();
 
 	// SceneManagerの破棄
 	scene_manager->Finalize();

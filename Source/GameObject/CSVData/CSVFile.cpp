@@ -17,11 +17,10 @@ bool CSVFile::Read(const char* file_name){
 
     std::string Data;
     std::string ConmmaData;
-
     std::vector<std::string> MapInfo;
-    const char* file = "C:/Users/n5919/EBC_2DScroll/Source/CSVFile/map_data.csv";
+
     // 読み込むcsvファイルを開く(std::ifstreamのコンストラクタで開く)
-    std::ifstream IfsCsvFile(file, std::ios::in);
+    std::ifstream IfsCsvFile(file_name, std::ios::in);
 
     if (!IfsCsvFile) {
         std::cout << u8"ファイルが開けませんでした。" << std::endl;
@@ -52,11 +51,10 @@ bool CSVFile::Read(const char* file_name){
         //追加し終わったら、二次元配列の方へ一行分の配列を入れる
         map_data.push_back(OneLineMapData);
 
-        //アイテム情報をリセット。しないと前のアイテム情報が残ってしまう
+        //情報をリセットしないと次のループで前の情報が残ってしまう
         MapInfo.clear();
 
     }
-    //CSVファイルを閉じる
     IfsCsvFile.close();
 	return true;
 }

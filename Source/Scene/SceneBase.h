@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include "InheritInfo.h"
 #include "../Utility/Vector2D.h"
 #include "../GameObject/GameObject.h"
 #include "../GameObject/StageObject/StageObject.h"
@@ -16,6 +17,7 @@ enum class SceneType : unsigned short
 	BOOT_SCENE,
 	TITLE_SCENE,
 	IN_GAME_SCENE,
+	NEXT_STAGE
 };
 
 /// <summary>
@@ -36,7 +38,6 @@ public:
 	virtual ~SceneBase();
 
 public:
-	
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -130,21 +131,47 @@ public:
 	/// <returns>true: 衝突した false:衝突してない</returns>
 	bool CheckBoxCollision(StageObject* target, const BoxCollisionParams& collision_params, BoxCollisionParams& hit_collision_params);
 
+	/// <summary>
+	/// 引継ぎ情報をセット
+	/// </summary>
+	/// <param name="inherit_info">引き継ぐ情報</param>
+	void SetInheritInfo(InheritInfo inherit_info) { this->inherit_info = inherit_info; }
+
+	/// <summary>
+	/// 引継ぎ情報を取得
+	/// </summary>
+	/// <returns>引き継がれた情報</returns>
+	InheritInfo GetInheritInfo() const { return inherit_info; }
+
 protected:
 	/// <summary>
-	/// シーンで生成したオブジェクト群
+	/// 引継ぎ情報
+	/// スコア、残機数、ステージ名、ステージIDを保持する
 	/// </summary>
-	std::vector<class GameObject*> objects;
-	/// <summary>
-	/// 削除予定のオブジェクトリスト
-	/// </summary>
-	std::vector<class GameObject*> delete_objects_list;
+	InheritInfo inherit_info;
+
 	/// <summary>
 	/// スクロール用オフセット
 	/// </summary>
 	Vector2D screen_offset;
+
+	/// <summary>
+	/// 現在のシーンタイプ
+	/// </summary>
+	SceneType now_scene_type;
+
 	/// <summary>
 	/// カメラ
 	/// </summary>
 	Camera* camera;
+
+	/// <summary>
+	/// シーンで生成したオブジェクト群
+	/// </summary>
+	std::vector<class GameObject*> objects;
+
+	/// <summary>
+	/// 削除予定のオブジェクトリスト
+	/// </summary>
+	std::vector<class GameObject*> delete_objects_list;
 };
