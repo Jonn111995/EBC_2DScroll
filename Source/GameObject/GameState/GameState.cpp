@@ -5,7 +5,7 @@
 #include "../Source/Utility/Vector2D.h"
 
 namespace {
-	const int RESPAWN_REMAIN_APP = 1;
+	const int RESPAWN_REMAIN_APP = 5;
 	const float INFORM_TIME = 1.f;
 	const float TIME_UP = 0.f;
 
@@ -82,7 +82,7 @@ void GameState::Update(float delta_seconds) {
 void GameState::Draw(const Vector2D& screen_offset) {
 	__super::Draw(screen_offset);
 	if (is_inform_respawn_remain_up) {
-		unsigned int color = GetColor(255, 255, 255);
+		unsigned int color = GetColor(255, 255, 0);
 		int str_length = strlen(INFORM_UP_RESPAEN_RMAIN);
 		int draw_width = GetDrawStringWidth(INFORM_UP_RESPAEN_RMAIN, str_length);
 

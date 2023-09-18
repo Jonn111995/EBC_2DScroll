@@ -3,5 +3,5 @@ class StageObject;
 
 class IStageObjectInterface {
 public:
-	virtual void DeadEvent(StageObject* dead_object) = 0;
+	virtual void GetDrawInformPositon(Vector2D& draw_postion) = 0;
 };

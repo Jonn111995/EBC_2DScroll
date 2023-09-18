@@ -12,7 +12,6 @@ Camera::~Camera()
 }
 
 void Camera::UpdateCamera(const Vector2D& chase_target_position) {
-
 	ScreenInfo* screen_info = ScreenInfo::GetInstance();
 
 	if (screen_info != nullptr) {
@@ -43,7 +42,6 @@ void Camera::UpdateCamera(const Vector2D& chase_target_position) {
 }
 
 Vector2D Camera::GetScreenOffset() const {
-
 	ScreenInfo* screen_info = ScreenInfo::GetInstance();
 
 	if (screen_info != nullptr) {

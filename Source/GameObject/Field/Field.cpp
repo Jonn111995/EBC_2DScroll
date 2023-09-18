@@ -15,24 +15,22 @@
 
 
 namespace {
+    /// <summary>
+    /// マップチップサイズ
+    /// </summary>
     const float MAP_CHIP_SIZE = 32.f;
-    const float wall_y_size = 40.f;
-    const float box_y_size = 40.f;
-    const float ground_y_size = 48.f;
-    const float half = 2.0f;
-    const int vector_index_adjust = 1;
-    const int initialize_ignore_limit = -1;
-    const int zero_ground_data = 0;
 
-    //地面の画像枚数
+    //壁の画像枚数
     const int wall_mapchip_file_num = 3;
-    //画像データの連番数
+
+    //壁画像データの連番数
     //1枚目の連番になる。
     const int wall_first_sequence = 0;
 
     //地面の画像枚数
     const int ground_mapchip_file_num = 9;
-    //画像データの連番数
+
+    //地面画像データの連番数
     //1枚目の連番になる。
     const int ground_first_sequence = 37;
 }
@@ -101,39 +99,9 @@ bool Field::InitializeField(EStageID stage_id){
     box_graphic_handle = LoadGraph("Resources/Images/mapchip_017.bmp");
     LoadDivGraph("Resources/Images/mapchip_017.bmp", 7, 4, 2, 32, 32, gimmick_box_graphic_handle);
 
+    //ステージ生成
     return BuildStage(stage_id);
-
- //   //CSV読み込み
-	//csv_file_reader = new CSVFile();
-	//if (!csv_file_reader->Read(map_file_name)) {
-	//	std::cout << u8"マップの初期化に失敗しました" << std::endl;
-	//	return false;
-	//}
-	//map_data = csv_file_reader->GetData();
-
- //   ScreenInfo* screen_info = ScreenInfo::GetInstance();
- //   screen_info->SetMapSize(map_data.at(map_data.size() - 1).size(), map_data.size());
 }
-
-//bool Field::InitializeStageObjectPosition() {
-//    
-//    for (auto& stage_obj : stage_object_list) {
-//        BoxCollisionParams stage_object_collision = stage_obj->GetBodyCollision();
-//        switch (stage_object_collision.object_type) {
-//
-//        case kPLAYER_TYPE:
-//            SetInitialPosition(*stage_obj, kPLAYER_START);
-//            break;
-//        case kENEMY_TYPE:
-//            SetInitialPosition(*stage_obj, kBASE_ENEMY);
-//            break;
-//        case kITEM_TYPE:
-//            SetInitialPosition(*stage_obj, kCOIN);
-//            break;
-//        }
-//    }
-//    return false;
-//}
 
 void Field::AddStageObject(StageObject& stage_object) {
     stage_object_list.push_back(&stage_object);
@@ -163,6 +131,10 @@ bool Field::CheckMoveToX(const Vector2D& move_to_position, const Vector2D& move_
     { opponent_center,opponent_x_leftup,opponent_x_rightup,opponent_x_leftdown,opponent_x_rightdown,opponent_x_leftmiddle,opponent_x_rightmiddle };
 
     for(auto& check_position : check_positions) {
+        Vector2D size = ScreenInfo::GetInstance()->GetMapSize();
+        if (check_position.x < 0 || check_position.x > size.x) {
+            return false;
+        }
         if (!CheckHitGround(check_position, opponent_center, collision)) {
 
             return false;
@@ -191,6 +163,10 @@ bool Field::CheckMoveToY(const Vector2D& move_to_position, const Vector2D& move_
 
 
     for (auto& check_position : check_positions) {
+        Vector2D size = ScreenInfo::GetInstance()->GetMapSize();
+        if (check_position.y < 0 || check_position.y > size.y) {
+            return false;
+        }
         if (!CheckHitGround(check_position, opponent_center, collision)) {
             return false;
         }
@@ -316,9 +292,9 @@ void Field::DrawMap(const Vector2D& screen_offset) {
             int display_y_top = static_cast<int>(screen_info->GetLeftY()) + MAP_CHIP_SIZE * y;
             //マップ全体におけるマップチップの座標から、スクリーン座標の左上座標を引く
             DrawGraph(display_x_top - screen_offset.x, display_y_top - screen_offset.y, graphic_handle, true);
-            //デバック用
-            unsigned int color = GetColor(255, 255, 255);
-            DrawBox(display_x_top - screen_offset.x, display_y_top - screen_offset.y, display_x_top - screen_offset.x + x_graphic_size, display_y_top - screen_offset.y + y_graphic_size, color, false);
+            ////デバック用
+            //unsigned int color = GetColor(255, 255, 255);
+            //DrawBox(display_x_top - screen_offset.x, display_y_top - screen_offset.y, display_x_top - screen_offset.x + x_graphic_size, display_y_top - screen_offset.y + y_graphic_size, color, false);
         }
     }
 }

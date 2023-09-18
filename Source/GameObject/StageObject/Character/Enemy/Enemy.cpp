@@ -110,9 +110,6 @@ void Enemy::Update(float delta_time) {
 }
 
 void Enemy::Draw(const Vector2D& screen_offset) {
-	//デバック用
-	unsigned int color = GetColor(255, 0, 0);
-	DrawFormatString(0, 32, color, "X=%f, Y=%f:::::", body_collision.center_position2.x, body_collision.center_position2.y);
 	__super::Draw(screen_offset);
 }
 

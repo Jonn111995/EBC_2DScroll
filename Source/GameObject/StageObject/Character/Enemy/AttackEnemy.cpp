@@ -71,14 +71,11 @@ void AttackEnemy::Update(float delta_time) {
 }
 
 void AttackEnemy::Draw(const Vector2D& screen_offset) {
-	unsigned int color = GetColor(255, 0, 0);
-	DrawFormatString(0, 64, color, "X=%f, Y=%f:::::", serch_range.serch_range_center.x, serch_range.serch_range_center.y);
 
-	
-	int x2 = serch_range.serch_range_center.x - serch_range.serch_range_extent.x -screen_offset.x;
-	int y2 = serch_range.serch_range_center.y - serch_range.serch_range_extent.y -screen_offset.y;
-	//デバック用
-	DrawBox(x2, y2, x2 + serch_range.serch_range_extent.x * 2, y2 + serch_range.serch_range_extent.y * 2, color, false);
+	//int x2 = serch_range.serch_range_center.x - serch_range.serch_range_extent.x -screen_offset.x;
+	//int y2 = serch_range.serch_range_center.y - serch_range.serch_range_extent.y -screen_offset.y;
+	////デバック用
+	//DrawBox(x2, y2, x2 + serch_range.serch_range_extent.x * 2, y2 + serch_range.serch_range_extent.y * 2, GetColor(255, 0, 0), false);
 
 	__super::Draw(screen_offset);
 

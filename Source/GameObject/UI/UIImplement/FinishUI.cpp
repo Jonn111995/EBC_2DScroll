@@ -34,7 +34,7 @@ void FinishUI::Update(float delta_seconds) {
 
 			display_count_time += delta_seconds;
 
-			if (display_count_time >= DISPLAY_TIME) {
+			if (CheckHitKey(KEY_INPUT_RETURN)) {
 
 				display_count_time = 0.0f;
 

@@ -26,5 +26,4 @@ public:
 	/// ステージID
 	/// </summary>
 	EStageID stage_id = EStageID::kNONE;
-
 };

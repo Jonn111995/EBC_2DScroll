@@ -81,7 +81,7 @@ void Character::Draw(const Vector2D& screen_offset) {
 	int y2 = body_collision.center_position2.y - screen_offset.y - body_collision.box_extent.y;
 
 	//デバック用
-	DrawBox(x2, y2, x2 + body_collision.box_extent.x * 2, y2 + body_collision.box_extent.y * 2, color, false);
+	//DrawBox(x2, y2, x2 + body_collision.box_extent.x * 2, y2 + body_collision.box_extent.y * 2, color, false);
 
 }
 
