@@ -5,7 +5,8 @@
 #include"../Source/GameObject/StageObject/Character/Character.h"
 
 namespace {
-    float INFORM_TIME = 1.f;
+    const float INFORM_TIME = 1.f;
+    const char* PASS_POINT_INFORM = "Pass Check Point!!";
 }
 
 RespawnManager::RespawnManager()
@@ -91,8 +92,13 @@ void RespawnManager::Draw(const Vector2D& screen_offset) {
     switch (now_state) {
     case ERespawnManagerState::kINFORM_PASS_POINT:
         if (is_pass_check_point) {
+            Vector2D inform_position;
+            stage_object_event->GetDrawInformPositon(inform_position);
             unsigned int color = GetColor(255, 0, 0);
-            DrawFormatString(0, static_cast<float>(180+ inform_movement), color, "pass check point!!");
+            int str_length = strlen(PASS_POINT_INFORM);
+            int draw_width = GetDrawStringWidth(PASS_POINT_INFORM, str_length);
+
+            DrawFormatString(inform_position.x - screen_offset.x - (draw_width / 2), static_cast<float>(inform_position.y - screen_offset.y + inform_movement), color, PASS_POINT_INFORM);
         }
         break;
     default:

@@ -12,6 +12,7 @@ class StartUI;
 class FinishUI;
 class RespawnManager;
 
+
 enum class EPlaySceneState : unsigned short {
 
 	kPRE_START,			//準備中
@@ -27,20 +28,24 @@ enum class EPlaySceneState : unsigned short {
 };
 
 /// <summary>
-///	プレイ画面
+///	ゲームプレイ画面
 /// </summary>
-class InGameScene : public SceneBase, public IInGameScene
-{
+class InGameScene : public SceneBase, public IInGameScene {
 public:
 	InGameScene();
 	virtual ~InGameScene();
 
 public:
 	//~ Begin SceneBase interface
+	/// <inheritdoc />
 	virtual void Initialize() override;
+	/// <inheritdoc />
 	virtual void Finalize() override;
-	virtual SceneType Update(float delta_seconds) override;
+	/// <inheritdoc />
+	virtual SceneType Update(const float delta_time) override;
+	/// <inheritdoc />
 	virtual void Draw() override;
+	/// <inheritdoc />
 	virtual SceneType GetSceneType() const override { return SceneType::IN_GAME_SCENE; }
 	//~ End SceneBase interface
 
@@ -52,6 +57,7 @@ public:
 	/// <param name="collision">衝突判定を行うオブジェクトのコリジョン</param>
 	/// <returns>true: 衝突している　false:衝突していない</returns>
 	virtual bool CheckCanMoveToX(const Vector2D& now_position, const Vector2D& move_amount, const BoxCollisionParams& collision) override;
+
 	/// <summary>
 	/// Y方向に衝突があるかチェック
 	/// </summary>
@@ -60,6 +66,7 @@ public:
 	/// <param name="collision">衝突判定を行うオブジェクトのコリジョン</param>
 	/// <returns>true: 衝突している　false:衝突していない</returns>
 	virtual bool CheckCanMoveToY(const Vector2D& now_position, const Vector2D& move_amount, const BoxCollisionParams& collision) override;
+
 	/// <summary>
 	/// 武器オブジェクトを当たり判定チェック配列に追加する
 	/// </summary>
@@ -73,7 +80,8 @@ public:
 	virtual void RemoveWeapon(BaseWeapon* weapon) override;
 
 	/// <summary>
-	/// HPを与えるイベント
+	/// ダメージを与えるイベント
+	/// 衝突判定がtrueになると、敵や武器から呼ばれる
 	/// </summary>
 	/// <param name="give_gamage_chara">ダメージを与えるオブジェクト</param>
 	/// <param name="opponent_chara">ダメージを受けるオブジェクト</param>
@@ -101,25 +109,31 @@ public:
 	/// <summary>
 	/// キャラの死亡イベント
 	/// </summary>
-	/// <param name="dead_object"></param>
+	/// <param name="dead_object">死亡したオブジェクト</param>
 	virtual void DeadEvent(StageObject* dead_object) override;
 
 	/// <summary>
 	/// プレイヤーを死亡状態に変える
 	/// </summary>
-	/// <param name="kill_target"></param>
+	/// <param name="kill_target">Killするオブジェクト</param>
 	virtual void KillEvent(const StageObject* kill_target) override;
 
 	/// <summary>
 	/// リスポーン処理を実行
 	/// </summary>
-	/// <returns>リスポーン成功</returns>
+	/// <returns>true: リスポーン成功 false: リスポーン不可</returns>
 	virtual bool ExecuteRespawn() override;
+
+	/// <summary>
+	/// UI表示を終わらせて良いか確認
+	/// </summary>
+	/// <returns></returns>
+	virtual bool CheckCanFinishUI() override;
 
 	/// <summary>
 	/// UIの表示終了時イベント
 	/// </summary>
-	/// <param name="ui_component"></param>
+	/// <param name="ui_component">イベントを呼び出したUI</param>
 	virtual void FInishUI(UIComponent* ui_component) override;
 
 	/// <summary>
@@ -127,23 +141,22 @@ public:
 	/// </summary>
 	virtual void GameClear() override;
 
-
 	//~ Begin Item Interface
-
 	/// <summary>
 	/// GameStateのScoreを増加
 	/// </summary>
 	virtual void ScoreUp() override;
+
 	/// <summary>
 	/// プレイヤーを無敵状態に変更
 	/// </summary>
 	virtual void ChangeInvincible(const float invincible_time) override;
+
 	/// <summary>
 	/// アイテムを削除
 	/// </summary>
-	/// <param name="delete_object"></param>
+	/// <param name="delete_object">削除するアイテム</param>
 	virtual void DestroyItem(StageObject& delete_object) override;
-
 	//~ End Item Interface
 
 	/// <summary>
@@ -169,14 +182,59 @@ public:
 	/// 制限時間オーバーのイベント
 	/// </summary>
 	virtual void TimeOver() override;
+
+	/// <summary>
+	/// 無敵状態が終わったことをSceneに通知する
+	/// </summary>
 	virtual void FinishInvincibleState() override;
 
 private:
 	/// <summary>
+	/// ゲームステートを生成、初期化
+	/// </summary>
+	/// <returns></returns>
+	bool CreateGameState();
+
+	/// <summary>
+	/// ゲームステージを生成、初期化
+	/// </summary>
+	/// <returns></returns>
+	bool CreateStage();
+
+	/// <summary>
+	/// UIを生成、初期化
+	/// </summary>
+	/// <returns></returns>
+	bool CreateUI();
+
+	/// <summary>
 	/// ステージオブジェクトを生成する
 	/// </summary>
-	void CreateStageObject();
+	bool CreateStageObject();
 
+	/// <summary>
+	/// リスポーンマネージャーを生成する
+	/// </summary>
+	/// <returns></returns>
+	bool CreateRespawnManager();
+
+	/// <summary>
+	/// ステージオブジェクトを削除する
+	/// </summary>
+	/// <param name="stage_object_list"></param>
+	void RemoveStageObject(std::vector<StageObject*> stage_object_list);
+
+	/// <summary>
+	/// 衝突判定を行う
+	/// </summary>
+	/// <param name="stage_obj_list"></param>
+	void CheckCollisionHit(std::vector<StageObject*> stage_obj_list);
+
+	/// <summary>
+	/// 次のステージのIDを確認する
+	/// 次のステージがあれば、NEXT_SCENE, 無ければ BOOT_SCENEを返す
+	/// </summary>
+	/// <returns></returns>
 	SceneType CheckExistNextStage();
 
 private:
@@ -199,6 +257,11 @@ private:
 	/// ゴールした時の効果音
 	/// </summary>
 	int goal_sound;
+
+	/// <summary>
+	/// ゲームオーバー時の効果音
+	/// </summary>
+	int game_over_bgm;
 
 	/// <summary>
 	/// Play Sceneのステート

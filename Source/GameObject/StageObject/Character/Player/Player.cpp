@@ -18,7 +18,7 @@ Player::Player()
 	, invincible_time(DEFAULT_INVINCIBLE_TIME)
 {
 	SetAttack(10);
-	SetHp(10);
+	//SetHp(10);
 }
 
 Player::~Player()
@@ -162,9 +162,6 @@ void Player::Update(float delta_time) {
 }
 
 void Player::Draw(const Vector2D& screen_offset) {
-	//デバック用
-	unsigned int color = GetColor(255, 0, 0);
-	DrawFormatString(0, 0, color, "X=%f, Y=%f:::::", body_collision.center_position2.x, body_collision.center_position2.y);
 
 	if (player_state == kDAMAGE || is_no_damage) {
 		if (((int)(count_time * 10) % (int)(0.2f * 10)) == 0.f) {

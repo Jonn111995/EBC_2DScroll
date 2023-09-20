@@ -52,8 +52,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 	}
 
-	//シングルトン破棄
+	//シングルトンの終了処理と破棄
 	ScreenInfo::DeleteInstance();
+
+	SoundManager::GetInstance()->UnLoadAllSoundResource();
 	SoundManager::DeleteInstance();
 
 	// SceneManagerの破棄

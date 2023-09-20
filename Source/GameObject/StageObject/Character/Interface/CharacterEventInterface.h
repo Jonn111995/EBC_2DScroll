@@ -1,5 +1,5 @@
 #pragma once
-#include "../Source/GameObject/StageObject/Interface/IStageObjectInterface.h"
+
 class BaseWeapon;
 class StageObject;
 class Character;
@@ -7,7 +7,7 @@ class Character;
 /// <summary>
 /// キャラクター共通イベント
 /// </summary>
-class CharacterEventInterface : public IStageObjectInterface {
+class CharacterEventInterface {
 
 public:
 
@@ -17,4 +17,5 @@ public:
 	virtual void RemoveWeapon(BaseWeapon* weapon) = 0;
 	virtual void GiveDamageEvent(StageObject& give_gamage_chara, const StageObject& opponent_chara, const int damage) = 0;
 	virtual void UpdateHpUI(const int now_hp) = 0;
+	virtual void DeadEvent(StageObject* dead_object) = 0;
 };

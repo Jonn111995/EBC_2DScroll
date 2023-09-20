@@ -14,6 +14,7 @@ class Camera;
 /// </summary>
 enum class SceneType : unsigned short
 {
+	NONE,
 	BOOT_SCENE,
 	TITLE_SCENE,
 	IN_GAME_SCENE,
@@ -48,7 +49,7 @@ public:
 	/// </summary>
 	/// <param name="delta_seconds">毎フレーム時間</param>
 	/// <returns>次に遷移するシーンタイプ</returns>
-	virtual SceneType Update(float delta_seconds);
+	virtual SceneType Update(const float delta_time);
 
 	/// <summary>
 	/// 描画
@@ -73,20 +74,20 @@ public:
 	virtual void BookDeleteObject(GameObject* delete_object) { delete_objects_list.push_back(delete_object); }
 
 	/// <summary>
-	/// 削除予定のオブジェクトを削除
+	/// 削除予定のオブジェクトを破棄
 	/// </summary>
 	virtual void DestroyBookDeleteObject();
 
-	/**
-	 * GameObjectの生成
-	 * Templateで指定したGameObjectクラスを派生したクラスのインスタンス生成する
-	 * @param	Position	初期位置
-	 * @return	生成したGameObject
-	 */
+	/// <summary>
+	/// GameObjectの生成
+	/// Templateで指定したGameObjectクラスを派生したクラスのインスタンス生成する
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="position">初期位置</param>
+	/// <returns>生成したGameObject</returns>
 	template <class T>
 	T* CreateObject(const Vector2D& position = Vector2D(0.0f,0.0f))
 	{
-		// GameObjectの生成
 		T* new_instance = new T();
 		GameObject* new_object = dynamic_cast<GameObject*>(new_instance);
 
@@ -98,28 +99,31 @@ public:
 			return nullptr;
 		}
 
-		// GameObjectの初期化
+		/* GameObjectは座標情報を持たないので、
+		座標情報を持つStageObjectを継承している時のみ座標をセットする*/
 		StageObject* stage_object = nullptr;
 		if (stage_object = dynamic_cast<StageObject*>(new_object)) {
 			stage_object->SetPosition(position);
 	    }
+
 		new_object->Initialize();
+		//objectsに入れることで、各オブジェクトのUpdateとDraw関数を呼べるようにしている。
 		objects.push_back(new_object);
 
 		return new_instance;
 	}
 
-	/**
-	 * GameObjectの破棄
-	 * GameObjectを破棄し、配列から削除する
-	 * @param	object	破棄するオブジェクト
-	 */
+	/// <summary>
+	/// GameObjectの破棄
+	/// GameObjectを破棄し、配列から削除する
+	/// </summary>
+	/// <param name="object">破棄するオブジェクト</param>
 	void DestroyObject(const class GameObject* object);
 
-	/**
-	 * 全てのGameObjectの破棄
-	 * シーンに生成されている全てのオブジェクトを破棄する
-	 */
+	/// <summary>
+	/// 全てのGameObjectの破棄
+	// シーンに生成されている全てのオブジェクトを破棄する
+	/// </summary>
 	void DestroyAllObjects();
 
 	/// <summary>
@@ -152,6 +156,7 @@ protected:
 
 	/// <summary>
 	/// スクロール用オフセット
+	/// Cameraオブジェクトの座標から現在描画する左上座標を算出し、その値を入れる。
 	/// </summary>
 	Vector2D screen_offset;
 

@@ -1,9 +1,11 @@
 #pragma once
 #include <vector>
 #include "../GameObject.h"
+#include "../StageObject/Interface/IStageObjectInterface.h"
 #include "../Source/Utility/Vector2D.h"
 
 class Character;
+IStageObjectInterface;
 
 /// <summary>
 /// リスポーンマネージャのステート
@@ -60,6 +62,8 @@ public:
 	/// キャラクターのリスポーンを実行
 	/// </summary>
 	void RespawnObject();
+
+	void SetIStageObjectEvent(IStageObjectInterface* stage_object_event) { this->stage_object_event = stage_object_event; }
 private:
 
 	ERespawnManagerState now_state;
@@ -67,6 +71,8 @@ private:
 	/// 追跡するオブジェクト
 	/// </summary>
 	Character* observe_object;
+
+	IStageObjectInterface* stage_object_event;
 
 	/// <summary>
 	/// 現在のチェックポイント

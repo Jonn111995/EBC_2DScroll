@@ -2,15 +2,18 @@
 #include <string>
 #include "../SceneBase.h"
 
-namespace {
-	const SceneType NEXT_SCENE = SceneType::TITLE_SCENE;
-}
-
+/// <summary>
+/// BootSceneのステート
+/// </summary>
 enum class EBootSceneState {
 	kPLAYING,
 	kEND,
 };
 
+/// <summary>
+/// 起動画面
+/// 現在は、ただの演出用途
+/// </summary>
 class BootScene : public SceneBase {
 public:
 	BootScene();
@@ -18,35 +21,44 @@ public:
 public:
 	/// <inheritdoc />
 	virtual void Initialize();
-
 	/// <inheritdoc />
-	virtual SceneType Update(float delta_seconds);
-
+	virtual SceneType Update(float delta_time);
 	/// <inheritdoc />
 	virtual void Draw();
-
 	/// <inheritdoc />
 	virtual void Finalize();
-
 	/// <inheritdoc />
 	virtual SceneType GetSceneType()const override { return SceneType::BOOT_SCENE; };
-
-	/// <inheritdoc />
-	virtual void BookDeleteObject(GameObject* delete_object) { delete_objects_list.push_back(delete_object); }
-
-	/// <inheritdoc />
-	virtual void DestroyBookDeleteObject();
+public:
+	/// <summary>
+	/// Boot文字のアニメーションを更新
+	/// </summary>
+	/// <param name="delta_time"></param>
+	void UpdateBootAnimation(const float delta_time);
 private:
+
+	/// <summary>
+	/// Bootステート
+	/// </summary>
 	EBootSceneState boot_scene_state;
 
-	//bootの文字を格納する変数。
-	std::string boot_array_[4] = { "Boot   ","Boot.  ","Boot.. ","Boot..." };
+	/// <summary>
+	/// bootの文字を格納する
+	/// </summary>
+	std::string boot_array[4];
 
-	//boot_array_から一つ選ばれた文字を代入する変数
-	std::string use_boot_;
+	/// <summary>
+	/// boot_array_から一つ選ばれた文字を代入する
+	/// </summary>
+	std::string use_boot;
 
-	//配列の要素番号を指定する変数
-	float boot_array_num_;
+	/// <summary>
+	/// 配列の要素番号を指定するインデクス番号
+	/// </summary>
+	float boot_array_num;
 
+	/// <summary>
+	/// カウント時間
+	/// </summary>
 	float boot_count_time;
 };
