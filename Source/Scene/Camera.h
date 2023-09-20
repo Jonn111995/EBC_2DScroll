@@ -15,11 +15,13 @@ public:
 	/// </summary>
 	/// <param name="chase_target_position">画面の中心に捉えるオブジェクト</param>
 	void UpdateCamera(const Vector2D& chase_target_position);
+
 	/// <summary>
 	/// カメラの座標を取得
 	/// </summary>
 	/// <returns>カメラ座標</returns>
 	Vector2D GetCameraPosition() const { return camera_position; }
+
 	/// <summary>
 	/// オフセットを取得
 	/// 描画する範囲の左上原点。
@@ -27,16 +29,19 @@ public:
 	/// </summary>
 	/// <returns>オフセット</returns>
 	Vector2D GetScreenOffset() const;
+
 	/// <summary>
 	/// ワールド座標のXY軸の大きさをセット
 	/// </summary>
 	/// <param name="size">ワールド座標のサイズ</param>
 	void SetOverallMapWidth(const Vector2D size) { overall_map_size = size; }
+
 private:
 	/// <summary>
 	/// カメラ座標
 	/// </summary>
 	Vector2D camera_position;
+
 	/// <summary>
 	/// ワールド座標のサイズ
 	/// </summary>

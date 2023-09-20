@@ -34,20 +34,26 @@ void TitleScene::Initialize() {
 	sound_manager->PlayLoadSound(title_bgm, true);
 }
 
-SceneType TitleScene::Update(float delta_seconds) {
-	
+SceneType TitleScene::Update(const float delta_time) {
+	__super::Update(delta_time);
+
 	if (CheckHitKey(KEY_INPUT_RETURN)) {
+
 		SoundManager* sound_manager = SoundManager::GetInstance();
 		sound_manager->PlayLoadSound(decide_sound);
+
 		return NEXT_SCENE;
 	}
+
 	return GetSceneType();
 }
 
 void TitleScene::Draw() {
 	__super::Draw();
+
 	const int HALF = 2;
 	ScreenInfo* screen_info = ScreenInfo::GetInstance();
+
 	//”wŒi‚ð•`‰æ
 	DrawGraph(screen_info->GetLeftX(), screen_info->GetLeftY(), title_graphic, true);
 

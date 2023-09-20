@@ -42,7 +42,7 @@ public:
 	/// <inheritdoc />
 	virtual void Finalize() override;
 	/// <inheritdoc />
-	virtual SceneType Update(float delta_seconds) override;
+	virtual SceneType Update(const float delta_time) override;
 	/// <inheritdoc />
 	virtual void Draw() override;
 	/// <inheritdoc />
@@ -57,6 +57,7 @@ public:
 	/// <param name="collision">衝突判定を行うオブジェクトのコリジョン</param>
 	/// <returns>true: 衝突している　false:衝突していない</returns>
 	virtual bool CheckCanMoveToX(const Vector2D& now_position, const Vector2D& move_amount, const BoxCollisionParams& collision) override;
+
 	/// <summary>
 	/// Y方向に衝突があるかチェック
 	/// </summary>
@@ -65,6 +66,7 @@ public:
 	/// <param name="collision">衝突判定を行うオブジェクトのコリジョン</param>
 	/// <returns>true: 衝突している　false:衝突していない</returns>
 	virtual bool CheckCanMoveToY(const Vector2D& now_position, const Vector2D& move_amount, const BoxCollisionParams& collision) override;
+
 	/// <summary>
 	/// 武器オブジェクトを当たり判定チェック配列に追加する
 	/// </summary>
@@ -127,6 +129,7 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	virtual bool CheckCanFinishUI() override;
+
 	/// <summary>
 	/// UIの表示終了時イベント
 	/// </summary>
@@ -143,10 +146,12 @@ public:
 	/// GameStateのScoreを増加
 	/// </summary>
 	virtual void ScoreUp() override;
+
 	/// <summary>
 	/// プレイヤーを無敵状態に変更
 	/// </summary>
 	virtual void ChangeInvincible(const float invincible_time) override;
+
 	/// <summary>
 	/// アイテムを削除
 	/// </summary>
@@ -189,23 +194,40 @@ private:
 	/// </summary>
 	/// <returns></returns>
 	bool CreateGameState();
+
 	/// <summary>
 	/// ゲームステージを生成、初期化
 	/// </summary>
 	/// <returns></returns>
 	bool CreateStage();
+
 	/// <summary>
 	/// UIを生成、初期化
 	/// </summary>
 	/// <returns></returns>
 	bool CreateUI();
+
 	/// <summary>
 	/// ステージオブジェクトを生成する
 	/// </summary>
 	bool CreateStageObject();
 
+	/// <summary>
+	/// リスポーンマネージャーを生成する
+	/// </summary>
+	/// <returns></returns>
+	bool CreateRespawnManager();
+
+	/// <summary>
+	/// ステージオブジェクトを削除する
+	/// </summary>
+	/// <param name="stage_object_list"></param>
 	void RemoveStageObject(std::vector<StageObject*> stage_object_list);
 
+	/// <summary>
+	/// 衝突判定を行う
+	/// </summary>
+	/// <param name="stage_obj_list"></param>
 	void CheckCollisionHit(std::vector<StageObject*> stage_obj_list);
 
 	/// <summary>
@@ -214,7 +236,6 @@ private:
 	/// </summary>
 	/// <returns></returns>
 	SceneType CheckExistNextStage();
-
 
 private:
 	/// <summary>

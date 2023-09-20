@@ -31,6 +31,8 @@ void BootScene::Initialize() {
 }
 
 SceneType BootScene::Update(float delta_seconds) {
+	__super::Update(delta_seconds);
+
 	switch (boot_scene_state) {
 	case EBootSceneState::kPLAYING:
 		//1•b–¢–‚¾‚Á‚½‚ç—İÏŠÔ‚É–ˆƒtƒŒ[ƒ€‚ÌŠÔ‚ğ‘«‚·B

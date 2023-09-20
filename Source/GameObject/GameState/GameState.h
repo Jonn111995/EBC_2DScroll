@@ -3,11 +3,7 @@
 #include "../GameObject.h"
 
 class IGameStateEvent;
-//enum class EGameStatePhase {
-//	kPRE_START,
-//	KPLAYING,
-//	kEND
-//};
+
 /// <summary>
 /// ƒQ[ƒ€‘S‘Ì‚Ìó‘Ô‚ğŠÇ—
 /// </summary>

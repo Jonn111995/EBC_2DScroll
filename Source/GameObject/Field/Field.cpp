@@ -7,9 +7,7 @@
 #include "EMapChipType.h"
 #include "../Source/Utility/Vector2D.h"
 #include "../Source/Utility/BoxCollisionParams.h"
-#include "Ground/Ground.h"
-#include "Ground/Wall.h"
-#include "Ground/Box.h"
+
 #include "../StageObject/Character/Character.h"
 #include <vector>
 

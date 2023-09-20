@@ -13,39 +13,41 @@ public:
 	virtual ~SceneManager();
 
 public:
-	/**
-	 * 初期化
-	 */
+	/// <summary>
+	/// 初期化
+	/// </summary>
 	void Initialize();
 
-	/**
-	 * 更新
-	 * @param delta_seconds	前フレームとの差分時間(s)
-	 */
-	void Update(float delta_seconds);
+	/// <summary>
+	/// 更新
+	/// SceneのUpdateを呼ぶ
+	/// </summary>
+	/// <param name="delta_time">前フレームとの差分時間(s)</param>
+	void Update(const float delta_time);
 
-	/**
-	 * 解放
-	 */
+	/// <summary>
+	/// 解放
+	/// </summary>
 	void Finalize();
 
 private:
-	/**
-	 * 描画
-	 */
+	
+	/// <summary>
+	/// 描画
+	/// </summary>
 	void Draw();
 
-	/**
-	 * シーンの遷移
-	 * @param	new_scene_type	遷移したいシーン
-	 */
+	/// <summary>
+	/// シーンの遷移
+	/// </summary>
+	/// <param name="new_scene_type">遷移したいシーン</param>
 	void ChangeScene(SceneType new_scene_type);
 
-	/**
-	 * シーンの生成
-	 * @param	new_scene_type	生成する新しいシーン
-	 * @return	生成したシーン
-	 */
+	/// <summary>
+	/// シーンの生成
+	/// </summary>
+	/// <param name="new_scene_type">生成する新しいシーン</param>
+	/// <returns>生成したシーン</returns>
 	class SceneBase* CreateScene(SceneType new_scene_type);
 
 	/// <summary>

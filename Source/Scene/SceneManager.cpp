@@ -21,9 +21,9 @@ void SceneManager::Initialize() {
 	ChangeScene(SceneType::BOOT_SCENE);
 }
 
-void SceneManager::Update(float DeltaSeconds) {
+void SceneManager::Update(const float delta_time) {
 
-	SceneType result_scene_type = current_scene->Update(DeltaSeconds);
+	SceneType result_scene_type = current_scene->Update(delta_time);
 	current_scene->DestroyBookDeleteObject();
 
 	// 現在とUpdateから受け取ったシーンが別の場合、シーンの遷移を行う
@@ -98,6 +98,7 @@ SceneBase* SceneManager::CreateScene(SceneType new_scene_type)
 }
 
 void SceneManager::InheritPreSceneData(const SceneBase& pre_scene, SceneBase& new_scene) {
+
 	InheritInfo pre_game_data = pre_scene.GetInheritInfo();
 	new_scene.SetInheritInfo(pre_game_data);
 }

@@ -18,9 +18,6 @@ enum class EWeaponDirection {
 class BaseWeapon : public StageObject {
 
 public:
-	
-
-public:
 
 	BaseWeapon();
 	virtual ~BaseWeapon();

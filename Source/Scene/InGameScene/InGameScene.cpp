@@ -6,7 +6,6 @@
 #include "../Camera.h"
 #include "../Source/System/ScreenInfo.h"
 #include "../Source/System/SoundManager.h"
-#include "../../GameObject/SampleObject/SampleObject.h"
 #include "../Source/GameObject/StageObject/Character/Player/Player.h"
 #include "../Source/GameObject/Field/Field.h"
 #include "../Source/GameObject/StageObject/Character/Enemy/Enemy.h"
@@ -54,11 +53,9 @@ void InGameScene::Initialize() {
 	assert(CreateUI());
 	assert(CreateStage());
 	assert(CreateStageObject());
+	assert(CreateRespawnManager());
 
-	respawn_manager = CreateObject<RespawnManager>();
-	respawn_manager->SetIStageObjectEvent(this);
-	respawn_manager->SetCheckPointList(field->GetCheckPointList());
-	respawn_manager->SetObserveObject(*player);
+	//オフセットを計算するため、プレイヤーの位置を入れる。
 	camera->UpdateCamera(player->GetPosition());
 
 	//描画させないようにしたいため
@@ -74,6 +71,7 @@ void InGameScene::Initialize() {
 	invincible_bgm = sound_manager->LoadSoundResource("Resources/Sounds/BGM/bgm_Invincible.mp3");
 	game_over_bgm = sound_manager->LoadSoundResource("Resources/Sounds/BGM/bgm_game_over.mp3");
 
+	//開始
 	sound_manager->PlayLoadSound(in_game_bgm, true);
 	play_scene_state = EPlaySceneState::kPRE_START;
 }
@@ -104,8 +102,12 @@ void InGameScene::Finalize() {
 	finish_ui = nullptr;
 }
 
-SceneType InGameScene::Update(float delta_seconds) {
+SceneType InGameScene::Update(const float delta_time) {
+
+	//TODO::Updateを常に呼び出しても問題ないように修正
+
 	switch (play_scene_state) {
+
 	case EPlaySceneState::kPRE_START:
 		//ここでキャラを動かないようにする
 		for (auto& object : objects) {
@@ -114,6 +116,7 @@ SceneType InGameScene::Update(float delta_seconds) {
 		field->OnActive();
 		play_scene_state = EPlaySceneState::kSTART_UI;
 		break;
+
 	case EPlaySceneState::kSTART_UI:
 		//StartUIを出す
 		start_ui->SetPlaying();
@@ -121,13 +124,15 @@ SceneType InGameScene::Update(float delta_seconds) {
 		start_ui->SetUIState(EUIState::kSHOW);
 		play_scene_state = EPlaySceneState::kWAIT_END_START_UI;
 		break;
+
 	case EPlaySceneState::kWAIT_END_START_UI:
 		//StartUIの表示が終わるまで待機
 		break;
+
 	case EPlaySceneState::kPLAYING:
 	{
 		//ゲーム進行中
-		now_scene_type = __super::Update(delta_seconds);
+		now_scene_type = __super::Update(delta_time);
 		std::vector<StageObject*> stage_obj_list = field->GetStageObjectList();
 
 		RemoveStageObject(stage_obj_list);
@@ -137,6 +142,7 @@ SceneType InGameScene::Update(float delta_seconds) {
 		return now_scene_type;
 		break;
 	}
+
 	case EPlaySceneState::kFINISH_UI:
 		//終了時UIを表示
 		
@@ -159,24 +165,33 @@ SceneType InGameScene::Update(float delta_seconds) {
 		finish_ui->SetUIState(EUIState::kSHOW);
 		play_scene_state = EPlaySceneState::kWAIT_END_FINISH_UI;
 		break;
+
 	case EPlaySceneState::kWAIT_END_FINISH_UI:
 		player->SetEnd();
 		//FInishUIの表示終了を待機。
 		break;
+
 	case EPlaySceneState::kPAUSE:
 		//TODO::未実装::ポーズ中
 		break;
+
 	case EPlaySceneState::kFINISH:
 	{
 			play_scene_state = EPlaySceneState::kFinished;
 			return now_scene_type = CheckExistNextStage();
 	}
 	break;
+
 	case EPlaySceneState::kFinished:
 		return now_scene_type;
 		break;
+
+	default:
+		break;
 	}
-	return 	now_scene_type = __super::Update(delta_seconds);
+
+
+	return 	now_scene_type = __super::Update(delta_time);
 }
 
 void InGameScene::Draw() {
@@ -203,16 +218,20 @@ void InGameScene::RemoveWeapon(BaseWeapon* weapon) {
 
 void InGameScene::GiveDamageEvent(StageObject& give_gamage_chara, const StageObject& opponent_chara, const int damage) {
 
+	//キャラクターの処理を呼び出したい為
 	Character* receive_damage_chara = nullptr;
 	Character* chara = dynamic_cast<Character*>(&give_gamage_chara);
 
 	if (chara != nullptr) {
+		//ダメージを受けるキャラのポインタがconstで、キャスト出来ないので、
+		//配列から一致するオブジェクトを検索し、見つけたものをキャストする。
 		for (auto& obj : field->GetStageObjectList()) {
 			if (obj == &opponent_chara) {
 				receive_damage_chara = dynamic_cast<Character*>(obj);
 			}
 		}
 
+		//ダメージ中は攻撃を受けないようにする。
 		if (receive_damage_chara != nullptr) {
 			if (!receive_damage_chara->GetIsNoDamage()) {
 				chara->GiveDamage(*receive_damage_chara, damage);
@@ -238,13 +257,16 @@ void InGameScene::DeadEvent(StageObject* dead_object) {
 }
 
 void InGameScene::KillEvent(const StageObject* kill_target) {
+
 	if (kill_target == player && player->GetPlayerState() != EPlayerState::kDEAD) {
 		player->SetDeadState();
 	}
 }
 
 bool InGameScene::ExecuteRespawn() {
+
 	game_state->ReduceRespawnRemain();
+
 	//残機があるか確認
 	if (game_state->GetRespawnRemain() == 0) {
 		//ゲームオーバー処理
@@ -259,6 +281,7 @@ bool InGameScene::ExecuteRespawn() {
 }
 
 bool InGameScene::CheckCanFinishUI() {
+
 	if (!CheckSoundMem(goal_sound)) {
 		return true;
 	}
@@ -321,16 +344,18 @@ void InGameScene::GetDrawInformPositon(Vector2D& draw_postion) {
 bool InGameScene::SerchPlayer(Enemy* enemy) {
 
 	AttackEnemy* attack_enemy = dynamic_cast<AttackEnemy*>(enemy);
+
 	if (attack_enemy != nullptr) {
 
 		BoxCollisionParams player_collision = player->GetBodyCollision();
+
+		/*CheckBoxCollisionの引数がBoxCollisionParamsなので、
+		索敵範囲の値を取得して、BoxCollisionParamsに格納し、衝突判定を行う。*/
 		BoxCollisionParams enemy_serch_range;
 		enemy_serch_range.center_position2 = enemy->GetSerchRange().serch_range_center;
 		enemy_serch_range.box_extent = enemy->GetSerchRange().serch_range_extent;
 
-		bool check = CheckBoxCollision(attack_enemy->GetEquipWeapon(), enemy_serch_range, player_collision);
-
-		return check;
+		return CheckBoxCollision(attack_enemy->GetEquipWeapon(), enemy_serch_range, player_collision);
 	}
 
 	return false;
@@ -474,6 +499,21 @@ bool InGameScene::CreateStageObject() {
 	return true;
 }
 
+bool InGameScene::CreateRespawnManager() {
+
+	respawn_manager = CreateObject<RespawnManager>();
+
+	if (respawn_manager == nullptr) {
+		return false;
+	}
+
+	respawn_manager->SetIStageObjectEvent(this);
+	respawn_manager->SetCheckPointList(field->GetCheckPointList());
+	respawn_manager->SetObserveObject(*player);
+
+	return false;
+}
+
 void InGameScene::RemoveStageObject(std::vector<StageObject*> stage_object_list) {
 
 	for (int i = 0; i < delete_objects_list.size(); i++) {
@@ -495,13 +535,16 @@ void InGameScene::CheckCollisionHit(std::vector<StageObject*> stage_obj_list) {
 			BoxCollisionParams own = (*iterator)->GetBodyCollision();
 			BoxCollisionParams opponent = (*oppnent_iterator)->GetBodyCollision();
 
+			//以下の場合は衝突判定を行わない
 			if (iterator == oppnent_iterator || (*oppnent_iterator)->GetGameObjectState() == EGameObjectState::kEND) {
 				continue;
 			}
+
 			if (own.collision_type == kOverlap || opponent.collision_type == kOverlap) {
 				continue;
 			}
 
+			//問題無ければ衝突判定を行う。
 			if (CheckBoxCollision(*iterator, own, opponent)) {
 				(*iterator)->OnHitBoxCollision(*oppnent_iterator, opponent);
 			}

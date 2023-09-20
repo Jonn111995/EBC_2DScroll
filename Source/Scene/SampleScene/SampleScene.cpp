@@ -1,7 +1,6 @@
 #include "SampleScene.h"
 #include "../Camera.h"
 #include "../Source/System/ScreenInfo.h"
-#include "../../GameObject/SampleObject/SampleObject.h"
 #include "../Source/GameObject/StageObject/Character/Player/Player.h"
 #include "../Source/GameObject/Field/Field.h"
 #include "../Source/GameObject/StageObject/Character/Enemy/Enemy.h"

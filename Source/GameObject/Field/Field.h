@@ -176,12 +176,5 @@ private:
 	/// 地面のグラフィックを取得。
 	/// </summary>
 	int GetGroundGraphic(const int x, const int y);
-
-	/*/// <summary>
-	/// 初期位置をセットする
-	/// </summary>
-	/// <param name="stage_obj"></param>
-	/// <param name="chip_type"></param>
-	void SetInitialPosition(StageObject& stage_obj, const MapChipType chip_type);*/
 };
 

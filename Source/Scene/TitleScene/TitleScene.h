@@ -12,7 +12,7 @@ public:
 	/// <inheritdoc />
 	virtual void Initialize() override;
 	/// <inheritdoc />
-	virtual SceneType Update(float delta_seconds) override;
+	virtual SceneType Update(const float delta_time) override;
 	/// <inheritdoc />
 	virtual void Draw() override;
 	/// <inheritdoc />
@@ -25,14 +25,19 @@ private:
 	/// タイトル画面の背景
 	/// </summary>
 	int title_graphic;
+
 	/// <summary>
 	/// 決定ボタンの効果音
 	/// </summary>
 	int decide_sound;
+
 	/// <summary>
 	/// タイトル画面のBGM
 	/// </summary>
 	int title_bgm;
 
+	/// <summary>
+	/// タイトル文字のフォントハンドル
+	/// </summary>
 	int title_font;
 };

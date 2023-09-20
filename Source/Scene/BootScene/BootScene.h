@@ -22,7 +22,7 @@ public:
 	/// <inheritdoc />
 	virtual void Initialize();
 	/// <inheritdoc />
-	virtual SceneType Update(float delta_seconds);
+	virtual SceneType Update(float delta_time);
 	/// <inheritdoc />
 	virtual void Draw();
 	/// <inheritdoc />
