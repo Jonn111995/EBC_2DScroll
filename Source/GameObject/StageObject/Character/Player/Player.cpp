@@ -40,6 +40,7 @@ void Player::Initialize() {
 	body_collision.hit_object_types = kENEMY_TYPE | kWEAPON_TYPE | kKILL_TYPE;
 	body_collision.object_type = kPLAYER_TYPE;
 	game_object_state = EGameObjectState::kPLAYING;
+	SetSpeed(MOVEMENT_SPEED);
 
 	SoundManager* sound_manager = SoundManager::GetInstance();
 	jump_sound = sound_manager->LoadSoundResource("Resources/Sounds/SE/Action/se_jump.mp3");
@@ -97,27 +98,19 @@ void Player::Update(float delta_time) {
 			}
 		}
 
+		//無敵状態チェック
+		if (is_no_damage) {
+			CheckKeepInvincible(delta_time);
+		}
+
 		//更新後の座標と比較して、移動量を出すため取得。
 		Vector2D pre_position = GetPosition();
 
-		if (is_no_damage) {
-			count_time += delta_time;
-
-			if (count_time > invincible_time) {
-				ChangePlayerState(kIDLE);
-				is_no_damage = false;
-				is_use_item = false;
-				invincible_time = DEFAULT_INVINCIBLE_TIME;
-				count_time = 0.f;
-
-				//player_event->FinishInvincibleState();
-			}
-		}
-
 		switch (player_state) {
 		case kJUMP:
-			JumpMove(delta_time);
-			
+			initial_velocity += GRAVITY_ACCELARATION;
+			input_direction.x *= AIR_RESISTANCE;
+			input_direction.y = initial_velocity;
 			break;
 		case kDAMAGE:
 			count_time += delta_time;
@@ -125,10 +118,10 @@ void Player::Update(float delta_time) {
 			if (count_time < 0.1f) {
 				is_reject_input = true;
 				input_direction = knock_back_dir;
-				Move(delta_time);
 			}
 			else if (count_time > 0.4f) {
-				ChangePlayerState(kINVINCIBLE);
+				is_reject_input = false;
+				ChangeInvincible();
 			}
 			break;
 		case kATTACK:
@@ -141,13 +134,13 @@ void Player::Update(float delta_time) {
 				CallDestroy();
 			}
 			break;
-		case kINVINCIBLE:
-			//無敵状態の時は移動処理もさせたいので、breakを置かずにフォースルーする。
 		default:
-			//移動処理はCharacterに任せる
-			__super::Update(delta_time);
 			break;
 		}
+
+		//移動処理はCharacterに任せる
+		//Updateをどんな状態で呼んでも不具合が起きずに動くように実装する
+		__super::Update(delta_time);
 
 		ChangeAnimState(delta_time, GetPosition() - pre_position);
 		break;
@@ -214,10 +207,6 @@ void Player::EnterState() {
 	case kATTACK:
 		Attack();
 		break;
-	case kINVINCIBLE:
-		is_reject_input = false;
-		is_no_damage = true;
-		break;
 	case kDAMAGE:
 		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
 		break;
@@ -248,9 +237,6 @@ void Player::ExitState() {
 	case kATTACK:
 		character_event->RemoveWeapon(equip_weapon);
 		break;
-	case kINVINCIBLE:
-		
-		break;
 	case kDAMAGE:
 		//body_collision.collision_type = kBLOCK;
 		break;
@@ -262,7 +248,7 @@ void Player::ExitState() {
 }
 
 void Player::SetInvincibleState() {
-	ChangePlayerState(kINVINCIBLE);
+	ChangeInvincible();
 }
 
 void Player::SetDeadState() {
@@ -412,6 +398,7 @@ void Player::CallDestroy() {
 		__super::CallDestroy();
 	}
 	else {
+		InitialWhenRespawn();
 		ChangePlayerState(kIDLE);
 	}
 }
@@ -458,3 +445,56 @@ void Player::JumpMove(const float delta_time) {
 	body_collision.center_position2 += amount;
 	SetPosition(new_position);
 }
+
+void Player::ChangeInvincible() {
+	is_no_damage = true;
+}
+
+void Player::CheckKeepInvincible(const float delta_time) {
+
+	count_time += delta_time;
+
+	if (count_time > invincible_time) {
+		ChangePlayerState(kIDLE);
+		is_no_damage = false;
+		is_use_item = false;
+		invincible_time = DEFAULT_INVINCIBLE_TIME;
+		count_time = 0.f;
+
+		//player_event->FinishInvincibleState();
+	}
+}
+
+void Player::InitialWhenRespawn() {
+	bIsCanJump = true;
+	count_time = 0.f;
+	is_no_damage = false;
+	is_use_item = false;
+	is_reject_input = false;
+}
+
+float Player::UpdateXPosition(const bool is_can_move_to_x, const float update_x_amount) {
+	return __super::UpdateXPosition(is_can_move_to_x, update_x_amount);
+}
+
+
+float Player::UpdateYPosition(const bool is_can_move_to_y, const float update_y_amount) {
+
+	switch (player_state) {
+	case kJUMP:
+		if (!is_can_move_to_y) {
+
+			bIsCanJump = true;
+			initial_velocity = RESET_INITIAL_VELOCITY;
+			ChangePlayerState(kIDLE);
+			return  GetPosition().y;
+		}
+		else {
+			return GetPosition().y + update_y_amount;
+		}
+		break;
+	default:
+		return __super::UpdateYPosition(is_can_move_to_y, update_y_amount);
+	}
+}
+

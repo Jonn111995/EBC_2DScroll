@@ -508,10 +508,11 @@ bool InGameScene::CreateRespawnManager() {
 	}
 
 	respawn_manager->SetIStageObjectEvent(this);
+	//ステージ上のチェックポイントの座標を全て取得
 	respawn_manager->SetCheckPointList(field->GetCheckPointList());
 	respawn_manager->SetObserveObject(*player);
 
-	return false;
+	return true;
 }
 
 void InGameScene::RemoveStageObject(std::vector<StageObject*> stage_object_list) {

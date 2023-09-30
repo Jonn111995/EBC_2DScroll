@@ -41,24 +41,29 @@ public:
 	/// プレイヤーイベントをセット
 	/// </summary>
 	void SetIPlayerEvent(IPlayerEvent* player_event) { this->player_event = player_event; }
+
 	/// <summary>
 	/// 無敵時間をセット
 	/// </summary>
 	/// <param name="time">毎フレーム時間</param>
 	void SetInvincibleTime(float time) { invincible_time = time; };
+
 	/// <summary>
 	/// アイテムを使用中か？
 	/// </summary>
 	/// <param name="is_use">使用しているかどうか?</param>
 	void SetIsUseItem(bool is_use) { is_use_item = is_use; }
+
 	/// <summary>
 	/// 無敵ステートに変更
 	/// </summary>
 	void SetInvincibleState();
+
 	/// <summary>
 	/// プレイヤーのステートを取得
 	/// </summary>
 	EPlayerState GetPlayerState() const { return player_state; };
+
 	/// <summary>
 	/// 死亡ステートに変更
 	/// </summary>
@@ -69,6 +74,15 @@ protected:
 	/// プレイヤーイベント
 	/// </summary>
 	IPlayerEvent* player_event;
+
+	/// <summary>
+	/// ジャンプ時の効果音
+	/// </summary>
+	int jump_sound;
+
+	/// <summary>
+	/// 死亡時の演出音
+	/// </summary>
 	int dead_sound;
 
 private:
@@ -117,8 +131,6 @@ private:
 	/// </summary>
 	bool is_reject_input;
 
-	int jump_sound;
-
 protected:
 	/// <summary>
 	/// プレイヤーの状態を変更する
@@ -132,6 +144,15 @@ protected:
 	/// <param name="delta_move_amount">更新前と後の移動量の差</param>
 	void ChangeAnimState(const float delta_time, const Vector2D& delta_move_amount);
 
+	void ChangeInvincible();
+
+	void CheckKeepInvincible(const float delta_time);
+
+	/// <summary>
+	/// 死亡後、フラグ等を全て初期化
+	/// </summary>
+	virtual void InitialWhenRespawn();
+
 	/// <summary>
 	/// 攻撃を開始
 	/// </summary>
@@ -142,7 +163,17 @@ protected:
 	/// </summary>
 	virtual void StopAttack();
 
+	virtual float UpdateXPosition(const bool is_can_move_to_x, const float update_x_amount) override;
+	virtual float UpdateYPosition(const bool is_can_move_to_y, const float update_y_amount) override;
+
+	/// <summary>
+	/// 死亡時のアニメーション
+	/// </summary>
 	virtual bool DeadMove(const float delta_time) override;
+
+	/// <summary>
+	/// 死亡処理を実行
+	/// </summary>
 	virtual void CallDestroy() override;
 
 private:

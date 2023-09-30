@@ -222,6 +222,9 @@ protected:
     /// <param name="delta_time">毎フレーム時間</param>
     virtual void Move(float delta_time);
 
+    virtual float UpdateXPosition(const bool is_can_move_to_x, const float update_x_amount);
+    virtual float UpdateYPosition(const bool is_can_move_to_y, const float update_y_amount);
+
     /// <summary>
     /// キャラの向きを反対に変更。
     /// </summary>

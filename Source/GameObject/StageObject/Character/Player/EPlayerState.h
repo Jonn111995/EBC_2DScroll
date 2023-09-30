@@ -3,14 +3,13 @@
 /// <summary>
 /// ƒvƒŒƒCƒ„[‚Ìˆ—ó‘Ô
 /// </summary>
-enum EPlayerState {
+enum EPlayerState{
 
 	kIDLE,
 	kWALK,
 	kRUN,
 	kJUMP,
 	kATTACK,
-	kINVINCIBLE,
 	kDAMAGE,
 	kDEAD
 };
