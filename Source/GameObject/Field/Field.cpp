@@ -212,7 +212,7 @@ bool Field::BuildStage(EStageID stage_id) {
   
     csv_file_reader = new CSVFile();
     if (!csv_file_reader->Read(GetStagePath(stage_id))) {
-        std::cout << u8"マップの初期化に失敗しました" << std::endl;
+        MessageBox(0, "マップの初期化に失敗しました", "致命的エラー", MB_OK);
         return false;
     }
 

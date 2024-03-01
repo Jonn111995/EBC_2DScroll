@@ -20,10 +20,10 @@ void AttackEnemy::Initialize() {
 	LoadDivGraph(_T("Resources/Images/murasuke_rd_attack.bmp"), 3, 3, 1, 56, 48, attack_enemy_graphic_handle);
 
 	int array_size = sizeof(*walk_enemy_graphic_handle);
-	now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
-	anim_speed = 5.0f;
-	min_anim_frame = 0.0f;
-	max_anim_frame = now_animations.size() - 1.0f;
+	character_anim.now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
+	character_anim.anim_speed = 5.0f;
+	character_anim.min_anim_frame = 0.0f;
+	character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
 	move_amount = range_move / 2;
 	enemy_state = EEnemyState::kSERCH;
 	equip_weapon = new Hand();
@@ -52,7 +52,7 @@ void AttackEnemy::Update(float delta_time) {
 		case EEnemyState::kCHASE:
 			break;
 		case EEnemyState::kATTACK:
-			if (animation_frame >= max_anim_frame - 0.2f) {
+			if (character_anim.animation_frame >= character_anim.max_anim_frame - 0.2f) {
 				ChangeEnemyState(EEnemyState::kSERCH);
 			}
 			break;
@@ -101,20 +101,20 @@ void AttackEnemy::EnterState() {
 		case EEnemyState::kSERCH: {
 			int array_size = sizeof(*walk_enemy_graphic_handle);
 			SetSpeed(GetSpeed() / 10.f);
-			now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
-			anim_speed = 5.0f;
-			min_anim_frame = 0.0f;
-			max_anim_frame = now_animations.size() - 1.0f;
+			character_anim.now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
+			character_anim.anim_speed = 5.0f;
+			character_anim.min_anim_frame = 0.0f;
+			character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
 			break;
 		}
 		case EEnemyState::kATTACK:{
 			//SetSpeed(MOVEMENT_SPEED * 1.2);
 			int array_size = sizeof(*attack_enemy_graphic_handle);
 			SetSpeed(GetSpeed() * 10.f);
-			now_animations.assign(attack_enemy_graphic_handle, attack_enemy_graphic_handle + array_size);
-			anim_speed = 5.0f;
-			min_anim_frame = 0.0f;
-			max_anim_frame = now_animations.size() - 1.0f;
+			character_anim.now_animations.assign(attack_enemy_graphic_handle, attack_enemy_graphic_handle + array_size);
+			character_anim.anim_speed = 5.0f;
+			character_anim.min_anim_frame = 0.0f;
+			character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
 			equip_weapon->SetWeaponDirection();
 			equip_weapon->SetAttackRange(body_collision);
 			character_event->AddWeapon(*equip_weapon);

@@ -13,6 +13,7 @@ Player::Player()
 	:input_handler(nullptr)
 	, resourcer(nullptr)
 	, player_state(EPlayerState::kIDLE)
+	, previous_anim_state(EPlayerAnimState::kIDLE_ANIM)
 	, player_anim_state(EPlayerAnimState::kIDLE_ANIM)
 	, bIsCanJump(true)
 	, invincible_time(DEFAULT_INVINCIBLE_TIME)
@@ -34,7 +35,7 @@ void Player::Initialize() {
 	equip_weapon->Initialize();
 	equip_weapon->SetOwner(this);
 	resourcer->Initialize();
-	now_animations = resourcer->GetAnimaitonHandle(kIDLE);
+	character_anim.now_animations = resourcer->GetAnimaitonHandle(kIDLE);
 	body_collision.center_position = Vector2D(64, 84);
 	body_collision.box_extent = Vector2D(12, 24);
 	body_collision.hit_object_types = kENEMY_TYPE | kWEAPON_TYPE | kKILL_TYPE;
@@ -76,25 +77,29 @@ void Player::Update(float delta_time) {
 			if (input_button_status[kLEFT_B]) {
 				input_direction.x = -10.0f;
 				SetDirection(CharacterDirection::kLEFT);
+				player_anim_state = kRUN_ANIM;
+				EnterAnimState();
 			}
 
 			if (input_button_status[kRIGHT_B]) {
 				input_direction.x = 10.0f;
 				SetDirection(CharacterDirection::kRIGHT);
+				player_anim_state = kRUN_ANIM;
+				EnterAnimState();
 			}
 
 			if (input_button_status[kJUMP_B]) {
 				StartJump();
+				player_anim_state = kJUMP_UP_ANIM;
+				EnterAnimState();
 			}
 
-			if (bIsCanJump) {
-				if (input_button_status[kATTACK_B]) {
+			if (input_button_status[kATTACK_B]) {
+				if (bIsCanJump) {
 					ChangePlayerState(kATTACK);
+					player_anim_state = kATTACK_ANIM;
+					EnterAnimState();
 				}
-			}
-
-			if (!bIsCanJump) {
-				ChangePlayerState(kJUMP);
 			}
 		}
 
@@ -108,11 +113,14 @@ void Player::Update(float delta_time) {
 
 		switch (player_state) {
 		case kJUMP:
+
 			initial_velocity += GRAVITY_ACCELARATION;
 			input_direction.x *= AIR_RESISTANCE;
 			input_direction.y = initial_velocity;
 			break;
+
 		case kDAMAGE:
+
 			count_time += delta_time;
 
 			if (count_time < 0.1f) {
@@ -124,16 +132,21 @@ void Player::Update(float delta_time) {
 				ChangeInvincible();
 			}
 			break;
+
 		case kATTACK:
-			if (animation_frame >= max_anim_frame - 0.2f) {
+
+			if (character_anim.animation_frame >= character_anim.max_anim_frame - 0.2f) {
 				ChangePlayerState(kIDLE);
 			}
 			break;
+
 		case kDEAD: 
+
 			if (DeadMove(delta_time)) {
 				CallDestroy();
 			}
 			break;
+
 		default:
 			break;
 		}
@@ -147,6 +160,7 @@ void Player::Update(float delta_time) {
 	}
 	case EGameObjectState::kPAUSE:
 		break;
+
 	case EGameObjectState::kEND:
 		ChangePlayerState(kIDLE);
 		ChangeAnimState(delta_time, Vector2D(0.f, 0.f));
@@ -185,6 +199,62 @@ void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollision
 	}
 }
 
+void Player::ChangeAnim(EPlayerAnimState anim) {
+	switch (anim) {
+	case kIDLE_ANIM:
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kIDLE);
+		character_anim.anim_speed = 4.0f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.animation_frame = character_anim.min_anim_frame;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
+		character_anim.is_loop = true;
+		character_anim.is_can_be_interrupted = true;
+		break;
+	case kRUN_ANIM:
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kRUN);
+		character_anim.anim_speed = 10.0f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
+		character_anim.is_loop = false;
+		character_anim.is_can_be_interrupted = true;
+		break;
+	case kJUMP_UP_ANIM:
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+		character_anim.anim_speed = 10.0f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = 1.99f;
+		character_anim.is_loop = true;
+		character_anim.is_can_be_interrupted = false;
+		break;
+	case kJUMP_MOVE_ANIM:
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+		character_anim.anim_speed = 5.0f;
+		character_anim.min_anim_frame = 2.0f;
+		character_anim.max_anim_frame = 3.99f;
+		break;
+	case kJUMP_FALL_ANIM:
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+		character_anim.anim_speed = 20.0f;
+		character_anim.min_anim_frame = 4.0f;
+		character_anim.max_anim_frame = 5.99f;
+		break;
+	case kATTACK_ANIM:
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kATTACK);
+		character_anim.anim_speed = 4.5f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1;
+		character_anim.is_loop = false;
+		character_anim.is_can_be_interrupted = false;
+		break;
+	case kDAMAGE_ANIM:
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kDAMAGE);
+		character_anim.anim_speed = 0.0f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1;
+		break;
+	}
+}
+
 void Player::ChangePlayerState(const EPlayerState new_state) {
 
 	ExitState();
@@ -193,6 +263,9 @@ void Player::ChangePlayerState(const EPlayerState new_state) {
 }
 
 void Player::EnterState() {
+	if (!character_anim.is_can_be_interrupted) {
+		return;
+	}
 
 	switch (player_state) {
 
@@ -238,7 +311,6 @@ void Player::ExitState() {
 		character_event->RemoveWeapon(equip_weapon);
 		break;
 	case kDAMAGE:
-		//body_collision.collision_type = kBLOCK;
 		break;
 	case kDEAD:
 		is_reject_input = false;
@@ -306,74 +378,88 @@ void Player::ChangeAnimState(const float delta_time = 0.0f, const Vector2D& delt
 	}
 
 	EnterAnimState();
+	
 	UpdateAnimFrame(delta_time);
 }
 
 void Player::EnterAnimState() {
 
+	if (player_anim_state == previous_anim_state)
+	{
+		return;
+	}
+	previous_anim_state = player_anim_state;
 	switch (player_anim_state) {
 	case kIDLE_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kIDLE);
-		anim_speed = 4.0f;
-		min_anim_frame = 0.0f;
-		animation_frame = min_anim_frame;
-		max_anim_frame = now_animations.size() - 1.0f;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kIDLE);
+		character_anim.anim_speed = 4.0f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.animation_frame = character_anim.min_anim_frame;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
+		character_anim.is_loop = true;
+		character_anim.is_can_be_interrupted = true;
 		break;
 	case kRUN_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kRUN);
-		anim_speed = 10.0f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = now_animations.size() - 1.0f;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kRUN);
+		character_anim.anim_speed = 10.0f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
+		character_anim.is_loop = false;
+		character_anim.is_can_be_interrupted = true;
 		break;
 	case kJUMP_UP_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
-		anim_speed = 10.0f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = 1.99f;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+		character_anim.anim_speed = 10.0f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = 1.99f;
+		character_anim.is_loop = true;
+		character_anim.is_can_be_interrupted = false;
 		break;
 	case kJUMP_MOVE_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
-		anim_speed = 5.0f;
-		min_anim_frame = 2.0f;
-		max_anim_frame = 3.99f;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+		character_anim.anim_speed = 5.0f;
+		character_anim.min_anim_frame = 2.0f;
+		character_anim.max_anim_frame = 3.99f;
 		break;
 	case kJUMP_FALL_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
-		anim_speed = 20.0f;
-		min_anim_frame = 4.0f;
-		max_anim_frame = 5.99f;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+		character_anim.anim_speed = 20.0f;
+		character_anim.min_anim_frame = 4.0f;
+		character_anim.max_anim_frame = 5.99f;
 		break;
 	case kATTACK_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kATTACK);
-		anim_speed = 4.5f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = now_animations.size() - 1;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kATTACK);
+		character_anim.anim_speed = 4.5f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1;
+		character_anim.is_loop = false;
+		character_anim.is_can_be_interrupted = false;
 		break;
 	case kDAMAGE_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kDAMAGE);
-		anim_speed = 0.0f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = now_animations.size() - 1;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kDAMAGE);
+		character_anim.anim_speed = 0.0f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1;
 		break;
 	}
 }
 
 void Player::UpdateAnimFrame(const float delta_time) {
 
-	if (animation_frame <= min_anim_frame) {
-		animation_frame = min_anim_frame;
+	if (character_anim.animation_frame <= character_anim.min_anim_frame) {
+		character_anim.animation_frame = character_anim.min_anim_frame;
 	}
 
 	//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
-	if (animation_frame >= now_animations.size()) {
-		animation_frame = min_anim_frame;
+	if (character_anim.animation_frame >= character_anim.now_animations.size()) {
+		character_anim.animation_frame = character_anim.min_anim_frame;
 	}
 
-	animation_frame += delta_time * anim_speed;
+	character_anim.animation_frame += delta_time * character_anim.anim_speed;
 
 	//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
-	if (animation_frame >= max_anim_frame) {
-		animation_frame = min_anim_frame;
+	if (character_anim.animation_frame >= character_anim.max_anim_frame) {
+		character_anim.animation_frame = character_anim.min_anim_frame;
 	}
 }
 
@@ -406,6 +492,7 @@ void Player::CallDestroy() {
 void Player::StartJump() {
 
 	if (bIsCanJump) {
+		ChangePlayerState(kJUMP);
 		bIsCanJump = false;
 		initial_velocity = INITIAL_JUMP_VELOCITY;
 		SoundManager* sound_manager = SoundManager::GetInstance();

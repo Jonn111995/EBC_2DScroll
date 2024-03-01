@@ -15,10 +15,14 @@ namespace {
 	const float DEFAULT_INVINCIBLE_TIME = 1.5f;
 }
 
+
+
 /// <summary>
 /// プレイヤー
 /// </summary>
 class Player : public Character {
+
+
 
 public:
 	Player();
@@ -35,6 +39,9 @@ public:
 	virtual void Draw(const Vector2D& screen_offset) override;
 	/// <inheritdoc/>
 	virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) override;
+
+	//Animation player_anim;
+	void ChangeAnim(EPlayerAnimState anim);
 
 public:
 	/// <summary>
@@ -110,6 +117,8 @@ private:
 	/// プレイヤーのアニメーションの状態
 	/// </summary>
 	EPlayerAnimState player_anim_state;
+
+	EPlayerAnimState previous_anim_state;
 
 	/// <summary>
 	/// 無敵時間

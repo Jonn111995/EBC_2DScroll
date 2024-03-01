@@ -30,11 +30,11 @@ void Enemy::Initialize() {
 	SetDirection(kLEFT);
 
 	int array_size = sizeof(*walk_enemy_graphic_handle);
-	now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
+	character_anim.now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
 	SetSpeed(50.f);
-	anim_speed = 5.0f;
-	min_anim_frame = 0.0f;
-	max_anim_frame = now_animations.size() - 1.0f;
+	character_anim.anim_speed = 5.0f;
+	character_anim.min_anim_frame = 0.0f;
+	character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
 	move_amount = range_move / 2;
 
 	body_collision.object_type = kENEMY_TYPE;
@@ -84,20 +84,20 @@ void Enemy::Update(float delta_time) {
 			break;
 		}
 
-		if (animation_frame <= min_anim_frame) {
-			animation_frame = min_anim_frame;
+		if (character_anim.animation_frame <= character_anim.min_anim_frame) {
+			character_anim.animation_frame = character_anim.min_anim_frame;
 		}
 
 		//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
-		if (animation_frame >= now_animations.size()) {
-			animation_frame = min_anim_frame;
+		if (character_anim.animation_frame >= character_anim.now_animations.size()) {
+			character_anim.animation_frame = character_anim.min_anim_frame;
 		}
 
-		animation_frame += delta_time * anim_speed;
+		character_anim.animation_frame += delta_time * character_anim.anim_speed;
 
 		//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
-		if (animation_frame >= max_anim_frame) {
-			animation_frame = min_anim_frame;
+		if (character_anim.animation_frame >= character_anim.max_anim_frame) {
+			character_anim.animation_frame = character_anim.min_anim_frame;
 		}
 		break;
 
@@ -187,10 +187,10 @@ void Enemy::EnterState() {
 	case EEnemyState::kWALK:
 	{
 		int array_size = sizeof(*walk_enemy_graphic_handle);
-		now_animations.clear();
-		now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
-		min_anim_frame = 0.0f;
-		max_anim_frame = now_animations.size() - 1.0f;
+		character_anim.now_animations.clear();
+		character_anim.now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
 	}
 		break;
 	case EEnemyState::kDEAD:
@@ -198,11 +198,11 @@ void Enemy::EnterState() {
 		initial_velocity = INITIAL_JUMP_VELOCITY;
 	case EEnemyState::kDAMAGE:
 		SetSpeed(50.f);
-		now_animations.clear();
-		now_animations.push_back(damage_enemy_graphic_handle);
-		min_anim_frame = 0.0f;
-		animation_frame = min_anim_frame;
-		max_anim_frame = now_animations.size() - 1.0f;
+		character_anim.now_animations.clear();
+		character_anim.now_animations.push_back(damage_enemy_graphic_handle);
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.animation_frame = character_anim.min_anim_frame;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
 		break;
 	}
 }

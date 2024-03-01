@@ -18,11 +18,11 @@ Character::Character()
 	, character_event(nullptr)
 	, hp_ui(nullptr)
 	, input_direction({0.f,0.f})
-	, now_animations()
-	, animation_frame(0.f)
+	//, now_animations()
+	/*, animation_frame(0.f)
 	, anim_speed(0.f)
 	, min_anim_frame(0.f)
-	, max_anim_frame(0.f)
+	, max_anim_frame(0.f)*/
 	, initial_velocity(0.f)
 	, count_time(0.f)
 {
@@ -35,6 +35,7 @@ void Character::Initialize() {
 	__super::Initialize();
 	SoundManager* sound_manager = SoundManager::GetInstance();
 	get_damage_sound = sound_manager->LoadSoundResource("Resources/Sounds/SE/Action/se_get_damage.mp3");
+	//character_anim = new Animation;
 }
 
 void Character::Finalize() {
@@ -61,19 +62,19 @@ void Character::Draw(const Vector2D& screen_offset) {
 	case kPLAYER_TYPE:
 		
 		if (GetDirection() == kLEFT) {
-			DrawTurnGraph(screen_x, screen_y, now_animations[animation_frame], true);
+			DrawTurnGraph(screen_x, screen_y, character_anim.now_animations[character_anim.animation_frame], true);
 		}
 		else {
-			DrawGraph(screen_x, screen_y, now_animations[animation_frame], true);
+			DrawGraph(screen_x, screen_y, character_anim.now_animations[character_anim.animation_frame], true);
 		}
 		break;
 	case kENEMY_TYPE:
 
 		if (GetDirection() == kRIGHT) {
-			DrawGraph(screen_x, screen_y, now_animations[animation_frame], true);
+			DrawGraph(screen_x, screen_y, character_anim.now_animations[character_anim.animation_frame], true);
 		}
 		else {
-		    DrawTurnGraph(screen_x, screen_y, now_animations[animation_frame], true);
+		    DrawTurnGraph(screen_x, screen_y, character_anim.now_animations[character_anim.animation_frame], true);
 		}
 	}
 	unsigned int color = GetColor(255, 0, 0);

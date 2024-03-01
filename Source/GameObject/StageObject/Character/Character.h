@@ -25,8 +25,65 @@ namespace {
     const float DEAD_MOVE_TIME = 1.5f;
 }
 
+
+
 class Character :public StageObject {
 
+public:
+    struct Animation
+    {
+        /// <summary>
+       /// 毎フレーム時間の計測時間
+       /// </summary>
+        float count_time;
+
+        /// <summary>
+      /// 現在のアニメーション
+      /// </summary>
+        std::vector<int> now_animations;
+
+        /// <summary>
+        /// アニメーションを変化させる値
+        /// </summary>
+        float animation_frame;
+
+        /// <summary>
+        /// アニメーションスピード
+        /// </summary>
+        float anim_speed;
+
+        /// <summary>
+        /// アニメーションフレームの最小値
+        /// </summary>
+        float min_anim_frame;
+
+        /// <summary>
+        /// アニメーションフレームの最大値
+        /// </summary>
+        float max_anim_frame;
+
+        /// <summary>
+        /// アニメーションをループするか？
+        /// </summary>
+        bool is_loop;
+
+        /// <summary>
+        /// 割り込みを受けるかどうか？
+        /// </summary>
+        bool is_can_be_interrupted;
+
+        /// <summary>
+        /// 割り込みをするアニメーションかどうか？
+        /// </summary>
+        bool is_interrupting_other_anim;
+
+        /// <summary>
+        /// 割り込めるかどうか
+        /// </summary>
+        /// <returns></returns>
+        bool GetIsBeInterrupted() { return is_can_be_interrupted; }
+
+    };
 public:
     Character();
     virtual ~Character();
@@ -186,27 +243,27 @@ protected:
     /// <summary>
     /// 現在のアニメーション
     /// </summary>
-    std::vector<int> now_animations;
+    //std::vector<int> now_animations;
 
     /// <summary>
     /// アニメーションを変化させる値
     /// </summary>
-    float animation_frame;
+    //float animation_frame;
 
     /// <summary>
     /// アニメーションスピード
     /// </summary>
-    float anim_speed;
+    //float anim_speed;
 
     /// <summary>
     /// アニメーションフレームの最小値
     /// </summary>
-    float min_anim_frame;
+    //float min_anim_frame;
 
     /// <summary>
     /// アニメーションフレームの最大値
     /// </summary>
-    float max_anim_frame;
+    //float max_anim_frame;
 
     /// <summary>
     /// ノックバックのベクトル
@@ -214,6 +271,9 @@ protected:
     Vector2D knock_back_dir;
 
     int get_damage_sound;
+
+    Animation character_anim;
+
 
 protected:
     /// <summary>
