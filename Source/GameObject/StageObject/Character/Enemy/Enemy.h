@@ -21,6 +21,11 @@ namespace {
         /// </summary>
         Vector2D serch_range_extent;
     };
+
+    /// <summary>
+    /// 敵の標準移動スピード
+    /// </summary>
+    const float ENEMY_MOVEMENT_SPEED = 50.f;
 }
 
 /// <summary>
@@ -99,6 +104,8 @@ protected:
     /// 敵のステート
     /// </summary>
     EEnemyState enemy_state;
+
+    EEnemyState prev_state;
 
     /// <summary>
     /// 索敵範囲

@@ -40,7 +40,6 @@ std::vector<int> PlayerAnimResourcer::GetAnimaitonHandle(EPlayerState now_state)
 	std::vector<int> return_animation;
 	int* head_anim_array = GetAnimationHandleHelper(now_state, array_size);
 
-	array_size = array_size / sizeof(*head_anim_array);
 	return_animation.assign(head_anim_array, head_anim_array + array_size);
 	return return_animation;
 }
@@ -50,24 +49,24 @@ int* PlayerAnimResourcer::GetAnimationHandleHelper(EPlayerState now_state, int& 
 	switch (now_state) {
 	case kIDLE:
 		
-		out_array_size = sizeof(loaded_sprite_wait);
+		out_array_size = sizeof(loaded_sprite_wait) / sizeof(loaded_sprite_wait[0]);
 		return loaded_sprite_wait;
 		break;
 	case kWALK:
 	case kRUN:
-		out_array_size = sizeof(loaded_sprite_run);
+		out_array_size = sizeof(loaded_sprite_run) / sizeof(loaded_sprite_run[0]);
 		return loaded_sprite_run;
 		break;
 	case kATTACK:
-		out_array_size = sizeof(loaded_sprite_attack);
+		out_array_size = sizeof(loaded_sprite_attack) / sizeof(loaded_sprite_attack[0]);
 		return loaded_sprite_attack;
 		break;
 	case kJUMP:
-		out_array_size = sizeof(loaded_sprite_jump);
+		out_array_size = sizeof(loaded_sprite_jump) / sizeof(loaded_sprite_jump[0]);
 		return loaded_sprite_jump;
 		break;
 	case kDAMAGE:
-		out_array_size = sizeof(loaded_sprite_damage);
+		out_array_size = sizeof(loaded_sprite_damage) / sizeof(loaded_sprite_damage);
 		return &loaded_sprite_damage;
 		break;
 	}

@@ -10,6 +10,7 @@ Enemy::Enemy()
 	, enemy_state(EEnemyState::kWALK)
 	, range_move(300.f)
 	, move_amount(0.f)
+	, prev_state(EEnemyState::kWALK)
 	
 {
 	SetHp(10);
@@ -29,12 +30,12 @@ void Enemy::Initialize() {
 
 	SetDirection(kLEFT);
 
-	int array_size = sizeof(*walk_enemy_graphic_handle);
-	now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
-	SetSpeed(50.f);
-	anim_speed = 5.0f;
-	min_anim_frame = 0.0f;
-	max_anim_frame = now_animations.size() - 1.0f;
+	int array_size = sizeof(walk_enemy_graphic_handle) / sizeof(walk_enemy_graphic_handle[0]);
+	character_anim.now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
+	SetSpeed(ENEMY_MOVEMENT_SPEED);
+	character_anim.anim_speed = 5.0f;
+	character_anim.min_anim_frame = 0.0f;
+	character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
 	move_amount = range_move / 2;
 
 	body_collision.object_type = kENEMY_TYPE;
@@ -62,7 +63,6 @@ void Enemy::Update(float delta_time) {
 
 			if (count_time < 0.1f) {
 				input_direction = knock_back_dir;
-				Move(delta_time);
 			}
 			else if (1.f < count_time) {
 				is_no_damage = false;
@@ -72,7 +72,6 @@ void Enemy::Update(float delta_time) {
 			break;
 
 		case EEnemyState::kWALK:
-			Move(delta_time);
 			break;
 
 		case EEnemyState::kDEAD:
@@ -84,20 +83,22 @@ void Enemy::Update(float delta_time) {
 			break;
 		}
 
-		if (animation_frame <= min_anim_frame) {
-			animation_frame = min_anim_frame;
+		__super::Update(delta_time);
+
+		if (character_anim.animation_frame <= character_anim.min_anim_frame) {
+			character_anim.animation_frame = character_anim.min_anim_frame;
 		}
 
 		//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
-		if (animation_frame >= now_animations.size()) {
-			animation_frame = min_anim_frame;
+		if (character_anim.animation_frame >= character_anim.now_animations.size()) {
+			character_anim.animation_frame = character_anim.min_anim_frame;
 		}
 
-		animation_frame += delta_time * anim_speed;
+		character_anim.animation_frame += delta_time * character_anim.anim_speed;
 
 		//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
-		if (animation_frame >= max_anim_frame) {
-			animation_frame = min_anim_frame;
+		if (character_anim.animation_frame >= character_anim.max_anim_frame) {
+			character_anim.animation_frame = character_anim.min_anim_frame;
 		}
 		break;
 
@@ -133,7 +134,7 @@ void Enemy::SetDeadState() {
 }
 
 void Enemy::Move(float delta_time) {
-	//以下簡易的実装
+
 	if (move_amount <= 0) {
 		move_amount = range_move / 2;
 		SetDirection(kLEFT);
@@ -186,23 +187,24 @@ void Enemy::EnterState() {
 	switch (enemy_state) {
 	case EEnemyState::kWALK:
 	{
-		int array_size = sizeof(*walk_enemy_graphic_handle);
-		now_animations.clear();
-		now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
-		min_anim_frame = 0.0f;
-		max_anim_frame = now_animations.size() - 1.0f;
+		int array_size = sizeof(walk_enemy_graphic_handle) / sizeof(walk_enemy_graphic_handle[0]);
+		character_anim.now_animations.clear();
+		character_anim.now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
 	}
 		break;
 	case EEnemyState::kDEAD:
 		body_collision.collision_type = kOverlap;
 		initial_velocity = INITIAL_JUMP_VELOCITY;
+		//無敵状態のプレイヤーに当たった時にもDamage処理をしたいので、breakしていない
 	case EEnemyState::kDAMAGE:
 		SetSpeed(50.f);
-		now_animations.clear();
-		now_animations.push_back(damage_enemy_graphic_handle);
-		min_anim_frame = 0.0f;
-		animation_frame = min_anim_frame;
-		max_anim_frame = now_animations.size() - 1.0f;
+		character_anim.now_animations.clear();
+		character_anim.now_animations.push_back(damage_enemy_graphic_handle);
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.animation_frame = character_anim.min_anim_frame;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
 		break;
 	}
 }

@@ -13,6 +13,7 @@ Player::Player()
 	:input_handler(nullptr)
 	, resourcer(nullptr)
 	, player_state(EPlayerState::kIDLE)
+	, previous_anim_state(EPlayerAnimState::kIDLE_ANIM)
 	, player_anim_state(EPlayerAnimState::kIDLE_ANIM)
 	, bIsCanJump(true)
 	, invincible_time(DEFAULT_INVINCIBLE_TIME)
@@ -34,12 +35,13 @@ void Player::Initialize() {
 	equip_weapon->Initialize();
 	equip_weapon->SetOwner(this);
 	resourcer->Initialize();
-	now_animations = resourcer->GetAnimaitonHandle(kIDLE);
+	character_anim.now_animations = resourcer->GetAnimaitonHandle(kIDLE);
 	body_collision.center_position = Vector2D(64, 84);
 	body_collision.box_extent = Vector2D(12, 24);
 	body_collision.hit_object_types = kENEMY_TYPE | kWEAPON_TYPE | kKILL_TYPE;
 	body_collision.object_type = kPLAYER_TYPE;
 	game_object_state = EGameObjectState::kPLAYING;
+	SetSpeed(MOVEMENT_SPEED);
 
 	SoundManager* sound_manager = SoundManager::GetInstance();
 	jump_sound = sound_manager->LoadSoundResource("Resources/Sounds/SE/Action/se_jump.mp3");
@@ -75,85 +77,90 @@ void Player::Update(float delta_time) {
 			if (input_button_status[kLEFT_B]) {
 				input_direction.x = -10.0f;
 				SetDirection(CharacterDirection::kLEFT);
+				player_anim_state = kRUN_ANIM;
+				EnterAnimState();
 			}
 
 			if (input_button_status[kRIGHT_B]) {
 				input_direction.x = 10.0f;
 				SetDirection(CharacterDirection::kRIGHT);
+				player_anim_state = kRUN_ANIM;
+				EnterAnimState();
 			}
 
 			if (input_button_status[kJUMP_B]) {
 				StartJump();
+				player_anim_state = kJUMP_UP_ANIM;
+				EnterAnimState();
 			}
 
-			if (bIsCanJump) {
-				if (input_button_status[kATTACK_B]) {
+			if (input_button_status[kATTACK_B]) {
+				if (bIsCanJump) {
 					ChangePlayerState(kATTACK);
+					player_anim_state = kATTACK_ANIM;
+					EnterAnimState();
 				}
 			}
+		}
 
-			if (!bIsCanJump) {
-				ChangePlayerState(kJUMP);
-			}
+		//無敵状態チェック
+		if (is_no_damage) {
+			CheckKeepInvincible(delta_time);
 		}
 
 		//更新後の座標と比較して、移動量を出すため取得。
 		Vector2D pre_position = GetPosition();
 
-		if (is_no_damage) {
-			count_time += delta_time;
-
-			if (count_time > invincible_time) {
-				ChangePlayerState(kIDLE);
-				is_no_damage = false;
-				is_use_item = false;
-				invincible_time = DEFAULT_INVINCIBLE_TIME;
-				count_time = 0.f;
-
-				//player_event->FinishInvincibleState();
-			}
-		}
-
 		switch (player_state) {
 		case kJUMP:
-			JumpMove(delta_time);
-			
+
+			initial_velocity += GRAVITY_ACCELARATION;
+			input_direction.x *= AIR_RESISTANCE;
+			input_direction.y = initial_velocity;
 			break;
+
 		case kDAMAGE:
+
 			count_time += delta_time;
 
 			if (count_time < 0.1f) {
 				is_reject_input = true;
 				input_direction = knock_back_dir;
-				Move(delta_time);
 			}
 			else if (count_time > 0.4f) {
-				ChangePlayerState(kINVINCIBLE);
+				is_reject_input = false;
+				ChangeInvincible();
 			}
 			break;
+
 		case kATTACK:
-			if (animation_frame >= max_anim_frame - 0.2f) {
+
+			if (character_anim.animation_frame >= character_anim.max_anim_frame - 0.2f) {
 				ChangePlayerState(kIDLE);
 			}
 			break;
+
 		case kDEAD: 
+
 			if (DeadMove(delta_time)) {
 				CallDestroy();
 			}
 			break;
-		case kINVINCIBLE:
-			//無敵状態の時は移動処理もさせたいので、breakを置かずにフォースルーする。
+
 		default:
-			//移動処理はCharacterに任せる
-			__super::Update(delta_time);
 			break;
 		}
+
+		//移動処理はCharacterに任せる
+		//Updateをどんな状態で呼んでも不具合が起きずに動くように実装する
+		__super::Update(delta_time);
 
 		ChangeAnimState(delta_time, GetPosition() - pre_position);
 		break;
 	}
 	case EGameObjectState::kPAUSE:
 		break;
+
 	case EGameObjectState::kEND:
 		ChangePlayerState(kIDLE);
 		ChangeAnimState(delta_time, Vector2D(0.f, 0.f));
@@ -192,6 +199,62 @@ void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollision
 	}
 }
 
+//void Player::ChangeAnim(EPlayerAnimState anim) {
+//	switch (anim) {
+//	case kIDLE_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kIDLE);
+//		character_anim.anim_speed = 4.0f;
+//		character_anim.min_anim_frame = 0.0f;
+//		character_anim.animation_frame = character_anim.min_anim_frame;
+//		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
+//		character_anim.is_loop = true;
+//		character_anim.is_can_be_interrupted = true;
+//		break;
+//	case kRUN_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kRUN);
+//		character_anim.anim_speed = 10.0f;
+//		character_anim.min_anim_frame = 0.0f;
+//		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
+//		character_anim.is_loop = false;
+//		character_anim.is_can_be_interrupted = true;
+//		break;
+//	case kJUMP_UP_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+//		character_anim.anim_speed = 10.0f;
+//		character_anim.min_anim_frame = 0.0f;
+//		character_anim.max_anim_frame = 1.99f;
+//		character_anim.is_loop = true;
+//		character_anim.is_can_be_interrupted = false;
+//		break;
+//	case kJUMP_MOVE_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+//		character_anim.anim_speed = 5.0f;
+//		character_anim.min_anim_frame = 2.0f;
+//		character_anim.max_anim_frame = 3.99f;
+//		break;
+//	case kJUMP_FALL_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+//		character_anim.anim_speed = 20.0f;
+//		character_anim.min_anim_frame = 4.0f;
+//		character_anim.max_anim_frame = 5.99f;
+//		break;
+//	case kATTACK_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kATTACK);
+//		character_anim.anim_speed = 4.5f;
+//		character_anim.min_anim_frame = 0.0f;
+//		character_anim.max_anim_frame = character_anim.now_animations.size() - 1;
+//		character_anim.is_loop = false;
+//		character_anim.is_can_be_interrupted = false;
+//		break;
+//	case kDAMAGE_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kDAMAGE);
+//		character_anim.anim_speed = 0.0f;
+//		character_anim.min_anim_frame = 0.0f;
+//		character_anim.max_anim_frame = character_anim.now_animations.size() - 1;
+//		break;
+//	}
+//}
+
 void Player::ChangePlayerState(const EPlayerState new_state) {
 
 	ExitState();
@@ -200,6 +263,9 @@ void Player::ChangePlayerState(const EPlayerState new_state) {
 }
 
 void Player::EnterState() {
+	if (!character_anim.is_can_be_interrupted) {
+		return;
+	}
 
 	switch (player_state) {
 
@@ -213,10 +279,6 @@ void Player::EnterState() {
 		break;
 	case kATTACK:
 		Attack();
-		break;
-	case kINVINCIBLE:
-		is_reject_input = false;
-		is_no_damage = true;
 		break;
 	case kDAMAGE:
 		ChangeAnimState(0.f, Vector2D(0.f, 0.f));
@@ -248,11 +310,7 @@ void Player::ExitState() {
 	case kATTACK:
 		character_event->RemoveWeapon(equip_weapon);
 		break;
-	case kINVINCIBLE:
-		
-		break;
 	case kDAMAGE:
-		//body_collision.collision_type = kBLOCK;
 		break;
 	case kDEAD:
 		is_reject_input = false;
@@ -262,7 +320,7 @@ void Player::ExitState() {
 }
 
 void Player::SetInvincibleState() {
-	ChangePlayerState(kINVINCIBLE);
+	ChangeInvincible();
 }
 
 void Player::SetDeadState() {
@@ -320,74 +378,88 @@ void Player::ChangeAnimState(const float delta_time = 0.0f, const Vector2D& delt
 	}
 
 	EnterAnimState();
+	
 	UpdateAnimFrame(delta_time);
 }
 
 void Player::EnterAnimState() {
 
+	if (player_anim_state == previous_anim_state)
+	{
+		return;
+	}
+	previous_anim_state = player_anim_state;
 	switch (player_anim_state) {
 	case kIDLE_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kIDLE);
-		anim_speed = 4.0f;
-		min_anim_frame = 0.0f;
-		animation_frame = min_anim_frame;
-		max_anim_frame = now_animations.size() - 1.0f;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kIDLE);
+		character_anim.anim_speed = 4.0f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.animation_frame = character_anim.min_anim_frame;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
+		character_anim.is_loop = true;
+		character_anim.is_can_be_interrupted = true;
 		break;
 	case kRUN_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kRUN);
-		anim_speed = 10.0f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = now_animations.size() - 1.0f;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kRUN);
+		character_anim.anim_speed = 10.0f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
+		character_anim.is_loop = false;
+		character_anim.is_can_be_interrupted = true;
 		break;
 	case kJUMP_UP_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
-		anim_speed = 10.0f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = 1.99f;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+		character_anim.anim_speed = 10.0f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = 1.99f;
+		character_anim.is_loop = true;
+		character_anim.is_can_be_interrupted = false;
 		break;
 	case kJUMP_MOVE_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
-		anim_speed = 5.0f;
-		min_anim_frame = 2.0f;
-		max_anim_frame = 3.99f;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+		character_anim.anim_speed = 5.0f;
+		character_anim.min_anim_frame = 2.0f;
+		character_anim.max_anim_frame = 3.99f;
 		break;
 	case kJUMP_FALL_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
-		anim_speed = 20.0f;
-		min_anim_frame = 4.0f;
-		max_anim_frame = 5.99f;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+		character_anim.anim_speed = 20.0f;
+		character_anim.min_anim_frame = 4.0f;
+		character_anim.max_anim_frame = 5.99f;
 		break;
 	case kATTACK_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kATTACK);
-		anim_speed = 4.5f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = now_animations.size() - 1;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kATTACK);
+		character_anim.anim_speed = 4.5f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1;
+		character_anim.is_loop = false;
+		character_anim.is_can_be_interrupted = false;
 		break;
 	case kDAMAGE_ANIM:
-		now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kDAMAGE);
-		anim_speed = 0.0f;
-		min_anim_frame = 0.0f;
-		max_anim_frame = now_animations.size() - 1;
+		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kDAMAGE);
+		character_anim.anim_speed = 0.0f;
+		character_anim.min_anim_frame = 0.0f;
+		character_anim.max_anim_frame = character_anim.now_animations.size() - 1;
 		break;
 	}
 }
 
 void Player::UpdateAnimFrame(const float delta_time) {
 
-	if (animation_frame <= min_anim_frame) {
-		animation_frame = min_anim_frame;
+	if (character_anim.animation_frame <= character_anim.min_anim_frame) {
+		character_anim.animation_frame = character_anim.min_anim_frame;
 	}
 
 	//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
-	if (animation_frame >= now_animations.size()) {
-		animation_frame = min_anim_frame;
+	if (character_anim.animation_frame >= character_anim.now_animations.size()) {
+		character_anim.animation_frame = character_anim.min_anim_frame;
 	}
 
-	animation_frame += delta_time * anim_speed;
+	character_anim.animation_frame += delta_time * character_anim.anim_speed;
 
 	//アニメーションを切り替えた場合に起こるバッファオーバーフロー対策
-	if (animation_frame >= max_anim_frame) {
-		animation_frame = min_anim_frame;
+	if (character_anim.animation_frame >= character_anim.max_anim_frame) {
+		character_anim.animation_frame = character_anim.min_anim_frame;
 	}
 }
 
@@ -412,6 +484,7 @@ void Player::CallDestroy() {
 		__super::CallDestroy();
 	}
 	else {
+		InitialWhenRespawn();
 		ChangePlayerState(kIDLE);
 	}
 }
@@ -419,6 +492,7 @@ void Player::CallDestroy() {
 void Player::StartJump() {
 
 	if (bIsCanJump) {
+		ChangePlayerState(kJUMP);
 		bIsCanJump = false;
 		initial_velocity = INITIAL_JUMP_VELOCITY;
 		SoundManager* sound_manager = SoundManager::GetInstance();
@@ -458,3 +532,56 @@ void Player::JumpMove(const float delta_time) {
 	body_collision.center_position2 += amount;
 	SetPosition(new_position);
 }
+
+void Player::ChangeInvincible() {
+	is_no_damage = true;
+}
+
+void Player::CheckKeepInvincible(const float delta_time) {
+
+	count_time += delta_time;
+
+	if (count_time > invincible_time) {
+		ChangePlayerState(kIDLE);
+		is_no_damage = false;
+		is_use_item = false;
+		invincible_time = DEFAULT_INVINCIBLE_TIME;
+		count_time = 0.f;
+
+		//player_event->FinishInvincibleState();
+	}
+}
+
+void Player::InitialWhenRespawn() {
+	bIsCanJump = true;
+	count_time = 0.f;
+	is_no_damage = false;
+	is_use_item = false;
+	is_reject_input = false;
+}
+
+float Player::UpdateXPosition(const bool is_can_move_to_x, const float update_x_amount) {
+	return __super::UpdateXPosition(is_can_move_to_x, update_x_amount);
+}
+
+
+float Player::UpdateYPosition(const bool is_can_move_to_y, const float update_y_amount) {
+
+	switch (player_state) {
+	case kJUMP:
+		if (!is_can_move_to_y) {
+
+			bIsCanJump = true;
+			initial_velocity = RESET_INITIAL_VELOCITY;
+			ChangePlayerState(kIDLE);
+			return  GetPosition().y;
+		}
+		else {
+			return GetPosition().y + update_y_amount;
+		}
+		break;
+	default:
+		return __super::UpdateYPosition(is_can_move_to_y, update_y_amount);
+	}
+}
+

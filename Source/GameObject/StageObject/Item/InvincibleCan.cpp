@@ -6,6 +6,7 @@
 InvincibleCan::InvincibleCan()
 	: invincible_time(10.f)
 	, invincible_can_graphic(0)
+	, get_invincible_can_sound(0)
 	, item_event(nullptr)
 {
 }
@@ -21,12 +22,13 @@ void InvincibleCan::Initialize() {
 	SoundManager* sound_manager = SoundManager::GetInstance();
 	get_invincible_can_sound = sound_manager->LoadSoundResource("Resources/Sounds/SE/se_get_invincible_can.mp3");
 
-	game_object_state = EGameObjectState::kPLAYING;
 	body_collision.box_extent = Vector2D(16, 16);
 	body_collision.center_position = Vector2D(16, 16);
 
 	body_collision.object_type = kITEM_TYPE;
 	body_collision.hit_object_types = kPLAYER_TYPE;
+
+	game_object_state = EGameObjectState::kPLAYING;
 }
 
 void InvincibleCan::Finalize() {
@@ -60,6 +62,7 @@ void InvincibleCan::OnHitBoxCollision(const StageObject* hit_object, const BoxCo
 
 	__super::OnHitBoxCollision(hit_object, hit_collision);
 
+	//Žæ“¾‰¹‚ð–Â‚ç‚·
 	if (game_object_state == EGameObjectState::kPLAYING) {
 		SoundManager* sound_manager = SoundManager::GetInstance();
 		sound_manager->PlayLoadSound(get_invincible_can_sound);
