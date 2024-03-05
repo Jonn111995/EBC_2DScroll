@@ -17,7 +17,4 @@ public:
 	///  <inheritdoc/>
 	virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) override;
 	virtual void SetAttackRange(const BoxCollisionParams& owner_collision);
-
-public:
-	
 };

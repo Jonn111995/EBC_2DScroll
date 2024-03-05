@@ -50,8 +50,7 @@ void HpUI::Draw(const Vector2D& screen_offset) {
 	//HP‚Ì”’l
 	std::to_string(display_hp);
 	int draw_width = GetDrawStringWidth(std::to_string(display_hp).c_str(), std::to_string(display_hp).size() - 1);
-	//DrawString(screen_info->GetLeftX(), 128, std::to_string(display_hp).c_str(), GetColor(0, 0, 255));
-
+	
 	//HPƒo[‚ÌˆÍ‚¢
 	DrawBox(screen_info->GetLeftX()+5, screen_info->GetLeftY() +9, screen_info->GetLeftX() + hp_guage_width +1, 25, GetColor(255, 255, 255), false);
 	DrawBox(screen_info->GetLeftX()+4, screen_info->GetLeftY()+10, screen_info->GetLeftX() + hp_guage_width, 24, GetColor(0, 0, 0), true);

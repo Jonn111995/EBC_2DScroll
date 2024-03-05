@@ -116,7 +116,6 @@ bool SceneBase::CheckBoxCollision(StageObject* target, const BoxCollisionParams&
 			float check = collision_params.center_position2.x - hit_collision_params.center_position2.x;
 
 			//左右どちらの辺に衝突したかを保持
-			//なんで？？？
 			if (check <= 0) {
 				hit_collision_params.SetHittdSruface(EHitSurface::kLEFT);
 			}

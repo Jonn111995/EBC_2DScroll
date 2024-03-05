@@ -165,7 +165,18 @@ private:
 
 private:
 
+	/// <summary>
+	/// ステージを生成する
+	/// </summary>
+	/// <param name="stage_id">生成するステージID</param>
+	/// <returns>ステージ生成に成功したか？</returns>
 	bool BuildStage(const EStageID stage_id);
+
+	/// <summary>
+	/// CSVファイルのファイルパスを取得
+	/// </summary>
+	/// <param name="stage_id">取得したいステージID</param>
+	/// <returns>ファイルパス</returns>
 	const char* GetStagePath(const EStageID stage_id);
 	/// <summary>
 	/// マップを描画する

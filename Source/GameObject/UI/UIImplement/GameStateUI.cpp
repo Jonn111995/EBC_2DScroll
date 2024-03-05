@@ -30,16 +30,12 @@ void GameStateUI::Update(float delta_seconds) {
 
 void GameStateUI::Draw(const Vector2D& screen_offset) {
 	__super::Draw(screen_offset);
-	/*if (active_state == EActivation::kNONE_ACTIVE) {
-		return;
-	}*/
-
+	
 	DrawTime();
 	DrawRespawnRemain();
 	DrawScore();
 }
 
-//TODO::ˆÈ‰º‚ÌŠÖ”‚Íˆ—‚ª‚Ù‚Æ‚ñ‚Ç“¯‚¶‚È‚Ì‚ÅA‚ ‚Æ‚ÅÅ“K‰»‚·‚é
 void GameStateUI::DrawTime() {
 	std::to_string(display_time);
 	ScreenInfo* screen_info = ScreenInfo::GetInstance();
@@ -55,7 +51,7 @@ void GameStateUI::DrawRespawnRemain() {
 
 	int draw_width = GetDrawStringWidth(std::to_string(display_respawn_remain).c_str(), std::to_string(display_respawn_remain).size() - 1);
 	int color = GetColor(255, 255, 255);
-	//+32‚Ì•”•ª‚ð‚ ‚Æ‚ÅC³
+	
 	DrawString(screen_info->GetCenterX()+32 - draw_width / 2, 0, std::to_string(display_respawn_remain).c_str(), color);
 }
 
@@ -65,6 +61,6 @@ void GameStateUI::DrawScore() {
 
 	int draw_width = GetDrawStringWidth(std::to_string(display_score).c_str(), std::to_string(display_score).size() - 1);
 	int color = GetColor(0, 255, 0);
-	//+64‚Ì•”•ª‚ð‚ ‚Æ‚ÅC³
+
 	DrawString(screen_info->GetCenterX() + 64 - draw_width / 2, 0, std::to_string(display_score).c_str(), color);
 }

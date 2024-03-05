@@ -18,11 +18,6 @@ Character::Character()
 	, character_event(nullptr)
 	, hp_ui(nullptr)
 	, input_direction({0.f,0.f})
-	//, now_animations()
-	/*, animation_frame(0.f)
-	, anim_speed(0.f)
-	, min_anim_frame(0.f)
-	, max_anim_frame(0.f)*/
 	, initial_velocity(0.f)
 	, count_time(0.f)
 {
@@ -80,10 +75,6 @@ void Character::Draw(const Vector2D& screen_offset) {
 	unsigned int color = GetColor(255, 0, 0);
 	int x2 = body_collision.center_position2.x - screen_offset.x - body_collision.box_extent.x;
 	int y2 = body_collision.center_position2.y - screen_offset.y - body_collision.box_extent.y;
-
-	//デバック用
-	//DrawBox(x2, y2, x2 + body_collision.box_extent.x * 2, y2 + body_collision.box_extent.y * 2, color, false);
-
 }
 
 void Character::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {

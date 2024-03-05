@@ -79,8 +79,6 @@ void InGameScene::Initialize() {
 void InGameScene::Finalize() {
 	__super::Finalize();
 
-	//TODO::仮でコメントアウト
-	//SoundManager::GetInstance()->UnLoadAllSoundResource();
 	DeleteGraph(in_game_back_graphic);
 	DeleteSoundMem(in_game_bgm);
 	DeleteSoundMem(invincible_bgm);
@@ -103,8 +101,6 @@ void InGameScene::Finalize() {
 }
 
 SceneType InGameScene::Update(const float delta_time) {
-
-	//TODO::Updateを常に呼び出しても問題ないように修正
 
 	switch (play_scene_state) {
 
@@ -172,7 +168,6 @@ SceneType InGameScene::Update(const float delta_time) {
 		break;
 
 	case EPlaySceneState::kPAUSE:
-		//TODO::未実装::ポーズ中
 		break;
 
 	case EPlaySceneState::kFINISH:
@@ -326,10 +321,6 @@ void InGameScene::ChangeInvincible(const float invincible_time) {
 	player->SetInvincibleState();
 	player->SetIsUseItem(true);
 	player->SetInvincibleTime(invincible_time);
-
-	//TODO::仮でコメントアウト
-	/*SoundManager::GetInstance()->StopSound(in_game_bgm);
-	SoundManager::GetInstance()->PlayLoadSound(invincible_bgm);*/
 }
 
 void InGameScene::DestroyItem(StageObject& delete_object) {
@@ -480,7 +471,6 @@ bool InGameScene::CreateStageObject() {
 		}
 		case kGOAL:
 		{
-			//TODO::後で位置を修正
 			Goal* goal = CreateObject<Goal>(create_object_info.initiali_position - Vector2D(12, 32));
 			goal->SetIGoalEvent(this);
 			created_object = goal;
@@ -566,7 +556,6 @@ SceneType InGameScene::CheckExistNextStage() {
 	inherit_info.stage_id = stage_id_enum;
 
 	if (stage_id_enum == EStageID::kNONE_STAGE || !game_state->GetbIsClear()) {
-		//仮。本当はリザルトレベルに遷移したい
 		return SceneType::BOOT_SCENE;
 	}
 	return SceneType::NEXT_STAGE;

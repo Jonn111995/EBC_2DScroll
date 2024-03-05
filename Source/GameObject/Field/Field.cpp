@@ -304,9 +304,6 @@ void Field::DrawMap(const Vector2D& screen_offset) {
             int display_y_top = static_cast<int>(screen_info->GetLeftY()) + MAP_CHIP_SIZE * y;
             //マップ全体におけるマップチップの座標から、スクリーン座標の左上座標を引く
             DrawGraph(display_x_top - screen_offset.x, display_y_top - screen_offset.y, graphic_handle, true);
-            ////デバック用
-            //unsigned int color = GetColor(255, 255, 255);
-            //DrawBox(display_x_top - screen_offset.x, display_y_top - screen_offset.y, display_x_top - screen_offset.x + x_graphic_size, display_y_top - screen_offset.y + y_graphic_size, color, false);
         }
     }
 }
@@ -340,34 +337,6 @@ int Field::GetGroundGraphic(const int x, const int y) {
         return ground_graphic_handle_bottom[x % 3];
     }
 }
-
-//void Field::SetInitialPosition(StageObject& stage_obj, const MapChipType chip_type) {
-//   
-//    ScreenInfo* screen_info = ScreenInfo::GetInstance();
-//   
-//    for (unsigned y = 0; y < map_data.size(); y++) {
-//        for (unsigned x = 0; x < map_data.at(y).size(); x++) {
-//
-//            if (map_data.at(y).at(x) == chip_type) {
-//
-//                const BoxCollisionParams collison = stage_obj.GetBodyCollision();
-//                //キャラクターの画像サイズが、キャラが描かれている範囲より大きいので、左上座標をそのままセットすると、
-//                //透過されている部分を含めた左上座標の位置に描画される。
-//                //それを避けるため、センターポジションまでのオフセット分だけ引いて、キャラが描かれている左上座標を、
-//                //指定したマップの座標位置まで持っていく必要がある。
-//                int x_left = (screen_info->GetLeftX() + x * MAP_CHIP_SIZE) - collison.center_position.x;
-//                int y_top = (screen_info->GetLeftY() + y * MAP_CHIP_SIZE) - collison.center_position.y;
-//                stage_obj.SetPosition(Vector2D(x_left, y_top));
-//
-//                float center_pos_x = stage_obj.GetPosition().x + collison.center_position.x;
-//                float center_pos_y = stage_obj.GetPosition().y + collison.center_position.y;
-//                stage_obj.SetCenterPosition(Vector2D(center_pos_x, center_pos_y));
-//
-//                return;
-//            }
-//        }
-//    }
-//}
 
 void Field::SetInitialPosition(StageObject& stage_obj)
 {
@@ -445,7 +414,6 @@ std::vector<CreateObjectInfo> Field::GetCreateObjectInfo() {
             if (create_object_info.object_type != kNONE) {
                 return_info.push_back(create_object_info);
             }
-
         }
     }
     return return_info;

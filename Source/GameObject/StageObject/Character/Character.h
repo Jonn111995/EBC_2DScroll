@@ -33,13 +33,8 @@ public:
     struct Animation
     {
         /// <summary>
-       /// 毎フレーム時間の計測時間
-       /// </summary>
-        float count_time;
-
-        /// <summary>
-      /// 現在のアニメーション
-      /// </summary>
+        /// 現在のアニメーション
+        /// </summary>
         std::vector<int> now_animations;
 
         /// <summary>
@@ -82,20 +77,8 @@ public:
         /// </summary>
         /// <returns></returns>
         bool GetIsBeInterrupted() { return is_can_be_interrupted; }
-
-     /*   void SetAnimationStatus(
-            const std::vector<int>& animations,
-            const float frame,
-            const float speed,
-            const float min_frame,
-            const float max_frame,
-            const bool loop,
-            const bool can_be_interrupted,
-            const bool interrupting_other_anim) 
-        {
-            now_animations = animations;
-        }*/
     };
+
 public:
     Character();
     virtual ~Character();
@@ -253,37 +236,18 @@ protected:
     float count_time;
 
     /// <summary>
-    /// 現在のアニメーション
-    /// </summary>
-    //std::vector<int> now_animations;
-
-    /// <summary>
-    /// アニメーションを変化させる値
-    /// </summary>
-    //float animation_frame;
-
-    /// <summary>
-    /// アニメーションスピード
-    /// </summary>
-    //float anim_speed;
-
-    /// <summary>
-    /// アニメーションフレームの最小値
-    /// </summary>
-    //float min_anim_frame;
-
-    /// <summary>
-    /// アニメーションフレームの最大値
-    /// </summary>
-    //float max_anim_frame;
-
-    /// <summary>
     /// ノックバックのベクトル
     /// </summary>
     Vector2D knock_back_dir;
 
+    /// <summary>
+    /// ダメージを受けた際の効果音
+    /// </summary>
     int get_damage_sound;
 
+    /// <summary>
+    /// キャラクターのアニメーション構造体
+    /// </summary>
     Animation character_anim;
 
 
