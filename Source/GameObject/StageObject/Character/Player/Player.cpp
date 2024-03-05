@@ -199,61 +199,61 @@ void Player::OnHitBoxCollision(const StageObject* hit_object, const BoxCollision
 	}
 }
 
-void Player::ChangeAnim(EPlayerAnimState anim) {
-	switch (anim) {
-	case kIDLE_ANIM:
-		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kIDLE);
-		character_anim.anim_speed = 4.0f;
-		character_anim.min_anim_frame = 0.0f;
-		character_anim.animation_frame = character_anim.min_anim_frame;
-		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
-		character_anim.is_loop = true;
-		character_anim.is_can_be_interrupted = true;
-		break;
-	case kRUN_ANIM:
-		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kRUN);
-		character_anim.anim_speed = 10.0f;
-		character_anim.min_anim_frame = 0.0f;
-		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
-		character_anim.is_loop = false;
-		character_anim.is_can_be_interrupted = true;
-		break;
-	case kJUMP_UP_ANIM:
-		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
-		character_anim.anim_speed = 10.0f;
-		character_anim.min_anim_frame = 0.0f;
-		character_anim.max_anim_frame = 1.99f;
-		character_anim.is_loop = true;
-		character_anim.is_can_be_interrupted = false;
-		break;
-	case kJUMP_MOVE_ANIM:
-		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
-		character_anim.anim_speed = 5.0f;
-		character_anim.min_anim_frame = 2.0f;
-		character_anim.max_anim_frame = 3.99f;
-		break;
-	case kJUMP_FALL_ANIM:
-		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
-		character_anim.anim_speed = 20.0f;
-		character_anim.min_anim_frame = 4.0f;
-		character_anim.max_anim_frame = 5.99f;
-		break;
-	case kATTACK_ANIM:
-		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kATTACK);
-		character_anim.anim_speed = 4.5f;
-		character_anim.min_anim_frame = 0.0f;
-		character_anim.max_anim_frame = character_anim.now_animations.size() - 1;
-		character_anim.is_loop = false;
-		character_anim.is_can_be_interrupted = false;
-		break;
-	case kDAMAGE_ANIM:
-		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kDAMAGE);
-		character_anim.anim_speed = 0.0f;
-		character_anim.min_anim_frame = 0.0f;
-		character_anim.max_anim_frame = character_anim.now_animations.size() - 1;
-		break;
-	}
-}
+//void Player::ChangeAnim(EPlayerAnimState anim) {
+//	switch (anim) {
+//	case kIDLE_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kIDLE);
+//		character_anim.anim_speed = 4.0f;
+//		character_anim.min_anim_frame = 0.0f;
+//		character_anim.animation_frame = character_anim.min_anim_frame;
+//		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
+//		character_anim.is_loop = true;
+//		character_anim.is_can_be_interrupted = true;
+//		break;
+//	case kRUN_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kRUN);
+//		character_anim.anim_speed = 10.0f;
+//		character_anim.min_anim_frame = 0.0f;
+//		character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;
+//		character_anim.is_loop = false;
+//		character_anim.is_can_be_interrupted = true;
+//		break;
+//	case kJUMP_UP_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+//		character_anim.anim_speed = 10.0f;
+//		character_anim.min_anim_frame = 0.0f;
+//		character_anim.max_anim_frame = 1.99f;
+//		character_anim.is_loop = true;
+//		character_anim.is_can_be_interrupted = false;
+//		break;
+//	case kJUMP_MOVE_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+//		character_anim.anim_speed = 5.0f;
+//		character_anim.min_anim_frame = 2.0f;
+//		character_anim.max_anim_frame = 3.99f;
+//		break;
+//	case kJUMP_FALL_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kJUMP);
+//		character_anim.anim_speed = 20.0f;
+//		character_anim.min_anim_frame = 4.0f;
+//		character_anim.max_anim_frame = 5.99f;
+//		break;
+//	case kATTACK_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kATTACK);
+//		character_anim.anim_speed = 4.5f;
+//		character_anim.min_anim_frame = 0.0f;
+//		character_anim.max_anim_frame = character_anim.now_animations.size() - 1;
+//		character_anim.is_loop = false;
+//		character_anim.is_can_be_interrupted = false;
+//		break;
+//	case kDAMAGE_ANIM:
+//		character_anim.now_animations = resourcer->GetAnimaitonHandle(EPlayerState::kDAMAGE);
+//		character_anim.anim_speed = 0.0f;
+//		character_anim.min_anim_frame = 0.0f;
+//		character_anim.max_anim_frame = character_anim.now_animations.size() - 1;
+//		break;
+//	}
+//}
 
 void Player::ChangePlayerState(const EPlayerState new_state) {
 

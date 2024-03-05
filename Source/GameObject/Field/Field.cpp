@@ -176,6 +176,20 @@ bool Field::CheckHitGround(Vector2D& opponent_check_position, const Vector2D& op
 
     int x_position = opponent_check_position.x / MAP_CHIP_SIZE;
     int y_position = opponent_check_position.y / MAP_CHIP_SIZE;
+
+    for (unsigned y = 0; y < map_data.size(); y++) {
+
+        if (map_data.size() <= y_position) {
+            //Y座標の最大値を超えているのでreturn
+            y_position = map_data.size() - 1;
+        }
+
+        if(map_data.at(y).size() <= x_position) {
+            //X座標の最大値を超えているので、return
+            x_position = map_data.at(y).size() - 1;
+        }
+    }
+  
     int object_in_destination = map_data.at(y_position).at(x_position);
 
     if (object_in_destination == kGROUND || object_in_destination == kWALL || object_in_destination == kBOX) {

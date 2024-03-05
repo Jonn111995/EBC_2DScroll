@@ -83,6 +83,18 @@ public:
         /// <returns></returns>
         bool GetIsBeInterrupted() { return is_can_be_interrupted; }
 
+     /*   void SetAnimationStatus(
+            const std::vector<int>& animations,
+            const float frame,
+            const float speed,
+            const float min_frame,
+            const float max_frame,
+            const bool loop,
+            const bool can_be_interrupted,
+            const bool interrupting_other_anim) 
+        {
+            now_animations = animations;
+        }*/
     };
 public:
     Character();
