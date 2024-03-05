@@ -37,7 +37,6 @@ public:
 
 	void SetOwner(Character* owner) { this->owner = owner; }
 	void SetWeaponDirection();
-	//void SetWeaponType(EWeaponType type);
 	int GetWeaponAttack() { return attack; }
 
 protected:

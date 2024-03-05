@@ -47,10 +47,6 @@ void Coin::Draw(const Vector2D& screen_offset) {
 	GetGraphSize(coin_graphic_handle, &x_graphic_size, &y_graphic_size);
 
 	DrawGraph(x - screen_offset.x, y - screen_offset.y, coin_graphic_handle, true);
-
-	//デバック用
-	/*unsigned int color = GetColor(255, 255, 255);
-	DrawBox(x - screen_offset.x, y - screen_offset.y, x - screen_offset.x + x_graphic_size, y - screen_offset.y + y_graphic_size, color, false);*/
 }
 
 void Coin::OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) {

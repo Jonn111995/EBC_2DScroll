@@ -37,5 +37,4 @@ private:
 	/// ゴールのグラフィックハンドル
 	/// </summary>
 	int goal_graphic_handle;
-
 };

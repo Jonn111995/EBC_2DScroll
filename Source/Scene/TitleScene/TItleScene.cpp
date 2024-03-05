@@ -73,7 +73,6 @@ void TitleScene::Draw() {
 void TitleScene::Finalize() {
 	__super::Finalize();
 	//タイトル画面からは必ずステージの1-1から。
-	//TODO::セレクト画面とか入れたら変更予定
 	inherit_info.stage_id = EStageID::kSTAGE_1_1;
 	inherit_info.respawn_remain = 3;
 

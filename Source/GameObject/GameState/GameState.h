@@ -74,15 +74,7 @@ public:
 
 	void SetIGameStateEvent(IGameStateEvent* game_state_event_interface) { game_state_event = game_state_event_interface; }
 
-	///
-	//void GetBeforeState(DataSuccessor&);
-
 private:
-	/// <summary>
-	/// ゲームステートの状態
-	/// </summary>
-	//EGameStatePhase game_state_state;
-
 	/// <summary>
 	/// ゲームステートのイベントインターフェース
 	/// </summary>

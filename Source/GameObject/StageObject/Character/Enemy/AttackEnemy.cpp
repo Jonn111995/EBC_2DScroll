@@ -30,7 +30,6 @@ void AttackEnemy::Initialize() {
 	equip_weapon->Initialize();
 	equip_weapon->SetOwner(this);
 	SetHp(20);
-	//equip_weapon->SetWeaponType(EWeaponType::KENEMY);
 	game_object_state = EGameObjectState::kPLAYING;
 }
 
@@ -64,18 +63,11 @@ void AttackEnemy::Update(float delta_time) {
 	case EGameObjectState::kPAUSE:
 		break;
 	case EGameObjectState::kEND:
-		//__super::Update(delta_time);
 		break;
 	}
 }
 
 void AttackEnemy::Draw(const Vector2D& screen_offset) {
-
-	//int x2 = serch_range.serch_range_center.x - serch_range.serch_range_extent.x -screen_offset.x;
-	//int y2 = serch_range.serch_range_center.y - serch_range.serch_range_extent.y -screen_offset.y;
-	////デバック用
-	//DrawBox(x2, y2, x2 + serch_range.serch_range_extent.x * 2, y2 + serch_range.serch_range_extent.y * 2, GetColor(255, 0, 0), false);
-
 	__super::Draw(screen_offset);
 
 	equip_weapon->Draw(screen_offset);
@@ -106,16 +98,9 @@ void AttackEnemy::EnterState() {
 
 	switch (enemy_state) {
 		case EEnemyState::kSERCH: {
-			/*int array_size = sizeof(*walk_enemy_graphic_handle);
-			SetSpeed(GetSpeed() / 10.f);
-			character_anim.now_animations.assign(walk_enemy_graphic_handle, walk_enemy_graphic_handle + array_size);
-			character_anim.anim_speed = 5.0f;
-			character_anim.min_anim_frame = 0.0f;
-			character_anim.max_anim_frame = character_anim.now_animations.size() - 1.0f;*/
 			break;
 		}
 		case EEnemyState::kATTACK:{
-			//SetSpeed(MOVEMENT_SPEED * 1.2);
 			character_anim.now_animations.clear();
 			int array_size = sizeof(attack_enemy_graphic_handle) / sizeof(attack_enemy_graphic_handle[0]);
 			SetSpeed(GetSpeed() * 1.2f);

@@ -74,6 +74,5 @@ private:
 	/// <param name="time">–ˆƒtƒŒ[ƒ€•b</param>
 	/// <returns>true:‰Ÿ‚³‚ê‚½ false:‰Ÿ‚³‚ê‚Ä‚¢‚È‚¢</returns>
 	bool CheckAttackButton(float time);
-
 };
 

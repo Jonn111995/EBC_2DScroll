@@ -40,9 +40,6 @@ public:
 	/// <inheritdoc/>
 	virtual void OnHitBoxCollision(const StageObject* hit_object, const BoxCollisionParams& hit_collision) override;
 
-	//Animation player_anim;
-	void ChangeAnim(EPlayerAnimState anim);
-
 public:
 	/// <summary>
 	/// プレイヤーイベントをセット
@@ -118,6 +115,9 @@ private:
 	/// </summary>
 	EPlayerAnimState player_anim_state;
 
+	/// <summary>
+	/// プレイヤーのアニメーションの前の状態
+	/// </summary>
 	EPlayerAnimState previous_anim_state;
 
 	/// <summary>
